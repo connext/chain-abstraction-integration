@@ -29,7 +29,6 @@ contract MeanFinanceTarget {
         address _originSender,
         uint32 _origin,
         bytes _callData,
-        DepositParams params,
         uint256 _positionId
     );
 
@@ -46,25 +45,52 @@ contract MeanFinanceTarget {
 
     function xReceive(
         bytes32 _transferId,
-        uint256 _amount, // must be amount in bridge asset less fees
+        uint256 _amount, // Final Amount receive via Connext(After AMM calculation)
         address _asset,
         address _originSender,
         uint32 _origin,
         bytes memory _callData
     ) external onlyConnext returns (bytes memory) {
         // Decode calldata
-        DepositParams memory params = abi.decode(_callData, (DepositParams));
+        (
+            address from,
+            address to,
+            uint256 originalAmount,
+            uint32 amountOfSwaps,
+            uint32 swapInterval,
+            address owner,
+            IDCAPermissionManager.PermissionSet[] memory permissions
+        ) = abi.decode(
+                _callData,
+                (
+                    address,
+                    address,
+                    uint256,
+                    uint32,
+                    uint32,
+                    address,
+                    IDCAPermissionManager.PermissionSet[]
+                )
+            );
+
+        // Aggregator Swap (ideally only works if we don't sign on quote)
+        // Final Amount after the swap
+
+        // if we do aggregator swap need better way to compare for slippage.
+
+        /// Sanity check for the Slippage _amount vs params._amount(Input at Origin)
+        // fallback transfer amount to user address(params.owner)
 
         // deposit
         IERC20(address(this)).approve(address(hub), _amount);
         uint256 _positionId = hub.deposit(
-            params._from,
-            params._to,
+            from,
+            to,
             _amount,
-            params._amountOfSwaps,
-            params._swapInterval,
-            params._owner,
-            params._permissions
+            amountOfSwaps,
+            swapInterval,
+            owner,
+            permissions
         );
 
         emit XReceiveDeposit(
@@ -74,7 +100,6 @@ contract MeanFinanceTarget {
             _originSender,
             _origin,
             _callData,
-            params,
             _positionId
         );
     }
