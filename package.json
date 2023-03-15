@@ -6,6 +6,15 @@
   "repository": "https://github.com/connext/mean-finance-integration.git",
   "author": "sanchaymittal <sanchaymittal@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "lint": "yarn lint:sol && yarn prettier:check",
+    "lint:sol": "forge fmt --check && yarn solhint \"{script,src,test}/**/*.sol\"",
+    "prettier:check": "prettier --check \"**/*.{json,md,yml}\"",
+    "prettier:write": "prettier --write \"**/*.{json,md,yml}\"",
+    "clean": "rimraf cache out"
+  },
   "devDependencies": {
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
@@ -27,5 +36,8 @@
     "ts-node": ">=8.0.0",
     "typechain": "^8.1.1",
     "typescript": ">=4.5.0"
+  },
+  "dependencies": {
+    "@connext/interfaces": "^2.0.0"
   }
 }
