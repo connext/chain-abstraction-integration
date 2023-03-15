@@ -39,5 +39,6 @@
   },
   "dependencies": {
     "@connext/interfaces": "^2.0.0"
-  }
+  },
+  "packageManager": "yarn@3.4.1"
 }
