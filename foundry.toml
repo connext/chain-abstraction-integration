@@ -1,7 +1,7 @@
 [profile.default]
 src = 'src'
 out = 'artifacts'
-libs = ['node_modules']
+libs = ["node_modules", "lib"]
 remappings = [
     '@connext/=node_modules/@connext/',
     'eth-gas-reporter/=node_modules/eth-gas-reporter/',
