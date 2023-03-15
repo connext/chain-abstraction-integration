@@ -1,0 +1,9 @@
+{
+  "name": "mean-finance-integration",
+  "version": "1.0.0",
+  "description": "mean finance integration source and target contracts",
+  "main": "index.js",
+  "repository": "https://github.com/connext/mean-finance-integration.git",
+  "author": "sanchaymittal <sanchaymittal@gmail.com>",
+  "license": "MIT"
+}
