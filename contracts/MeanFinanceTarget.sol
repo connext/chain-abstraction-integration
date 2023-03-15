@@ -56,7 +56,7 @@ contract MeanFinanceTarget {
         DepositParams memory params = abi.decode(_callData, (DepositParams));
 
         // deposit
-        IERC20(params._from).approve(address(hub), _amount);
+        IERC20(address(this)).approve(address(hub), _amount);
         uint256 _positionId = hub.deposit(
             params._from,
             params._to,
