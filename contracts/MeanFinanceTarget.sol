@@ -6,16 +6,6 @@ import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@mean-finance/dca-v2-core/contracts/interfaces/IDCAHub.sol";
 
-struct DepositParams {
-    address _from;
-    address _to;
-    uint256 _amount;
-    uint32 _amountOfSwaps;
-    uint32 _swapInterval;
-    address _owner;
-    IDCAPermissionManager.PermissionSet[] _permissions;
-}
-
 contract MeanFinanceTarget {
     // The Connext contract on this domain
     IConnext public immutable connext;

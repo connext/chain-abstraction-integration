@@ -18,7 +18,6 @@ contract MeanFinanceTargetTest is TestHelper {
         address _originSender,
         uint32 _origin,
         bytes _callData,
-        DepositParams params,
         uint256 _positionId
     );
 
