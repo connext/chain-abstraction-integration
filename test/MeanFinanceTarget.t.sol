@@ -39,7 +39,7 @@ contract MeanFinanceTargetTest is TestHelper {
 
     MeanFinanceTarget private target;
     bytes32 public transferId = keccak256("12345");
-    uint32 public amount = 0;
+    uint32 public amount = 1;
 
     function setUp() public override {
         super.setUp();
