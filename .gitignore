@@ -1,3 +1,30 @@
+# directories
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+**/cache
+**/node_modules
+**/out
+
+# files
+*.env
+*.log
+.DS_Store
+.pnp.*
+lcov.info
+yarn-debug.log*
+yarn-error.log*
+
+# broadcasts
+!/broadcast
+/broadcast/*
+/broadcast/*/31337/
+
+.vscode/
+
 node_modules
 .env
 coverage
