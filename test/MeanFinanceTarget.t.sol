@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 import "./utils/TestHelper.sol";
 import "../contracts/MeanFinanceTarget.sol";
 import "@mean-finance/nft-descriptors/solidity/interfaces/IDCAHubPositionDescriptor.sol";
-import "@mean-finance/dca-v2-core/contracts/interfaces/IDCAHub.sol";
+import {IDCAHub} from "@mean-finance/dca-v2-core/contracts/interfaces/IDCAHub.sol";
 
 contract MeanFinanceTargetTest is TestHelper {
     // ============ Errors ============
@@ -28,7 +28,7 @@ contract MeanFinanceTargetTest is TestHelper {
 
     address private deposit_from = address(2);
     address private deposit_to = address(3);
-    uint32 private deposit_amount = 0;
+    uint32 private deposit_amount = 10;
     uint32 private deposit_amountOfSwaps = 10;
     uint32 private deposit_swapInterval = 10;
     address private deposit_owner = address(4);
@@ -38,7 +38,7 @@ contract MeanFinanceTargetTest is TestHelper {
 
     MeanFinanceTarget private target;
     bytes32 public transferId = keccak256("12345");
-    uint32 public amount = 1;
+    uint32 public amount = 10;
 
     function setUp() public override {
         super.setUp();
@@ -49,10 +49,35 @@ contract MeanFinanceTargetTest is TestHelper {
     }
 
     // ============ MeanFinanceTarget.xReceive ============
-    function test_MeanFinanceTargetTest__xReceive_shouldWork(
-        address caller
-    ) public {
+    function test_MeanFinanceTargetTest__xReceive_shouldWork() public {
         vm.prank(MOCK_CONNEXT);
+
+        bytes memory _callData = abi.encodeWithSignature(
+            "deposit(address,address,uint256,uint32,uint32,address,IDCAPermissionManager.PermissionSet[])",
+            deposit_from,
+            deposit_to,
+            deposit_amount,
+            deposit_amountOfSwaps,
+            deposit_swapInterval,
+            deposit_owner,
+            deposit_permissions
+        );
+
+        // vm.expectCall(
+        //     address(MOCK_MEAN_FINANCE),
+        //     abi.encodeCall(
+        //         IDCAHub.deposit,
+        //         (
+        //             deposit_from,
+        //             deposit_to,
+        //             deposit_amount,
+        //             deposit_amountOfSwaps,
+        //             deposit_swapInterval,
+        //             deposit_owner,
+        //             deposit_permissions
+        //         )
+        //     )
+        // );
 
         target.xReceive(
             transferId,
@@ -60,19 +85,17 @@ contract MeanFinanceTargetTest is TestHelper {
             MOCK_ERC20,
             notOriginSender,
             GOERLI_DOMAIN_ID,
-            abi.encodeWithSignature(
-                "deposit(address,address,uint256,uint32,uint32,address,IDCAPermissionManager.PermissionSet[])",
-                deposit_from,
-                deposit_to,
-                deposit_amount,
-                deposit_amountOfSwaps,
-                deposit_swapInterval,
-                deposit_owner,
-                deposit_permissions
-            )
+            _callData
         );
-        // assertEq(target.greeting(), newGreeting);
-        // vm.prank(caller);
-        // _rootManager.xReceive(_domains[0], _connectors[0]);
+
+        // vm.expectEmit(
+        //     transferId,
+        //     amount,
+        //     MOCK_ERC20,
+        //     notOriginSender,
+        //     GOERLI_DOMAIN_ID,
+        //     _callData,
+        //     1
+        // );
     }
 }
