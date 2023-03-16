@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import "./utils/TestHelper.sol";
-import "../contracts/MeanFinanceTarget.sol";
+import "../contracts/MeanFinance/MeanFinanceTarget.sol";
 import "@mean-finance/nft-descriptors/solidity/interfaces/IDCAHubPositionDescriptor.sol";
 import {IDCAHub} from "@mean-finance/dca-v2-core/contracts/interfaces/IDCAHub.sol";
 
@@ -42,7 +42,7 @@ contract MeanFinanceTargetTest is TestHelper {
 
     function setUp() public override {
         super.setUp();
-        target = new MeanFinanceTarget(MOCK_CONNEXT, MOCK_MEAN_FINANCE);
+        target = new MeanFinanceTarget(MOCK_CONNEXT);
 
         vm.label(address(this), "TestContract");
         vm.label(address(target), "MeanFinanceTarget");
@@ -87,15 +87,5 @@ contract MeanFinanceTargetTest is TestHelper {
             GOERLI_DOMAIN_ID,
             _callData
         );
-
-        // vm.expectEmit(
-        //     transferId,
-        //     amount,
-        //     MOCK_ERC20,
-        //     notOriginSender,
-        //     GOERLI_DOMAIN_ID,
-        //     _callData,
-        //     1
-        // );
     }
 }
