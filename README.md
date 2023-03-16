@@ -1,5 +1,5 @@
-# mean-finance-integration
-Source and XReceiver Contracts for Mean finance integration
+# Connext-Integration
+Contracts for Connext integration
 
 # Setting up environment
 
