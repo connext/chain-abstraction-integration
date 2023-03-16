@@ -4,23 +4,11 @@ pragma solidity ^0.8.13;
 import {IConnext} from "@connext/interfaces/core/IConnext.sol";
 import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@mean-finance/dca-v2-core/contracts/interfaces/IDCAHub.sol";
+import "./MeanFinanceAdapter.sol";
 
-contract MeanFinanceTarget {
+contract MeanFinanceTarget is MeanFinanceAdapter{
     // The Connext contract on this domain
     IConnext public immutable connext;
-    IDCAHub public immutable hub;
-
-    /// Events
-    event XReceiveDeposit(
-        bytes32 _transferId,
-        uint256 _amount, // must be amount in bridge asset less fees
-        address _asset,
-        address _originSender,
-        uint32 _origin,
-        bytes _callData,
-        uint256 _positionId
-    );
 
     /// Modifier
     modifier onlyConnext() {
@@ -28,9 +16,8 @@ contract MeanFinanceTarget {
         _;
     }
 
-    constructor(address _connext, address _hub) {
+    constructor(address _connext) {
         connext = IConnext(_connext);
-        hub = IDCAHub(_hub);
     }
 
     function xReceive(
@@ -72,8 +59,7 @@ contract MeanFinanceTarget {
         // fallback transfer amount to user address(params.owner)
 
         // deposit
-        IERC20(address(this)).approve(address(hub), _amount);
-        uint256 _positionId = hub.deposit(
+        deposit(
             from,
             to,
             _amount,
@@ -81,16 +67,6 @@ contract MeanFinanceTarget {
             swapInterval,
             owner,
             permissions
-        );
-
-        emit XReceiveDeposit(
-            _transferId,
-            _amount,
-            _asset,
-            _originSender,
-            _origin,
-            _callData,
-            _positionId
         );
     }
 }
