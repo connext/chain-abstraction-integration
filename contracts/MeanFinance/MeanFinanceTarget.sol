@@ -29,26 +29,26 @@ contract MeanFinanceTarget is MeanFinanceAdapter{
         bytes memory _callData
     ) external onlyConnext returns (bytes memory) {
         // Decode calldata
-        (
-            address from,
-            address to,
-            uint256 originalAmount,
-            uint32 amountOfSwaps,
-            uint32 swapInterval,
-            address owner,
-            IDCAPermissionManager.PermissionSet[] memory permissions
-        ) = abi.decode(
-                _callData,
-                (
-                    address,
-                    address,
-                    uint256,
-                    uint32,
-                    uint32,
-                    address,
-                    IDCAPermissionManager.PermissionSet[]
-                )
-            );
+        // (
+        //     address from,
+        //     address to,
+        //     uint256 originalAmount,
+        //     uint32 amountOfSwaps,
+        //     uint32 swapInterval,
+        //     address owner,
+        //     IDCAPermissionManager.PermissionSet[] memory permissions
+        // ) = abi.decode(
+        //         _callData,
+        //         (
+        //             address,
+        //             address,
+        //             uint256,
+        //             uint32,
+        //             uint32,
+        //             address,
+        //             IDCAPermissionManager.PermissionSet[]
+        //         )
+        //     );
 
         // Aggregator Swap (ideally only works if we don't sign on quote)
         // Final Amount after the swap
@@ -59,14 +59,14 @@ contract MeanFinanceTarget is MeanFinanceAdapter{
         // fallback transfer amount to user address(params.owner)
 
         // deposit
-        deposit(
-            from,
-            to,
-            _amount,
-            amountOfSwaps,
-            swapInterval,
-            owner,
-            permissions
-        );
+        // deposit(
+        //     from,
+        //     to,
+        //     _amount,
+        //     amountOfSwaps,
+        //     swapInterval,
+        //     owner,
+        //     permissions
+        // );
     }
 }

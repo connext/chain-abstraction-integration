@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import "./utils/TestHelper.sol";
-import "../contracts/MeanFinance/MeanFinanceTarget.sol";
+import "../utils/TestHelper.sol";
+import "../../contracts/MeanFinance/MeanFinanceTarget.sol";
 import "@mean-finance/nft-descriptors/solidity/interfaces/IDCAHubPositionDescriptor.sol";
 import {IDCAHub} from "@mean-finance/dca-v2-core/contracts/interfaces/IDCAHub.sol";
 
@@ -62,27 +62,11 @@ contract MeanFinanceTargetTest is TestHelper {
             deposit_owner,
             deposit_permissions
         );
-
-        // vm.expectCall(
-        //     address(MOCK_MEAN_FINANCE),
-        //     abi.encodeCall(
-        //         IDCAHub.deposit,
-        //         (
-        //             deposit_from,
-        //             deposit_to,
-        //             deposit_amount,
-        //             deposit_amountOfSwaps,
-        //             deposit_swapInterval,
-        //             deposit_owner,
-        //             deposit_permissions
-        //         )
-        //     )
-        // );
-
+        
         target.xReceive(
             transferId,
             amount,
-            MOCK_ERC20,
+            TokenA_ERC20,
             notOriginSender,
             GOERLI_DOMAIN_ID,
             _callData
