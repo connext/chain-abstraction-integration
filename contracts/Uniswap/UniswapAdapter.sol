@@ -12,16 +12,17 @@ contract UniswapAdapter {
     ISwapRouter public immutable swapRouter =
         ISwapRouter(0xE592427A0AEce92De3Edee1F18E0157C05861564);
 
+    event log(string);
+
     function swap(
         address fromAsset,
         address toAsset,
         uint24 poolFee,
         uint256 amountIn,
         uint256 amountOutMin
-    ) public returns (uint256) {
+    ) public returns (uint256 amountOut) {
         // Approve the uniswap router to spend fromAsset.
         TransferHelper.safeApprove(fromAsset, address(swapRouter), amountIn);
-
         // Set up uniswap swap params.
         ISwapRouter.ExactInputSingleParams memory params = ISwapRouter
             .ExactInputSingleParams({
@@ -36,6 +37,7 @@ contract UniswapAdapter {
             });
 
         // The call to `exactInputSingle` executes the swap.
-        return swapRouter.exactInputSingle(params);
+        amountOut = swapRouter.exactInputSingle(params);
+        emit log("here");
     }
 }
