@@ -14,6 +14,9 @@ contract UniswapAdapter {
 
     event log(string);
 
+    /// Payable
+    receive() external payable {}
+
     function swap(
         address fromAsset,
         address toAsset,
