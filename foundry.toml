@@ -1,5 +1,5 @@
 [profile.default]
-src = 'contracts'
+src = 'contracts_forge'
 out = 'artifacts'
 libs = ["node_modules", "lib"]
 remappings = [
