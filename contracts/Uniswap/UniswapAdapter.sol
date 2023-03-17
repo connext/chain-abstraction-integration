@@ -18,7 +18,7 @@ contract UniswapAdapter {
         uint24 poolFee,
         uint256 amountIn,
         uint256 amountOutMin
-    ) internal returns (uint256) {
+    ) public returns (uint256) {
         // Approve the uniswap router to spend fromAsset.
         TransferHelper.safeApprove(fromAsset, address(swapRouter), amountIn);
 

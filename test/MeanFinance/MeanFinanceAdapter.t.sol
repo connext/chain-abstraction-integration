@@ -59,7 +59,7 @@ contract MeanFinanceAdapterTest is TestHelper {
     }
 
     // ============ MeanFinanceAdapter.xReceive ============
-    function test_MeanFinanceAdapterTest__xReceive_shouldWork() public {
+    function test_MeanFinanceAdapterTest__deposit_shouldWork() public {
         vm.prank(MOCK_CONNEXT);
 
         vm.expectEmit(true, true, false, true);
