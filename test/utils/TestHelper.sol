@@ -21,12 +21,14 @@ contract TestHelper is Test {
   address public USER_CHAIN_B = address(bytes20(keccak256("USER_CHAIN_B")));
   address public MOCK_CONNEXT = address(bytes20(keccak256("MOCK_CONNEXT")));
   address public MOCK_MEAN_FINANCE = address(bytes20(keccak256("MOCK_MEAN_FINANCE")));
-  address public MOCK_ERC20 = address(bytes20(keccak256("MOCK_ERC20")));
+  address public TokenA_ERC20 = address(bytes20(keccak256("TokenA_ERC20")));
+  address public TokenB_ERC20 = address(bytes20(keccak256("TokenB_ERC20")));
 
   function setUp() public virtual {
     vm.label(MOCK_CONNEXT, "Mock Connext");
     vm.label(MOCK_MEAN_FINANCE, "Mock Mean Finance");
-    vm.label(MOCK_ERC20, "Mock ERC20");
+    vm.label(TokenA_ERC20, "TokenA_ERC20");
+    vm.label(TokenB_ERC20, "TokenB_ERC20");
     vm.label(USER_CHAIN_A, "User Chain A");
     vm.label(USER_CHAIN_B, "User Chain B");
   }
