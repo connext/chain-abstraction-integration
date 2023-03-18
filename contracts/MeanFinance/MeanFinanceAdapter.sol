@@ -11,7 +11,7 @@ contract MeanFinanceAdapter {
         IDCAHub(0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345);
 
     /// Payable
-    receive() external payable {}
+    receive() virtual external payable {}
 
     /// @notice Creates a new position
     /// @param _from The address of the "from" token
