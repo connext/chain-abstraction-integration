@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@0xgafu/common-abi": "^1.0.3",
+    "@connext/utils": "^7.3.17",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.6",
