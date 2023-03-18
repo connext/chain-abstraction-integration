@@ -17,7 +17,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   // Get the constructor args
   const args = [
     process.env.CONNEXT ?? DEFAULT_ARGS[chainId].CONNEXT,
-    process.env.WETH ?? DEFAULT_ARGS[chainId].WETH,
   ];
 
   // Get the deployer

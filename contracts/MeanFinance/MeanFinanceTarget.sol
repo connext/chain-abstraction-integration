@@ -2,7 +2,6 @@
 pragma solidity ^0.8.13;
 
 import {IConnext} from "@connext/interfaces/core/IConnext.sol";
-import {IWrapper} from "@connext/interfaces/core/IWrapper.sol";
 import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./MeanFinanceAdapter.sol";
@@ -12,12 +11,12 @@ contract MeanFinanceTarget is MeanFinanceAdapter, UniswapAdapter {
     // The Connext contract on this domain
     IConnext public immutable connext;
 
-    /**
-     * @notice The wrapper contract that this contract will always use for unwrapping native token.
-     */
-    IWrapper public immutable weth;
-
-    receive() external payable virtual override(MeanFinanceAdapter, UniswapAdapter) {}
+    receive()
+        external
+        payable
+        virtual
+        override(MeanFinanceAdapter, UniswapAdapter)
+    {}
 
     /// Modifier
     modifier onlyConnext() {
@@ -25,9 +24,8 @@ contract MeanFinanceTarget is MeanFinanceAdapter, UniswapAdapter {
         _;
     }
 
-    constructor(address _connext, address _wrapper) {
+    constructor(address _connext) {
         connext = IConnext(_connext);
-        weth = IWrapper(_wrapper);
     }
 
     function xReceive(
@@ -52,14 +50,9 @@ contract MeanFinanceTarget is MeanFinanceAdapter, UniswapAdapter {
         ) = decode(_callData);
 
         if (from != _asset) {
-            // wrap origin asset if needed
-            if (from == address(0) && _asset == address(weth)) {
-                weth.withdraw(amountOut);
-            } else {
-                // swap to deposit asset if needed
-                amountOut = swap(_asset, from, poolFee, amountOut, amountOutMin);
-                // TODO:  Add fallback to address(owner) if swap fails
-            }
+            // swap to deposit asset if needed
+            amountOut = swap(_asset, from, poolFee, amountOut, amountOutMin);
+            // TODO:  Add fallback to address(owner) if swap fails
         }
 
         // deposit
