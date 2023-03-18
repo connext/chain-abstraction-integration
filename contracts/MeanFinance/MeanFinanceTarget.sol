@@ -36,7 +36,7 @@ contract MeanFinanceTarget is MeanFinanceAdapter, UniswapAdapter {
         uint32 _origin,
         bytes calldata _callData
     ) external returns (bytes memory) {
-        uint256 amountOut = _amount;
+        uint256 amount = _amount;
         // Decode calldata
         (
             uint24 poolFee,
@@ -49,17 +49,20 @@ contract MeanFinanceTarget is MeanFinanceAdapter, UniswapAdapter {
             IDCAPermissionManager.PermissionSet[] memory permissions
         ) = decode(_callData);
 
+        require(amount > 0, "!amount");
+        require(amountOutMin > 0, "!amountOut");
+        require(from != address(0), "!invalid");
+
         if (from != _asset) {
             // swap to deposit asset if needed
-            amountOut = swap(_asset, from, poolFee, amountOut, amountOutMin);
-            // TODO:  Add fallback to address(owner) if swap fails
+            amount = swap(_asset, from, poolFee, amount, amountOutMin);
         }
 
         // deposit
         deposit(
             from,
             to,
-            amountOut,
+            amount,
             amountOfSwaps,
             swapInterval,
             owner,
@@ -90,6 +93,7 @@ contract MeanFinanceTarget is MeanFinanceAdapter, UniswapAdapter {
             );
     }
 
+    /// INTERNAL
     function decode(
         bytes calldata data
     )
