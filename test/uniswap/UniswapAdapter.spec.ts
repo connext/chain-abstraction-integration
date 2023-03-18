@@ -32,8 +32,7 @@ const fund = async (
 
 describe("UniswapAdapter", function () {
   // Set up constants (will mirror what deploy fixture uses)
-  const [WETH, ASSET, DONATION_DOMAIN] =
-    DEFAULT_ARGS[31337];
+  const { WETH, USDC } = DEFAULT_ARGS[31337];
   const UNISWAP_SWAP_ROUTER = "0xE592427A0AEce92De3Edee1F18E0157C05861564";
   const WHALE = "0x385BAe68690c1b86e2f1Ad75253d080C14fA6e16"; // this is the address that should have weth, adapter, and random addr
   const UNPERMISSIONED = "0x7088C5611dAE159A640d940cde0a3221a4af8896";
@@ -67,7 +66,7 @@ describe("UniswapAdapter", function () {
       ethers.provider
     );
     // setup tokens
-    tokenA = new ethers.Contract(ASSET, ERC20_ABI, ethers.provider);
+    tokenA = new ethers.Contract(USDC, ERC20_ABI, ethers.provider);
     weth = new ethers.Contract(WETH, ERC20_ABI, ethers.provider);
     randomToken = new ethers.Contract(RANDOM_TOKEN, ERC20_ABI, ethers.provider);
   });
@@ -78,7 +77,7 @@ describe("UniswapAdapter", function () {
       expect(await adapter.swapRouter()).to.be.eq(UNISWAP_SWAP_ROUTER);
       // Ensure whale is okay
       expect(whale.address).to.be.eq(WHALE);
-      expect(tokenA.address).to.be.eq(ASSET);
+      expect(tokenA.address).to.be.eq(USDC);
     });
   });
 
@@ -93,7 +92,7 @@ describe("UniswapAdapter", function () {
       );
 
       await fund(
-        ASSET,
+        USDC,
         utils.parseUnits("1", ASSET_DECIMALS),
         whale,
         adapter.address
