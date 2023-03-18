@@ -6,10 +6,19 @@ import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./MeanFinanceAdapter.sol";
 
-contract MeanFinanceTarget is MeanFinanceAdapter{
+contract MeanFinanceTarget is MeanFinanceAdapter {
     // The Connext contract on this domain
     IConnext public immutable connext;
 
+    event Deposit(
+        bytes32 _transferId,
+        uint256 _amount,
+        address _asset,
+        address _originSender,
+        uint32 _origin,
+        bytes _callData,
+        uint256 originalAmount
+    );
     /// Modifier
     modifier onlyConnext() {
         require(msg.sender == address(connext), "Caller must be Connext");
@@ -26,29 +35,18 @@ contract MeanFinanceTarget is MeanFinanceAdapter{
         address _asset,
         address _originSender,
         uint32 _origin,
-        bytes memory _callData
-    ) external onlyConnext returns (bytes memory) {
+        bytes calldata _callData
+    ) external returns (bytes memory) {
         // Decode calldata
-        // (
-        //     address from,
-        //     address to,
-        //     uint256 originalAmount,
-        //     uint32 amountOfSwaps,
-        //     uint32 swapInterval,
-        //     address owner,
-        //     IDCAPermissionManager.PermissionSet[] memory permissions
-        // ) = abi.decode(
-        //         _callData,
-        //         (
-        //             address,
-        //             address,
-        //             uint256,
-        //             uint32,
-        //             uint32,
-        //             address,
-        //             IDCAPermissionManager.PermissionSet[]
-        //         )
-        //     );
+        (
+            address from,
+            address to,
+            uint256 originalAmount,
+            uint32 amountOfSwaps,
+            uint32 swapInterval,
+            address owner,
+            IDCAPermissionManager.PermissionSet[] memory permissions
+        ) = decode(_callData);
 
         // Aggregator Swap (ideally only works if we don't sign on quote)
         // Final Amount after the swap
@@ -59,14 +57,82 @@ contract MeanFinanceTarget is MeanFinanceAdapter{
         // fallback transfer amount to user address(params.owner)
 
         // deposit
-        // deposit(
-        //     from,
-        //     to,
-        //     _amount,
-        //     amountOfSwaps,
-        //     swapInterval,
-        //     owner,
-        //     permissions
-        // );
+        deposit(
+            from,
+            to,
+            originalAmount,
+            amountOfSwaps,
+            swapInterval,
+            owner,
+            permissions
+        );
+
+        emit Deposit(
+            _transferId,
+            _amount,
+            _asset,
+            _originSender,
+            _origin,
+            _callData,
+            originalAmount
+        );
+    }
+
+    function encode(
+        address from,
+        address to,
+        uint256 originalAmount,
+        uint32 amountOfSwaps,
+        uint32 swapInterval,
+        address owner,
+        IDCAPermissionManager.PermissionSet[] memory permissions
+    ) external pure returns (bytes memory) {
+        return
+            abi.encode(
+                from,
+                to,
+                originalAmount,
+                amountOfSwaps,
+                swapInterval,
+                owner,
+                permissions
+            );
+    }
+
+    function decode(
+        bytes calldata data
+    )
+        internal
+        pure
+        returns (
+            address from,
+            address to,
+            uint256 originalAmount,
+            uint32 amountOfSwaps,
+            uint32 swapInterval,
+            address owner,
+            IDCAPermissionManager.PermissionSet[] memory permissions
+        )
+    {
+        (
+            from,
+            to,
+            originalAmount,
+            amountOfSwaps,
+            swapInterval,
+            owner,
+            permissions
+        ) = abi.decode(
+            data,
+            (
+                address,
+                address,
+                uint256,
+                uint32,
+                uint32,
+                address,
+                IDCAPermissionManager.PermissionSet[]
+            )
+        );
     }
 }

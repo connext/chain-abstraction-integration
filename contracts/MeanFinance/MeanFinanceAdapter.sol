@@ -28,7 +28,7 @@ contract MeanFinanceAdapter {
         uint32 _amountOfSwaps,
         uint32 _swapInterval,
         address _owner,
-        IDCAPermissionManager.PermissionSet[] calldata _permissions
+        IDCAPermissionManager.PermissionSet[] memory _permissions
     ) public returns (uint256 _positionId) {
         // We need to increase the allowance for the hub before calling deposit
         IERC20(_from).approve(address(hub), _amount);
