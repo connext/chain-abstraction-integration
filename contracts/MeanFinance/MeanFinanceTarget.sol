@@ -2,31 +2,32 @@
 pragma solidity ^0.8.13;
 
 import {IConnext} from "@connext/interfaces/core/IConnext.sol";
+import {IWrapper} from "@connext/interfaces/core/IWrapper.sol";
 import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./MeanFinanceAdapter.sol";
+import "../Uniswap/UniswapAdapter.sol";
 
-contract MeanFinanceTarget is MeanFinanceAdapter {
+contract MeanFinanceTarget is MeanFinanceAdapter, UniswapAdapter {
     // The Connext contract on this domain
     IConnext public immutable connext;
 
-    event Deposit(
-        bytes32 _transferId,
-        uint256 _amount,
-        address _asset,
-        address _originSender,
-        uint32 _origin,
-        bytes _callData,
-        uint256 originalAmount
-    );
+    /**
+     * @notice The wrapper contract that this contract will always use for unwrapping native token.
+     */
+    IWrapper public immutable weth;
+
+    receive() external payable virtual override(MeanFinanceAdapter, UniswapAdapter) {}
+
     /// Modifier
     modifier onlyConnext() {
         require(msg.sender == address(connext), "Caller must be Connext");
         _;
     }
 
-    constructor(address _connext) {
+    constructor(address _connext, address _wrapper) {
         connext = IConnext(_connext);
+        weth = IWrapper(_wrapper);
     }
 
     function xReceive(
@@ -37,51 +38,47 @@ contract MeanFinanceTarget is MeanFinanceAdapter {
         uint32 _origin,
         bytes calldata _callData
     ) external returns (bytes memory) {
+        uint256 amountOut = _amount;
         // Decode calldata
         (
+            uint24 poolFee,
+            uint256 amountOutMin,
             address from,
             address to,
-            uint256 originalAmount,
             uint32 amountOfSwaps,
             uint32 swapInterval,
             address owner,
             IDCAPermissionManager.PermissionSet[] memory permissions
         ) = decode(_callData);
 
-        // Aggregator Swap (ideally only works if we don't sign on quote)
-        // Final Amount after the swap
-
-        // if we do aggregator swap need better way to compare for slippage.
-
-        /// Sanity check for the Slippage _amount vs params._amount(Input at Origin)
-        // fallback transfer amount to user address(params.owner)
+        if (from != _asset) {
+            // wrap origin asset if needed
+            if (from == address(0) && _asset == address(weth)) {
+                weth.withdraw(amountOut);
+            } else {
+                // swap to deposit asset if needed
+                amountOut = swap(_asset, from, poolFee, amountOut, amountOutMin);
+                // TODO:  Add fallback to address(owner) if swap fails
+            }
+        }
 
         // deposit
         deposit(
             from,
             to,
-            originalAmount,
+            amountOut,
             amountOfSwaps,
             swapInterval,
             owner,
             permissions
         );
-
-        emit Deposit(
-            _transferId,
-            _amount,
-            _asset,
-            _originSender,
-            _origin,
-            _callData,
-            originalAmount
-        );
     }
 
     function encode(
+        uint24 poolFee,
+        uint256 amountOutMin,
         address from,
         address to,
-        uint256 originalAmount,
         uint32 amountOfSwaps,
         uint32 swapInterval,
         address owner,
@@ -89,9 +86,10 @@ contract MeanFinanceTarget is MeanFinanceAdapter {
     ) external pure returns (bytes memory) {
         return
             abi.encode(
+                poolFee,
+                amountOutMin,
                 from,
                 to,
-                originalAmount,
                 amountOfSwaps,
                 swapInterval,
                 owner,
@@ -105,9 +103,10 @@ contract MeanFinanceTarget is MeanFinanceAdapter {
         internal
         pure
         returns (
+            uint24 poolFee,
+            uint256 amountOutMin,
             address from,
             address to,
-            uint256 originalAmount,
             uint32 amountOfSwaps,
             uint32 swapInterval,
             address owner,
@@ -115,9 +114,10 @@ contract MeanFinanceTarget is MeanFinanceAdapter {
         )
     {
         (
+            poolFee,
+            amountOutMin,
             from,
             to,
-            originalAmount,
             amountOfSwaps,
             swapInterval,
             owner,
@@ -125,9 +125,10 @@ contract MeanFinanceTarget is MeanFinanceAdapter {
         ) = abi.decode(
             data,
             (
-                address,
-                address,
+                uint24,
                 uint256,
+                address,
+                address,
                 uint32,
                 uint32,
                 address,

@@ -16,6 +16,13 @@ import { SwapInterval } from "./interval-utils";
 import IDCAHubInterface from "../../artifacts/@mean-finance/dca-v2-core/contracts/interfaces/IDCAHub.sol/IDCAHub.json";
 import ConnextInterface from "../../artifacts/@connext/interfaces/core/IConnext.sol/IConnext.json";
 
+enum Permission {
+  INCREASE,
+  REDUCE,
+  WITHDRAW,
+  TERMINATE,
+}
+
 const fund = async (
   asset: string,
   wei: BigNumberish,
@@ -43,21 +50,20 @@ describe("MeanFinanceTarget", function () {
   const RANDOM_TOKEN = "0x4200000000000000000000000000000000000042"; // this is OP
   const ASSET_DECIMALS = 6; // USDC decimals on op
 
+  const permissions = [
+    { operator: NOT_ZERO_ADDRESS, permissions: [Permission.INCREASE] },
+  ];
+  const swaps = 10;
+  const interval = SwapInterval.ONE_DAY.seconds;
+
   // Set up variables
   let connext: Contract;
   let target: Contract;
   let wallet: Wallet;
   let whale: Wallet;
-  let tokenA: Contract;
+  let tokenUSDC: Contract;
   let weth: Contract;
   let randomToken: Contract;
-
-  enum Permission {
-    INCREASE,
-    REDUCE,
-    WITHDRAW,
-    TERMINATE,
-  }
 
   before(async () => {
     // get wallet
@@ -76,7 +82,7 @@ describe("MeanFinanceTarget", function () {
 
     connext = new Contract(CONNEXT, ConnextInterface.abi, ethers.provider);
     // setup tokens
-    tokenA = new ethers.Contract(USDC, ERC20_ABI, ethers.provider);
+    tokenUSDC = new ethers.Contract(USDC, ERC20_ABI, ethers.provider);
     weth = new ethers.Contract(WETH, ERC20_ABI, ethers.provider);
     randomToken = new ethers.Contract(RANDOM_TOKEN, ERC20_ABI, ethers.provider);
   });
@@ -87,7 +93,7 @@ describe("MeanFinanceTarget", function () {
       expect(await target.hub()).to.be.eq(MEAN_FINANCE_IDCAHUB);
       // Ensure whale is okay
       expect(whale.address).to.be.eq(WHALE);
-      expect(tokenA.address).to.be.eq(USDC);
+      expect(tokenUSDC.address).to.be.eq(USDC);
     });
   });
 
@@ -116,43 +122,33 @@ describe("MeanFinanceTarget", function () {
       );
     });
 
-    it("should work", async () => {
+    it("should work when from is ERC20", async () => {      
+      const fromAsset  = randomToken;
+      const toAsset = tokenUSDC;
       // get reasonable amount out
-      const adapterBalance = await randomToken.balanceOf(target.address);
 
-      const permissions = [
-        { operator: NOT_ZERO_ADDRESS, permissions: [Permission.INCREASE] },
-      ];
-
-      const rate = 10;
-      const swaps = 10;
-      const interval = SwapInterval.ONE_DAY.seconds;
-
-      // const iface = new ethers.utils.Interface(IDCAHubInterface.abi);
-      // const calldata = iface.encodeFunctionData(
-      //   "deposit(address,address,uint256,uint32,uint32,address,(address,uint8[])[])",
-      //   [
-      //     randomToken.address,
-      //     tokenA.address,
-      //     BigNumber.from(adapterBalance),
-      //     swaps,
-      //     interval,
-      //     wallet.address,
-      //     permissions,
-      //   ]
-      // );
-
-      const calldata = await target
-        .connect(wallet)
-        .encode(
-          randomToken.address,
-          tokenA.address,
-          BigNumber.from(adapterBalance),
-          swaps,
-          interval,
-          wallet.address,
-          permissions
-        );
+      const adapterBalance = await fromAsset.balanceOf(target.address);
+      const randomDecimals = await fromAsset.decimals();
+      const normalized =
+        randomDecimals > ASSET_DECIMALS
+          ? adapterBalance.div(
+              BigNumber.from(10).pow(randomDecimals - ASSET_DECIMALS)
+            )
+          : adapterBalance.mul(
+              BigNumber.from(10).pow(ASSET_DECIMALS - randomDecimals)
+            );
+      // use 0.1% slippage (OP is > $2, adapter = usdc)
+      const lowerBound = normalized.mul(10).div(10_000);
+      const calldata = await target.connect(wallet).encode(
+        3000, //0.3%
+        lowerBound,
+        fromAsset.address,
+        toAsset.address,
+        swaps,
+        interval,
+        wallet.address,
+        permissions
+      );
 
       const transferId = getRandomBytes32();
 
@@ -162,7 +158,7 @@ describe("MeanFinanceTarget", function () {
         .xReceive(
           transferId,
           BigNumber.from(adapterBalance),
-          randomToken.address,
+          fromAsset.address,
           wallet.address,
           DOMAIN,
           calldata
@@ -170,7 +166,57 @@ describe("MeanFinanceTarget", function () {
 
       const receipt = await tx.wait();
       // Ensure tokens got sent to connext
-      expect((await randomToken.balanceOf(target.address)).toString()).to.be.eq(
+      expect((await fromAsset.balanceOf(target.address)).toString()).to.be.eq(
+        "0"
+      );
+    });
+
+    it.only("should work wen from is Address Zero", async () => {
+      const fromAsset  = constants.AddressZero;
+      const toAsset = tokenUSDC.address;
+      
+      // get reasonable amount out
+      const adapterBalance = await weth.balanceOf(target.address);
+      const fromAssetDecimals = await weth.decimals();
+      const normalized =
+      fromAssetDecimals > ASSET_DECIMALS
+          ? adapterBalance.div(
+              BigNumber.from(10).pow(fromAssetDecimals - ASSET_DECIMALS)
+            )
+          : adapterBalance.mul(
+              BigNumber.from(10).pow(ASSET_DECIMALS - fromAssetDecimals)
+            );
+      // use 0.1% slippage (OP is > $2, adapter = usdc)
+      const lowerBound = normalized.mul(10).div(10_000);
+
+      const calldata = await target.connect(wallet).encode(
+        3000, //0.3%
+        lowerBound,
+        fromAsset,
+        toAsset,
+        swaps,
+        interval,
+        wallet.address,
+        permissions
+      );
+
+      const transferId = getRandomBytes32();
+
+      // send tx
+      const tx = await target
+        .connect(wallet)
+        .xReceive(
+          transferId,
+          BigNumber.from(adapterBalance),
+          weth.address,
+          wallet.address,
+          DOMAIN,
+          calldata
+        );
+
+      const receipt = await tx.wait();
+      // Ensure tokens got sent to connext
+      expect((await weth.balanceOf(target.address)).toString()).to.be.eq(
         "0"
       );
     });
