@@ -10,19 +10,30 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const chainId = +(await hre.getChainId());
   console.log("chainId", chainId);
 
+  if (!DEFAULT_ARGS[chainId]) {
+    throw new Error(`No defaults provided for ${chainId}`);
+  }
+
+  // Get the constructor args
+  const args = [
+    process.env.CONNEXT ?? DEFAULT_ARGS[chainId].CONNEXT,
+  ];
+
   // Get the deployer
   const [deployer] = await hre.ethers.getSigners();
   if (!deployer) {
     throw new Error(`Cannot find signer to deploy with`);
   }
   console.log(
-    "\n============================= Deploying MeanFinanceAdapter ==============================="
+    "\n============================= Deploying MeanFinanceTarget ==============================="
   );
   console.log("deployer: ", deployer.address);
+  console.log("constructorArgs:", args);
 
   // Deploy contract
-  const adapter = await hre.deployments.deploy("MeanFinanceAdapter", {
+  const adapter = await hre.deployments.deploy("MeanFinanceTarget", {
     from: deployer.address,
+    args: args,
     skipIfAlreadyDeployed: true,
     log: true,
     // deterministicDeployment: true,
@@ -30,4 +41,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   console.log(`MeanFinanceAdapter deployed to ${adapter.address}`);
 };
 export default func;
-func.tags = ["meanfinanceadapter"];
+func.tags = ["meanfinancetarget"];
