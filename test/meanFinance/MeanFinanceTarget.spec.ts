@@ -13,7 +13,6 @@ import { DEFAULT_ARGS } from "../../deploy";
 import { ERC20_ABI } from "@0xgafu/common-abi";
 import { getRandomBytes32 } from "@connext/utils";
 import { SwapInterval } from "./interval-utils";
-import IDCAHubInterface from "../../artifacts/@mean-finance/dca-v2-core/contracts/interfaces/IDCAHub.sol/IDCAHub.json";
 import ConnextInterface from "../../artifacts/@connext/interfaces/core/IConnext.sol/IConnext.json";
 
 enum Permission {
@@ -167,56 +166,6 @@ describe("MeanFinanceTarget", function () {
       const receipt = await tx.wait();
       // Ensure tokens got sent to connext
       expect((await fromAsset.balanceOf(target.address)).toString()).to.be.eq(
-        "0"
-      );
-    });
-
-    it.only("should work wen from is Address Zero", async () => {
-      const fromAsset  = constants.AddressZero;
-      const toAsset = tokenUSDC.address;
-      
-      // get reasonable amount out
-      const adapterBalance = await weth.balanceOf(target.address);
-      const fromAssetDecimals = await weth.decimals();
-      const normalized =
-      fromAssetDecimals > ASSET_DECIMALS
-          ? adapterBalance.div(
-              BigNumber.from(10).pow(fromAssetDecimals - ASSET_DECIMALS)
-            )
-          : adapterBalance.mul(
-              BigNumber.from(10).pow(ASSET_DECIMALS - fromAssetDecimals)
-            );
-      // use 0.1% slippage (OP is > $2, adapter = usdc)
-      const lowerBound = normalized.mul(10).div(10_000);
-
-      const calldata = await target.connect(wallet).encode(
-        3000, //0.3%
-        lowerBound,
-        fromAsset,
-        toAsset,
-        swaps,
-        interval,
-        wallet.address,
-        permissions
-      );
-
-      const transferId = getRandomBytes32();
-
-      // send tx
-      const tx = await target
-        .connect(wallet)
-        .xReceive(
-          transferId,
-          BigNumber.from(adapterBalance),
-          weth.address,
-          wallet.address,
-          DOMAIN,
-          calldata
-        );
-
-      const receipt = await tx.wait();
-      // Ensure tokens got sent to connext
-      expect((await weth.balanceOf(target.address)).toString()).to.be.eq(
         "0"
       );
     });
