@@ -10,7 +10,8 @@ contract MeanFinanceAdapter {
     IDCAHub public immutable hub =
         IDCAHub(0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345);
 
-    event log(string);
+    /// Payable
+    receive() external payable {}
 
     /// @notice Creates a new position
     /// @param _from The address of the "from" token
@@ -40,6 +41,5 @@ contract MeanFinanceAdapter {
             _owner,
             _permissions
         );
-        emit log("here");
     }
 }

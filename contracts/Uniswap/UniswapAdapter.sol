@@ -12,8 +12,6 @@ contract UniswapAdapter {
     ISwapRouter public immutable swapRouter =
         ISwapRouter(0xE592427A0AEce92De3Edee1F18E0157C05861564);
 
-    event log(string);
-
     /// Payable
     receive() external payable {}
 
@@ -41,6 +39,5 @@ contract UniswapAdapter {
 
         // The call to `exactInputSingle` executes the swap.
         amountOut = swapRouter.exactInputSingle(params);
-        emit log("here");
     }
 }
