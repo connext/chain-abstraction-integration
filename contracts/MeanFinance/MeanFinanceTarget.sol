@@ -56,6 +56,7 @@ contract MeanFinanceTarget is MeanFinanceAdapter, UniswapAdapter {
         if (from != _asset) {
             // swap to deposit asset if needed
             amount = swap(_asset, from, poolFee, amount, amountOutMin);
+            // TODO: add fallback to return funds to user address
         }
 
         // deposit
