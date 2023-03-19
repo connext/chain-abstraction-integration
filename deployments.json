@@ -1,0 +1,93 @@
+{
+  "31337": [
+    {
+      "name": "hardhat",
+      "chainId": "31337",
+      "contracts": {
+        "MeanFinanceAdapter": {
+          "address": "0xa85233C63b9Ee964Add6F2cffe00Fd84eb32338f",
+          "abi": [
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "_from",
+                  "type": "address"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_to",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "_amount",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint32",
+                  "name": "_amountOfSwaps",
+                  "type": "uint32"
+                },
+                {
+                  "internalType": "uint32",
+                  "name": "_swapInterval",
+                  "type": "uint32"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_owner",
+                  "type": "address"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "address",
+                      "name": "operator",
+                      "type": "address"
+                    },
+                    {
+                      "internalType": "enum IDCAPermissionManager.Permission[]",
+                      "name": "permissions",
+                      "type": "uint8[]"
+                    }
+                  ],
+                  "internalType": "struct IDCAPermissionManager.PermissionSet[]",
+                  "name": "_permissions",
+                  "type": "tuple[]"
+                }
+              ],
+              "name": "deposit",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "_positionId",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "hub",
+              "outputs": [
+                {
+                  "internalType": "contract IDCAHub",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "stateMutability": "payable",
+              "type": "receive"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
