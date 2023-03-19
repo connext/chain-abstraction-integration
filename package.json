@@ -16,6 +16,7 @@
     "prettier:check": "prettier --check \"**/*.{json,md,yml}\"",
     "prettier:write": "prettier --write \"**/*.{json,md,yml}\"",
     "hardhat": "hardhat",
+    "export": "hardhat export --export-all ./deployments.json",
     "clean": "rimraf cache out"
   },
   "devDependencies": {

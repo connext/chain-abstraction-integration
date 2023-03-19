@@ -1,4 +1,281 @@
 {
+  "137": [
+    {
+      "name": "polygon",
+      "chainId": "137",
+      "contracts": {
+        "MeanFinanceTarget": {
+          "address": "0x3E64213564cc30107Beb81cd0DCEd3F18dF79B35",
+          "abi": [
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "_connext",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "constructor"
+            },
+            {
+              "inputs": [],
+              "name": "connext",
+              "outputs": [
+                {
+                  "internalType": "contract IConnext",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "_from",
+                  "type": "address"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_to",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "_amount",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint32",
+                  "name": "_amountOfSwaps",
+                  "type": "uint32"
+                },
+                {
+                  "internalType": "uint32",
+                  "name": "_swapInterval",
+                  "type": "uint32"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_owner",
+                  "type": "address"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "address",
+                      "name": "operator",
+                      "type": "address"
+                    },
+                    {
+                      "internalType": "enum IDCAPermissionManager.Permission[]",
+                      "name": "permissions",
+                      "type": "uint8[]"
+                    }
+                  ],
+                  "internalType": "struct IDCAPermissionManager.PermissionSet[]",
+                  "name": "_permissions",
+                  "type": "tuple[]"
+                }
+              ],
+              "name": "deposit",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "_positionId",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint24",
+                  "name": "poolFee",
+                  "type": "uint24"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "amountOutMin",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "address",
+                  "name": "from",
+                  "type": "address"
+                },
+                {
+                  "internalType": "address",
+                  "name": "to",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint32",
+                  "name": "amountOfSwaps",
+                  "type": "uint32"
+                },
+                {
+                  "internalType": "uint32",
+                  "name": "swapInterval",
+                  "type": "uint32"
+                },
+                {
+                  "internalType": "address",
+                  "name": "owner",
+                  "type": "address"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "address",
+                      "name": "operator",
+                      "type": "address"
+                    },
+                    {
+                      "internalType": "enum IDCAPermissionManager.Permission[]",
+                      "name": "permissions",
+                      "type": "uint8[]"
+                    }
+                  ],
+                  "internalType": "struct IDCAPermissionManager.PermissionSet[]",
+                  "name": "permissions",
+                  "type": "tuple[]"
+                }
+              ],
+              "name": "encode",
+              "outputs": [
+                {
+                  "internalType": "bytes",
+                  "name": "",
+                  "type": "bytes"
+                }
+              ],
+              "stateMutability": "pure",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "hub",
+              "outputs": [
+                {
+                  "internalType": "contract IDCAHub",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "fromAsset",
+                  "type": "address"
+                },
+                {
+                  "internalType": "address",
+                  "name": "toAsset",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint24",
+                  "name": "poolFee",
+                  "type": "uint24"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "amountIn",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "amountOutMin",
+                  "type": "uint256"
+                }
+              ],
+              "name": "swap",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "amountOut",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "swapRouter",
+              "outputs": [
+                {
+                  "internalType": "contract ISwapRouter",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "bytes32",
+                  "name": "_transferId",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "_amount",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_asset",
+                  "type": "address"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_originSender",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint32",
+                  "name": "_origin",
+                  "type": "uint32"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "_callData",
+                  "type": "bytes"
+                }
+              ],
+              "name": "xReceive",
+              "outputs": [
+                {
+                  "internalType": "bytes",
+                  "name": "",
+                  "type": "bytes"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "stateMutability": "payable",
+              "type": "receive"
+            }
+          ]
+        }
+      }
+    }
+  ],
   "31337": [
     {
       "name": "hardhat",
