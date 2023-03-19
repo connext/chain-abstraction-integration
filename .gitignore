@@ -35,4 +35,5 @@ typechain-types
 # Hardhat files
 cache
 artifacts
+deployments/*/solcInputs
 
