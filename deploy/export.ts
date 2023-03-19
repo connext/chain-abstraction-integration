@@ -25,6 +25,5 @@ const func: DeployFunction = async (
 };
 
 export default func;
-func.tags = ["export"];
-func.dependencies = ["uniswap"];
-func.dependencies = ["meanfinanceadapter"];
+func.tags = ["export", "test"];
+func.dependencies = ["prod"];
