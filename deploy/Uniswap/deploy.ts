@@ -31,4 +31,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   console.log(`uniswapAdapter deployed to ${uniswapAdapter.address}`);
 };
 export default func;
-func.tags = ["uniswap"];
+func.tags = ["uniswap", "test"];

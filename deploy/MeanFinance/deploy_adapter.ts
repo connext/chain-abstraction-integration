@@ -30,4 +30,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   console.log(`MeanFinanceAdapter deployed to ${adapter.address}`);
 };
 export default func;
-func.tags = ["meanfinanceadapter"];
+func.tags = ["meanfinanceadapter", "test"];
