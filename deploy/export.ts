@@ -25,4 +25,4 @@ const func: DeployFunction = async (
 };
 
 export default func;
-func.tags = ["export", "test", "prod"];
+func.tags = ["export", "test", "prod", "meanfinancetarget", "meanfinancesource"];
