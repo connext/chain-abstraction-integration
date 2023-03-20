@@ -12,7 +12,7 @@ import {
 import { DEFAULT_ARGS } from "../../deploy";
 import { ERC20_ABI } from "@0xgafu/common-abi";
 import { getRandomBytes32 } from "@connext/utils";
-import { SwapInterval } from "./interval-utils";
+import { SwapInterval } from "../../utils/interval-utils";
 import ConnextInterface from "../../artifacts/@connext/interfaces/core/IConnext.sol/IConnext.json";
 
 enum Permission {

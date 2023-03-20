@@ -11,17 +11,7 @@ import {
 } from "ethers";
 import { DEFAULT_ARGS } from "../../deploy";
 import { ERC20_ABI } from "@0xgafu/common-abi";
-import { getRandomBytes32 } from "@connext/utils";
-import { SwapInterval } from "./interval-utils";
 import ConnextInterface from "../../artifacts/@connext/interfaces/core/IConnext.sol/IConnext.json";
-import MeanFinanceTargetInterface from "../../artifacts/contracts/MeanFinance/MeanFinanceTarget.sol/MeanFinanceTarget.json";
-
-enum Permission {
-  INCREASE,
-  REDUCE,
-  WITHDRAW,
-  TERMINATE,
-}
 
 const fund = async (
   asset: string,
@@ -53,7 +43,6 @@ describe("MeanFinanceSource", function () {
   // Set up variables
   let connext: Contract;
   let source: Contract;
-  let target: Contract;
   let wallet: Wallet;
   let whale: Wallet;
   let tokenUSDC: Contract;
@@ -76,11 +65,6 @@ describe("MeanFinanceSource", function () {
     );
 
     connext = new Contract(CONNEXT, ConnextInterface.abi, ethers.provider);
-    target = new Contract(
-      "MeanFinanceContract",
-      MeanFinanceTargetInterface.abi,
-      ethers.provider
-    );
     // setup tokens
     tokenUSDC = new ethers.Contract(USDC, ERC20_ABI, ethers.provider);
     weth = new ethers.Contract(WETH, ERC20_ABI, ethers.provider);

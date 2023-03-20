@@ -11,7 +11,7 @@ import {
 } from "ethers";
 import { DEFAULT_ARGS } from "../../deploy";
 import { ERC20_ABI } from "@0xgafu/common-abi";
-import { SwapInterval } from "./interval-utils";
+import { SwapInterval } from "../../utils/interval-utils";
 
 const fund = async (
   asset: string,
