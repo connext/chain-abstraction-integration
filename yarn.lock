@@ -54,10 +54,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@connext/interfaces@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "@connext/interfaces@npm:2.0.1"
-  checksum: aa5a1b4f766d517b2594a3d6f73624abc9d95bf65667c68ed1926b7c0465fdd36aefe7b6ec77d887bd6d9847f4b1bef99a2af2534d7225105a98cecf84898b2a
+"@connext/interfaces@npm:^2.0.3":
+  version: 2.0.3
+  resolution: "@connext/interfaces@npm:2.0.3"
+  checksum: e305765dd436fff8dbcc643c263c9532763cbd9ee166ada193b386b56c3732f487808469c48c0a3a4243d32fa1aae9825e2b497956850861b14f3ed7e406524c
   languageName: node
   linkType: hard
 
@@ -5114,7 +5114,7 @@ __metadata:
   resolution: "mean-finance-integration@workspace:."
   dependencies:
     "@0xgafu/common-abi": ^1.0.3
-    "@connext/interfaces": ^2.0.1
+    "@connext/interfaces": ^2.0.3
     "@connext/utils": ^7.3.17
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/providers": ^5.7.2
