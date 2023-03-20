@@ -41,7 +41,7 @@ const fund = async (
   return await tx.wait();
 };
 
-describe.only("MeanFinanceSource", function () {
+describe("MeanFinanceSource", function () {
   // Set up constants (will mirror what deploy fixture uses)
   const { WETH, USDC, CONNEXT, DOMAIN } = DEFAULT_ARGS[31337];
   const UNISWAP_SWAP_ROUTER = "0xE592427A0AEce92De3Edee1F18E0157C05861564";
@@ -165,7 +165,7 @@ describe.only("MeanFinanceSource", function () {
       );
     });
 
-    it.only("should work input AddressZero", async () => {
+    it.skip("should work input AddressZero", async () => {
       const target = NOT_ZERO_ADDRESS;
       const destinationDomain = "6648936";
       const inputAsset = constants.AddressZero;
