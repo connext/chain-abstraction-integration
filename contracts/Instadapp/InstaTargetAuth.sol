@@ -7,7 +7,7 @@ import {InstaTargetAuthInterface} from "./interfaces/InstaTargetAuthInterface.so
 contract InstaTargetAuth is InstaTargetAuthInterface {
     bytes32 immutable public DOMAIN_SEPARATOR;
 
-    // The Connext contract on this domain
+    // Instadapp contract on this domain
     IDSA public dsa;
 
     constructor(address _dsa) {
