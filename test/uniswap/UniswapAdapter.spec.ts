@@ -1,34 +1,8 @@
 import { expect } from "chai";
-import { deployments, ethers } from "hardhat";
-import {
-  BigNumber,
-  BigNumberish,
-  constants,
-  Contract,
-  providers,
-  utils,
-  Wallet,
-} from "ethers";
+import { ethers } from "hardhat";
+import { BigNumber, constants, Contract, utils, Wallet } from "ethers";
 import { DEFAULT_ARGS } from "../../deploy";
-import { ERC20_ABI } from "@0xgafu/common-abi";
-
-const fund = async (
-  asset: string,
-  wei: BigNumberish,
-  from: Wallet,
-  to: string
-): Promise<providers.TransactionReceipt> => {
-  if (asset === constants.AddressZero) {
-    const tx = await from.sendTransaction({ to, value: wei });
-    // send eth
-    return await tx.wait();
-  }
-
-  // send tokens
-  const token = new Contract(asset, ERC20_ABI, from);
-  const tx = await token.transfer(to, wei);
-  return await tx.wait();
-};
+import { fund, deploy, ERC20_ABI } from "../helpers";
 
 describe("UniswapAdapter", function () {
   // Set up constants (will mirror what deploy fixture uses)
@@ -45,7 +19,6 @@ describe("UniswapAdapter", function () {
   let whale: Wallet;
   let unpermissioned: Wallet;
   let tokenA: Contract;
-  let tokenB: Contract;
   let weth: Contract;
   let randomToken: Contract;
 
@@ -59,12 +32,8 @@ describe("UniswapAdapter", function () {
       UNPERMISSIONED
     )) as unknown as Wallet;
     // deploy contract
-    const { UniswapAdapter } = await deployments.fixture(["uniswap"]);
-    adapter = new Contract(
-      UniswapAdapter.address,
-      UniswapAdapter.abi,
-      ethers.provider
-    );
+    const { instance } = await deploy("UniswapAdapter");
+    adapter = instance;
     // setup tokens
     tokenA = new ethers.Contract(USDC, ERC20_ABI, ethers.provider);
     weth = new ethers.Contract(WETH, ERC20_ABI, ethers.provider);
