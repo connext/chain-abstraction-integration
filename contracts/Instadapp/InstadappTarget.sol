@@ -35,16 +35,11 @@ contract InstadappTarget is IXReceiver {
     ) external onlyConnext returns (bytes memory) {
         // Decode signed calldata
         (
-            IAT.CastData memory _castData,
+            bytes memory signature,
             address sender,
-            uint8 v,
-            bytes32 r,
-            bytes32 s
-        ) = abi.decode(
-                _callData,
-                (IAT.CastData, address, uint8, bytes32, bytes32)
-            );
+            IAT.CastData memory _castData
+        ) = abi.decode(_callData, (bytes, address, IAT.CastData));
 
-        targetAuth.authCast(_castData, sender, v, r, s);
+        targetAuth.authCast(signature, sender, _castData);
     }
 }
