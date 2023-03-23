@@ -5,7 +5,7 @@ import {IDSA} from "./interfaces/IDSA.sol";
 import {InstaTargetAuthInterface} from "./interfaces/InstaTargetAuthInterface.sol";
 
 contract InstaTargetAuth is InstaTargetAuthInterface {
-    bytes32 immutable public DOMAIN_SEPARATOR;
+    bytes32 public immutable DOMAIN_SEPARATOR;
 
     // Instadapp contract on this domain
     IDSA public dsa;
@@ -54,6 +54,18 @@ contract InstaTargetAuth is InstaTargetAuthInterface {
             castData._targetNames,
             castData._datas,
             castData._origin
+        );
+    }
+
+    function createDigest(
+        CastData memory castData
+    ) public view returns (bytes32 digest) {
+        digest = keccak256(
+            abi.encodePacked(
+                "\x19\x01",
+                DOMAIN_SEPARATOR,
+                hashCastData(castData)
+            )
         );
     }
 
