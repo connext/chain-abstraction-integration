@@ -4,9 +4,6 @@ on:
   push:
   pull_request:
 
-# env:
-#   FOUNDRY_PROFILE: ci
-
 jobs:
   check:
     strategy:
@@ -20,11 +17,6 @@ jobs:
         with:
           submodules: recursive
 
-      # - name: Install Foundry
-      #   uses: foundry-rs/foundry-toolchain@v1
-      #   with:
-      #     version: nightly
-      
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
@@ -34,21 +26,5 @@ jobs:
       - name: Yarn install
         run: yarn install
 
-      # - name: Forge install
-      #   run: forge install
-        
-      # - name: Run Forge build
-      #   run: |
-      #     forge --version
-      #     forge build --sizes
-      #   id: build
-
-      # - name: Run Forge tests
-      #   run: |
-      #     forge test -vvv
-      #   id: test
-
       - name: Run Hardhat tests
-        run: |
-          yarn test
-        id: test
+        run: yarn test

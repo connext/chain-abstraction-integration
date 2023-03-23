@@ -3,7 +3,7 @@ pragma solidity ^0.8.13;
 
 import "../utils/TestHelper.sol";
 import "../../contracts/Uniswap/UniswapAdapter.sol";
-import "../utils/TestERC20.sol";
+import "../../contracts/TestERC20/TestERC20.sol";
 
 import "@mean-finance/nft-descriptors/solidity/interfaces/IDCAHubPositionDescriptor.sol";
 import {IDCAHub} from "@mean-finance/dca-v2-core/contracts/interfaces/IDCAHub.sol";
