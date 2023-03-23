@@ -3,94 +3,23 @@ pragma solidity ^0.8.0;
 
 import {IDSA} from "./interfaces/IDSA.sol";
 import {InstaTargetAuthInterface} from "./interfaces/InstaTargetAuthInterface.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
 
-contract InstaTargetAuth is InstaTargetAuthInterface {
-    bytes32 public immutable DOMAIN_SEPARATOR;
-
+contract InstaTargetAuth is EIP712, InstaTargetAuthInterface {
     // Instadapp contract on this domain
     IDSA public dsa;
 
-    constructor(address _dsa) {
+    constructor(address _dsa) EIP712("InstaTargetAuth", "1") {
         dsa = IDSA(_dsa);
-
-        DOMAIN_SEPARATOR = hashEIP712Domain(
-            EIP712Domain({
-                name: "InstadappTargetAuth",
-                version: "1",
-                chainId: block.chainid,
-                verifyingContract: address(this)
-            })
-        );
     }
 
     function verify(
-        CastData memory castData,
+        bytes memory signature,
         address sender,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
+        CastData memory castData
     ) public view returns (bool) {
-        bytes32 digest = keccak256(
-            abi.encodePacked(
-                "\x19\x01",
-                DOMAIN_SEPARATOR,
-                hashCastData(castData)
-            )
-        );
-        return ecrecover(digest, v, r, s) == sender;
-    }
-
-    function authCast(
-        CastData memory castData,
-        address sender,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) public payable {
-        require(verify(castData, sender, v, r, s), "Invalid signature");
-
-        // send funds to DSA
-        dsa.cast{value: msg.value}(
-            castData._targetNames,
-            castData._datas,
-            castData._origin
-        );
-    }
-
-    function createDigest(
-        CastData memory castData
-    ) public view returns (bytes32 digest) {
-        digest = keccak256(
-            abi.encodePacked(
-                "\x19\x01",
-                DOMAIN_SEPARATOR,
-                hashCastData(castData)
-            )
-        );
-    }
-
-    /// INTERNALS
-    function hashEIP712Domain(
-        EIP712Domain memory eip712Domain
-    ) internal pure returns (bytes32) {
-        return
-            keccak256(
-                abi.encode(
-                    keccak256(
-                        "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
-                    ),
-                    keccak256(bytes(eip712Domain.name)),
-                    keccak256(bytes(eip712Domain.version)),
-                    eip712Domain.chainId,
-                    eip712Domain.verifyingContract
-                )
-            );
-    }
-
-    function hashCastData(
-        CastData memory castData
-    ) private pure returns (bytes32) {
-        return
+        bytes32 digest = _hashTypedDataV4(
             keccak256(
                 abi.encode(
                     keccak256(
@@ -100,6 +29,49 @@ contract InstaTargetAuth is InstaTargetAuthInterface {
                     castData._datas,
                     castData._origin
                 )
-            );
+            )
+        );
+
+        address signer = ECDSA.recover(digest, signature);
+        return signer == sender;
+    }
+
+    function authCast(
+        bytes memory signature,
+        address sender,
+        CastData memory castData
+    ) public payable {
+        require(verify(signature, sender, castData), "Invalid signature");
+
+        // send funds to DSA
+        dsa.cast{value: msg.value}(
+            castData._targetNames,
+            castData._datas,
+            castData._origin
+        );
+    }
+
+    function recover(
+        bytes32 digest,
+        bytes memory signature
+    ) public pure returns (address) {
+        return ECDSA.recover(digest, signature);
+    }
+
+    function createDigest(
+        CastData memory castData
+    ) public view returns (bytes32 digest) {
+        digest = _hashTypedDataV4(
+            keccak256(
+                abi.encode(
+                    keccak256(
+                        "Cast(string[] _targetNames,bytes[] _datas,address _origin)"
+                    ),
+                    castData._targetNames,
+                    castData._datas,
+                    castData._origin
+                )
+            )
+        );
     }
 }
