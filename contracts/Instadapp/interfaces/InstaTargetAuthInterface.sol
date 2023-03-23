@@ -8,26 +8,15 @@ interface InstaTargetAuthInterface {
         address _origin;
     }
 
-    struct EIP712Domain {
-        string name;
-        string version;
-        uint256 chainId;
-        address verifyingContract;
-    }
-
     function verify(
-        CastData memory castData,
+        bytes memory signature,
         address sender,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
+        CastData memory castData
     ) external view returns (bool);
 
     function authCast(
-        CastData memory castData,
+        bytes memory signature,
         address sender,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
+        CastData memory castData
     ) external payable;
 }
