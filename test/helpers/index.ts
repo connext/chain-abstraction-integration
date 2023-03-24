@@ -1,11 +1,9 @@
 import { ethers } from "hardhat";
 import {
-  BigNumber,
   BigNumberish,
   constants,
   Contract,
   providers,
-  utils,
   Wallet,
 } from "ethers";
 import { ERC20_ABI } from "@0xgafu/common-abi";
