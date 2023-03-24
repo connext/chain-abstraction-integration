@@ -14,8 +14,7 @@ contract MeanFinanceAdapterTest is TestHelper {
     // ============ Events ============
     // ============ Storage ============
     address private connext = address(1);
-    address public notOriginSender =
-        address(bytes20(keccak256("NotOriginSender")));
+    address public notOriginSender = address(bytes20(keccak256("NotOriginSender")));
 
     address private deposit_from;
     address private deposit_to;
@@ -32,7 +31,6 @@ contract MeanFinanceAdapterTest is TestHelper {
     IERC20 private tokenB;
     bytes32 public transferId = keccak256("12345");
     uint32 public amount = 10;
-    
 
     function setUp() public override {
         super.setUp();
@@ -50,12 +48,7 @@ contract MeanFinanceAdapterTest is TestHelper {
         deposit_swapInterval = 2 * 60 * 1000; // 2mins
         deposit_owner = address(4);
         permissions = [IDCAPermissionManager.Permission.TERMINATE];
-        deposit_permissions = [
-            IDCAPermissionManager.PermissionSet(
-                address(5),
-                permissions
-            )
-        ];
+        deposit_permissions = [IDCAPermissionManager.PermissionSet(address(5), permissions)];
     }
 
     // ============ MeanFinanceAdapter.xReceive ============

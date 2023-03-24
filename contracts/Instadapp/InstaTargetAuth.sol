@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 contract InstaTargetAuth is EIP712, InstaTargetAuthInterface {
     // Instadapp contract on this domain
     IDSA public dsa;
-    bytes32 public constant CASTDATA_TYPEHASH = keccak256("Cast(string[] _targetNames,bytes[] _datas,address _origin)");
+    bytes32 public constant CASTDATA_TYPEHASH = keccak256("CastData(string[] _targetNames,bytes[] _datas,address _origin)");
 
     constructor(address _dsa) EIP712("InstaTargetAuth", "1") {
         dsa = IDSA(_dsa);
@@ -20,15 +20,13 @@ contract InstaTargetAuth is EIP712, InstaTargetAuthInterface {
         address sender,
         CastData memory castData
     ) public view returns (bool) {
-        bytes32 digest = _hashTypedDataV4(
-            keccak256(
+        bytes32 digest = _hashTypedDataV4(keccak256(
                 abi.encode(CASTDATA_TYPEHASH,
                     castData._targetNames,
                     castData._datas,
                     castData._origin
                 )
-            )
-        );
+            ));
         address signer = ECDSA.recover(digest, signature);
         return signer == sender;
     }
