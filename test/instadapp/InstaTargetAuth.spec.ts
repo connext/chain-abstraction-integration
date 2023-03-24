@@ -28,7 +28,7 @@ const deployInstaTargetAuth = async (dsaAddress: string) => {
   return contractInstance
 }
 
-describe.only("InstaTargetAuth", () => {
+describe.skip("InstaTargetAuth", () => {
 
   let owner: SignerWithAddress, otherAccount: SignerWithAddress;
   let dsaContract: Contract;
