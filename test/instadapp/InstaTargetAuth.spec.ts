@@ -28,11 +28,6 @@ const deployInstaTargetAuth = async (dsaAddress: string) => {
   return contractInstance
 }
 
-const generateSignature = async (signer: SignerWithAddress, domain: any, types: any, value: any): Promise<string> => {
-    const signedMessage = await signer._signTypedData(domain, types, value)
-    return signedMessage;
-}
-
 describe.only("InstaTargetAuth", () => {
 
   let owner: SignerWithAddress, otherAccount: SignerWithAddress;
@@ -70,7 +65,7 @@ describe.only("InstaTargetAuth", () => {
         "_origin": sender.toLowerCase(),
       };     
 
-      const signature = await generateSignature(otherAccount, domain, types, castData);
+      const signature = await otherAccount._signTypedData(domain, types, castData);
       // Verify the signature
       const recoverAddress = verifyTypedData(domain, types, castData, signature);
       const verified = await instaTargetAuthContract.connect(otherAccount).verify(signature, sender, castData);
