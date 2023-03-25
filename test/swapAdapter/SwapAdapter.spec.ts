@@ -5,7 +5,7 @@ import { DEFAULT_ARGS } from '../../deploy'
 import { fund, deploy, ERC20_ABI } from '../helpers'
 import ISwapAdapter from '../../artifacts/contracts/SwapAdapter/SwapAdapter.sol/SwapAdapter.json'
 
-describe.only('SwapAdapter', function () {
+describe('SwapAdapter', function () {
   // Set up constants (will mirror what deploy fixture uses)
   const { WETH, USDC } = DEFAULT_ARGS[31337]
   const UNISWAP_SWAP_ROUTER = '0xE592427A0AEce92De3Edee1F18E0157C05861564'
