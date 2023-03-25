@@ -39,6 +39,6 @@ contract UniswapV3 {
             });
 
         // The call to `exactInputSingle` executes the swap.
-        amountOut = ISwapRouter(swapper).exactInputSingle(params);
+        amountOut = ISwapRouter(swapper).exactInputSingle{value: value}(params);
     }
 }
