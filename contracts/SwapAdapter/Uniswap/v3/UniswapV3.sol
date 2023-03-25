@@ -23,6 +23,8 @@ contract UniswapV3 {
                 _data,
                 (address, address, uint24, uint256, uint256, address)
             );
+
+        TransferHelper.safeApprove(fromAsset, address(swapper), amountIn);
         // Set up uniswap swap params.
         ISwapRouter.ExactInputSingleParams memory params = ISwapRouter
             .ExactInputSingleParams({
