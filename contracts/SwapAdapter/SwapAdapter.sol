@@ -2,10 +2,7 @@
 pragma solidity >=0.8.7 <0.9.0;
 
 import "@openzeppelin/contracts/utils/Address.sol";
-import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 import {Swapper} from "./Swapper.sol";
-
-/// TODO: Add custom TransferHelper for allowance and approve
 
 contract SwapAdapter is Swapper {
     using Address for address;
@@ -24,6 +21,8 @@ contract SwapAdapter is Swapper {
     /// Payable
     receive() external payable virtual {}
 
+    /// TODO: Need to implement max-approve to avoid calling approve for every swap.
+    /// And then safety checks around it. 
     /// TODO: Add function to whitelist swappers
     /// TODO: Add function to remove whitelisted swappers
     /// TODO: Add roles for admin
@@ -36,7 +35,6 @@ contract SwapAdapter is Swapper {
         bytes calldata _swapData
     ) external payable {
         require(allowedSwappers[swapper], "!allowedSwapper");
-        /// TODO: check for allowance for swapper address.
         bytes memory swapData = (
             abi.encodeWithSelector(_selector, swapper, _swapData)
         );
