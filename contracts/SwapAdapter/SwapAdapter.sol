@@ -23,6 +23,12 @@ contract SwapAdapter is Swapper {
     /// Payable
     receive() external payable virtual {}
 
+    /// TODO: Add function to whitelist swappers
+    /// TODO: Add function to remove whitelisted swappers
+    /// TODO: Add roles for admin
+    /// TODO: Make the contract ownable
+    /// TODO: ...
+
     function _exactSwap(
         address swapper,
         bytes4 _selector,
@@ -30,21 +36,21 @@ contract SwapAdapter is Swapper {
     ) external payable {
         require(allowedSwappers[swapper], "!allowedSwapper");
         /// TODO: check for allowance for swapper address.
-
-        (bool success, bytes memory data) = address(this).call{
-            value: msg.value
-        }(abi.encodeWithSelector(_selector, swapper, _swapData));
-        require(
-            success && (data.length == 0 || abi.decode(data, (bool))),
-            "!exactSwap"
+        bytes memory swapData = (
+            abi.encodeWithSelector(_selector, swapper, _swapData)
         );
+        address(this).functionCallWithValue(swapData, msg.value, "!exactSwap");
     }
 
     function _directSwapperCall(
         address _swapper,
-        bytes calldata _swapData,
+        bytes calldata swapData,
         uint256 value
     ) internal virtual {
-        _swapper.functionCallWithValue(_swapData, value);
+        _swapper.functionCallWithValue(
+            swapData,
+            value,
+            "!directSwapperCallFailed"
+        );
     }
 }
