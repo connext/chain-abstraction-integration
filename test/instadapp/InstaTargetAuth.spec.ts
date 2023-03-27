@@ -2,14 +2,15 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import instaIndexABI from "../helpers/abis/instaindex.json";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { Contract } from "ethers";
-import { defaultAbiCoder, formatBytes32String, keccak256, solidityKeccak256, toUtf8Bytes, verifyMessage, verifyTypedData } from "ethers/lib/utils";
-import { hashTypedMessage } from "@connext/utils";
+import { Contract, Wallet } from "ethers";
+import { defaultAbiCoder, joinSignature, keccak256, solidityKeccak256, toUtf8Bytes, _TypedDataEncoder } from "ethers/lib/utils";
 
 
 // Hardcoded addresses on optimism
 const instaIndexAddr = "0x6CE3e607C808b4f4C26B7F6aDAeB619e49CAbb25";
 
+// DO NOT USE THIS KEY ON MAINNET
+const TEST_PRIIVATE_KEY = "913b591c8abc30e7d3d2a4ebd560e1f02197cb701f077c9fcdc2ba8b0a7d9abe"; // address = 0xc1aAED5D41a3c3c33B1978EA55916f9A3EE1B397
 const deployDSAv2 = async (owner: any) => {
   const instaIndex = await ethers.getContractAt(instaIndexABI, instaIndexAddr);
   const tx = await instaIndex.build(owner, 2, owner);
@@ -28,21 +29,33 @@ const deployInstaTargetAuth = async (dsaAddress: string) => {
   return contractInstance
 }
 
-describe.skip("InstaTargetAuth", () => {
+const generateSignature = async (sender: Wallet, domain: any, castData: any, typeHash: string): Promise<string> => {
+  const encodedData = defaultAbiCoder.encode(
+    ['bytes32', 'string[]', 'bytes[]', 'address'],
+    [typeHash, castData._targetNames, castData._datas, castData._origin]
+  );
+  const domainSeparator = _TypedDataEncoder.hashDomain(domain);
+  const digest = solidityKeccak256(["string", "bytes32", "bytes32"], ["\x19\x01", domainSeparator, keccak256(encodedData)]);
+  const signingKey = sender._signingKey();
+  const signature = signingKey.signDigest(digest);
+  const joinedSig = joinSignature(signature);
+  return joinedSig
+}
+describe("InstaTargetAuth", () => {
 
-  let owner: SignerWithAddress, otherAccount: SignerWithAddress;
+  let deployer: SignerWithAddress, sender: Wallet;
   let dsaContract: Contract;
   let instaTargetAuthContract: any
 
   before(async () => {
-    [owner, otherAccount] = await ethers.getSigners();
-    dsaContract = await deployDSAv2(owner.address);
+    [deployer] = await ethers.getSigners();
+
+    sender = new ethers.Wallet(TEST_PRIIVATE_KEY, ethers.provider);
+    dsaContract = await deployDSAv2(deployer.address);
     instaTargetAuthContract = await deployInstaTargetAuth(dsaContract.address);
   })
   describe("#verify",  () => {
     it("happy: should verify successfully", async () => {
-      const sender = await otherAccount.getAddress();
-      const ownerAddress = await owner.getAddress();
 
       const authContractAddress = instaTargetAuthContract.address.toLowerCase();
       const domain = {
@@ -51,28 +64,39 @@ describe.skip("InstaTargetAuth", () => {
         chainId: 31337,
         verifyingContract: authContractAddress
       };
-      const types = {
-        CastData: [
-          { name: "_targetNames", type: "string[]" },
-          { name: "_datas", type: "bytes[]" },
-          { name: "_origin", type: "address" },
-        ],
-      };
 
       const castData = {
-        "_targetNames": ["target111", "target222"],
-        "_datas": [ toUtf8Bytes('0x0102013'), toUtf8Bytes('0x040506')],
-        "_origin": sender.toLowerCase(),
+        "_targetNames": ["target111", "target222", "target333"],
+        "_datas": [toUtf8Bytes("0x111"),toUtf8Bytes("0x222"),toUtf8Bytes("0x333")],
+        "_origin": sender.address.toLowerCase(),
       };     
 
-      const signature = await otherAccount._signTypedData(domain, types, castData);
-      // Verify the signature
-      const recoverAddress = verifyTypedData(domain, types, castData, signature);
-      const verified = await instaTargetAuthContract.connect(otherAccount).verify(signature, sender, castData);
+      const CASTDATA_TYPEHASH = keccak256(toUtf8Bytes("CastData(string[] _targetNames,bytes[] _datas,address _origin)"));
+      const signature = await generateSignature(sender, domain, castData, CASTDATA_TYPEHASH);
+      const verified = await instaTargetAuthContract.connect(deployer).verify(signature, sender.address, castData);
       expect(verified).to.be.true;
     });
 
-    it("should return false if signature is invalid", async () => {})
+    it("should return false if signature is invalid", async () => {
+      const authContractAddress = instaTargetAuthContract.address.toLowerCase();
+      const domain = {
+        name: "InstaTargetAuth",
+        version: "1",
+        chainId: 31337,
+        verifyingContract: authContractAddress
+      };
+
+      const castData = {
+        "_targetNames": ["target111", "target222", "target333"],
+        "_datas": [toUtf8Bytes("0x111"),toUtf8Bytes("0x222"),toUtf8Bytes("0x333")],
+        "_origin": sender.address.toLowerCase(),
+      };     
+
+      const CASTDATA_TYPEHASH = keccak256(toUtf8Bytes("CastData(string[] _targetNames,bytes[] _datas,address _origin)"));
+      const signature = await generateSignature(sender, domain, castData, CASTDATA_TYPEHASH);
+      const verified = await instaTargetAuthContract.connect(deployer).verify(signature, deployer.address, castData);
+      expect(verified).to.be.false;      
+    })
   });
 
   describe("#authCast", () => {
