@@ -9,14 +9,15 @@ interface InstaTargetAuthInterface {
     }
 
     function verify(
+        address auth,
         bytes memory signature,
-        address sender,
         CastData memory castData
     ) external view returns (bool);
 
     function authCast(
+        address dsaAddress,
+        address auth,
         bytes memory signature,
-        address sender,
         CastData memory castData
     ) external payable;
 }
