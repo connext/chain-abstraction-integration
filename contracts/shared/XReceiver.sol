@@ -54,6 +54,7 @@ abstract contract XReceiver {
             success = false;
         }
 
+        // transfer to fallback address if forwardFunctionCall fails
         if (!success) {
             IERC20(_asset).transferFrom(msg.sender, fallbackAddress, _amount);
         }
