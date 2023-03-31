@@ -35,7 +35,7 @@ abstract contract ForwarderXReceiver {
 
         // transfer to fallback address if forwardFunctionCall fails
         if (!forwardFunctionCall(_transferId, data, _amount, _asset)) {
-            IERC20(_asset).transferFrom(msg.sender, fallbackAddress, _amount);
+            IERC20(_asset).transfer(fallbackAddress, _amount);
         }
     }
 
