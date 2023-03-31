@@ -3,36 +3,39 @@ pragma solidity >=0.8.7 <0.9.0;
 
 import "@openzeppelin/contracts/utils/Address.sol";
 import {ISwapRouter} from "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
+import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 
-import {ProtocolTarget} from "./ProtocolTarget.sol";
+import {ForwarderXReceiver} from "./ForwarderXReceiver.sol";
 
-contract Swapper is ProtocolTarget {
-    ISwapRouter public immutable UniswapSwapRouter =
-        ISwapRouter(0xE592427A0AEce92De3Edee1F18E0157C05861564);
+contract UniswapV3Swapper is ForwarderXReceiver {
+    ISwapRouter public immutable uniswapSwapRouter;
 
-    constructor(address _connext) XReceiver(_connext) {}
+    constructor(address _connext, address _uniswapSwapRouter) ForwarderXReceiver(_connext) {
+        uniswapSwapRouter = ISwapRouter(_uniswapSwapRouter);
+    }
 
     function forwardFunctionCall(
+        bytes32 /*_transferId*/,
         bytes memory _data,
         uint256 _amount,
         address _asset
-    ) internal virtual returns (bool) {
+    ) internal override returns (bool) {
         (
-            address fromAsset,
             address toAsset,
             uint24 poolFee,
             uint256 amountOutMin,
-            address recipient
+            address recipient,
+            uint256 value
         ) = abi.decode(
                 _data,
-                (address, address, uint24, uint256, address)
+                (address, uint24, uint256, address, uint256)
             );
 
-        TransferHelper.safeApprove(fromAsset, address(UniswapSwapRouter), _amount);
+        TransferHelper.safeApprove(_asset, address(uniswapSwapRouter), _amount);
         // Set up uniswap swap params.
         ISwapRouter.ExactInputSingleParams memory params = ISwapRouter
             .ExactInputSingleParams({
-                tokenIn: fromAsset,
+                tokenIn: _asset,
                 tokenOut: toAsset,
                 fee: poolFee,
                 recipient: recipient,
@@ -43,7 +46,7 @@ contract Swapper is ProtocolTarget {
             });
 
         // The call to `exactInputSingle` executes the swap.
-        ISwapRouter(swapper).exactInputSingle{value: value}(params);
+        ISwapRouter(uniswapSwapRouter).exactInputSingle{value: value}(params);
 
         return true;
     }
