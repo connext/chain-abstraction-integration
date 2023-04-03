@@ -17,8 +17,8 @@ contract MeanFinanceTarget is MeanFinanceAdapter, UniswapV3ForwarderXReceiver {
   function _forwardFunctionCall(
     bytes memory _preparedData,
     bytes32,
-    uint256 ,
-    address 
+    uint256,
+    address
   ) internal override returns (bool) {
     // Decode calldata
     (
@@ -47,6 +47,7 @@ contract MeanFinanceTarget is MeanFinanceAdapter, UniswapV3ForwarderXReceiver {
           IDCAPermissionManager.PermissionSet[]
         )
       );
+
     deposit(
       from,
       to,
