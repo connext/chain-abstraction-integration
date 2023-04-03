@@ -7,7 +7,7 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { ISwapRouter } from "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 import { TransferHelper } from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 
-abstract contract ForwarderXReceiver {
+abstract contract UniswapV3ForwarderXReceiver {
   // The Connext contract on this domain
   IConnext public immutable connext;
   ISwapRouter public immutable uniswapSwapRouter;
