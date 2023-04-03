@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 import { ISwapRouter } from "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 import { TransferHelper } from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 
-import {ForwarderXReceiver} from "./ForwarderXReceiver.sol";
+import {ForwarderXReceiver} from "../shared/ForwarderXReceiver.sol";
 
 abstract contract UniswapV3ForwarderXReceiver is ForwarderXReceiver {
   ISwapRouter public immutable uniswapSwapRouter;

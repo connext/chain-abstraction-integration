@@ -3,7 +3,7 @@ pragma solidity ^0.8.13;
 
 import { TransferHelper } from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 
-import { UniswapV3ForwarderXReceiver } from "../shared/UniswapV3ForwarderXReceiver.sol";
+import { UniswapV3ForwarderXReceiver } from "../Uniswap/UniswapV3ForwarderXReceiver.sol";
 
 interface IGreeter {
   function greetWithTokens(
