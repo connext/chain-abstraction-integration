@@ -6,5 +6,8 @@ interface CTokenExtensionInterface {
 }
 
 interface CTokenInterface {
-    function asCTokenExtensionInterface() external view returns (CTokenExtensionInterface);
+    function asCTokenExtensionInterface()
+        external
+        view
+        returns (CTokenExtensionInterface);
 }

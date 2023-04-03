@@ -13,8 +13,8 @@
     "forge:test": "forge test --via-ir",
     "lint": "yarn lint:sol && yarn prettier:check",
     "lint:sol": "forge fmt --check && yarn solhint \"{script,src,test}/**/*.sol\"",
-    "prettier:check": "prettier --check \"**/*.{json,md,yml}\"",
-    "prettier:write": "prettier --write \"**/*.{json,md,yml}\"",
+    "prettier:check": "prettier --check \"contracts/**/*.sol\"",
+    "prettier:write": "prettier --write \"contracts/**/*.sol\"",
     "hardhat": "hardhat",
     "export": "hardhat export --export-all ./deployments.json",
     "clean": "rimraf cache out"

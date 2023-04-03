@@ -20,7 +20,8 @@ contract TestHelper is Test {
     address public USER_CHAIN_A = address(bytes20(keccak256("USER_CHAIN_A")));
     address public USER_CHAIN_B = address(bytes20(keccak256("USER_CHAIN_B")));
     address public MOCK_CONNEXT = address(bytes20(keccak256("MOCK_CONNEXT")));
-    address public MOCK_MEAN_FINANCE = address(bytes20(keccak256("MOCK_MEAN_FINANCE")));
+    address public MOCK_MEAN_FINANCE =
+        address(bytes20(keccak256("MOCK_MEAN_FINANCE")));
     address public TokenA_ERC20 = address(bytes20(keccak256("TokenA_ERC20")));
     address public TokenB_ERC20 = address(bytes20(keccak256("TokenB_ERC20")));
 

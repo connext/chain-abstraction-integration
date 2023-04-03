@@ -1,11 +1,14 @@
 # Connext-Integration
+
 Contracts for Connext integration
 
 # Setting up environment
 
 ### 1. Node.js environment - Prerequisite
+
 You can `skip` this step if you are using node.js version `>=16.0`
 command to check your node.js version
+
 ```
 node -v
 ```
@@ -20,4 +23,5 @@ yarn
 ```
 
 # Reference
+
 - https://hardhat.org/tutorial/setting-up-the-environment
