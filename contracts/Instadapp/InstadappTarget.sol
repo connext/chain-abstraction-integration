@@ -10,6 +10,14 @@ contract InstadappTarget is IXReceiver, InstadappAdapter {
     // The Connext contract on this domain
     IConnext public connext;
 
+    event AuthCast(
+        bytes32 transferId,
+        address dsaAddress,
+        address auth,
+        bool success,
+        bytes returnedData
+    );
+
     modifier onlyConnext() {
         require(msg.sender == address(connext), "Caller must be Connext");
         _;
@@ -38,6 +46,16 @@ contract InstadappTarget is IXReceiver, InstadappAdapter {
         require(dsaAddress != address(0), "!invalidFallback");
         IERC20(_asset).transferFrom(msg.sender, dsaAddress, _amount);
 
-        authCast(dsaAddress, auth, signature, _castData);
+        (bool success, bytes memory returnedData) = address(this).call(
+            abi.encodeWithSignature(
+                "authCast(address,address,bytes,CastData)",
+                dsaAddress,
+                auth,
+                signature,
+                _castData
+            )
+        );
+
+        emit AuthCast(_transferId, dsaAddress, auth, success, returnedData);
     }
 }
