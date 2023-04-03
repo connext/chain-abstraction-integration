@@ -26,9 +26,8 @@ contract XSwapAndGreet is UniswapV3ForwarderXReceiver {
 
   /// INTERNAL
   function _forwardFunctionCall(
-    bytes memory _prepared,
+    bytes memory _preparedData,
     bytes32 /*_transferId*/,
-    bytes memory /*_data*/,
     uint256 /*_amount*/,
     address /*_asset*/
   ) internal override returns (bool) {
@@ -36,7 +35,7 @@ contract XSwapAndGreet is UniswapV3ForwarderXReceiver {
       uint256 amountOut,
       address toAsset,
       bytes memory forwardCallData
-    ) = abi.decode(_prepared, (uint256, address, bytes));
+    ) = abi.decode(_preparedData, (uint256, address, bytes));
 
     // Decode calldata
     (string memory greeting) = abi.decode(

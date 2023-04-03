@@ -52,7 +52,7 @@ abstract contract ForwarderXReceiver {
     bytes memory _prepared = _prepare(_transferId, _data, _amount, _asset);
 
     // Forward the call
-    return _forwardFunctionCall(_prepared, _transferId, _data, _amount, _asset);
+    return _forwardFunctionCall(_prepared, _transferId, _amount, _asset);
   }
 
   function _prepare(
@@ -65,9 +65,8 @@ abstract contract ForwarderXReceiver {
   }
 
   function _forwardFunctionCall(
-    bytes memory _prepared,
+    bytes memory _preparedData,
     bytes32 _transferId,
-    bytes memory _data,
     uint256 _amount,
     address _asset
   ) internal virtual returns (bool) {}
