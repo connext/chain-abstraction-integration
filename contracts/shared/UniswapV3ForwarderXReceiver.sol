@@ -14,19 +14,20 @@ abstract contract UniswapV3ForwarderXReceiver is ForwarderXReceiver {
   }
 
   /// INTERNAL
-  function _forwardFunctionCall(
+  function _prepare(
     bytes32 /*_transferId*/,
     bytes memory _data,
     uint256 _amount,
     address _asset
-  ) internal virtual returns (bool) {
+  ) internal override returns (bytes memory) {
     (
       address toAsset,
       uint24 poolFee,
       uint256 amountOutMin,
       address recipient,
-      uint256 value
-    ) = abi.decode(_data, (address, uint24, uint256, address, uint256));
+      uint256 value,
+      bytes memory forwardCallData
+    ) = abi.decode(_data, (address, uint24, uint256, address, uint256, bytes));
 
     uint256 amountOut = _amount;
     if (_asset != toAsset) {
@@ -48,6 +49,6 @@ abstract contract UniswapV3ForwarderXReceiver is ForwarderXReceiver {
       amountOut = ISwapRouter(uniswapSwapRouter).exactInputSingle{ value: value }(params);
     }
 
-    // Overrider implements additional forwarding logic.
+    return abi.encode(amountOut, toAsset, forwardCallData);
   }
 }
