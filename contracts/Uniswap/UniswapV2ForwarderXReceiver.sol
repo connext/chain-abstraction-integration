@@ -23,29 +23,26 @@ abstract contract UniswapV2ForwarderXReceiver is ForwarderXReceiver {
     uint256 _amount,
     address _asset
   ) internal override returns (bytes memory) {
-    (
-      address toAsset,
-      uint256 amountOutMin,
-      address recipient,
-      bytes memory forwardCallData
-    ) = abi.decode(_data, (address, uint256, address, bytes));
+    (address toAsset, uint256 amountOutMin, bytes memory forwardCallData) = abi
+      .decode(_data, (address, uint256, bytes));
 
     uint[] memory amounts = new uint[](1);
     amounts[0] = _amount;
+    address[] memory path = new address[](2);
+    path[0] = _asset;
+    path[1] = toAsset;
     if (_asset != toAsset) {
       TransferHelper.safeApprove(_asset, address(uniswapSwapRouter), _amount);
-      address[] memory path = new address[](2);
-      path[0] = _asset;
-      path[1] = toAsset;
       amounts = uniswapSwapRouter.swapExactTokensForTokens(
         _amount,
         amountOutMin,
         path,
-        recipient,
+        address(this),
         block.timestamp
       );
     }
 
-    return abi.encode(amounts, toAsset, forwardCallData);
+    return
+      abi.encode(amounts, toAsset, path, amountOutMin, forwardCallData);
   }
 }
