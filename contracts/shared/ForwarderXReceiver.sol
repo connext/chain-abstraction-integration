@@ -9,7 +9,10 @@ abstract contract ForwarderXReceiver {
   // The Connext contract on this domain
   IConnext public immutable connext;
 
-  /// Modifier
+  /// EVENTS
+  event ForwardedFunctionCallFailed();
+
+  /// MODIFIERS
   modifier onlyConnext() {
     require(msg.sender == address(connext), "Caller must be Connext");
     _;
@@ -38,6 +41,7 @@ abstract contract ForwarderXReceiver {
     // transfer to fallback address if forwardFunctionCall fails
     if (!_prepareAndForward(_transferId, data, _amount, _asset)) {
       IERC20(_asset).transfer(fallbackAddress, _amount);
+      emit ForwardedFunctionCallFailed();
     }
   }
 
