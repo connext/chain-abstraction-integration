@@ -10,20 +10,24 @@ import {IComptroller} from "./interfaces/IComptroller.sol";
 contract MidasProtocolAdapter {
     using SafeERC20 for IERC20;
 
+    IComptroller public immutable comptroller;
+
     /// Payable
     receive() external payable virtual {}
+
+    constructor(address _comptroller) {
+        comptroller = IComptroller(_comptroller);
+    }
 
     /**
      * @dev Internal function to mint cTokens and transfer them to the `minter`
      *
-     * @param comptrollerAddress The comptroller address
      * @param cTokenAddress The cToken address to mint
      * @param asset The underlying asset address
      * @param amount The amount of underlying asset
      * @param minter The recipient to transfer minted cTokens
      */
     function mint(
-        address comptrollerAddress,
         address cTokenAddress,
         address asset,
         uint256 amount,
@@ -33,7 +37,6 @@ contract MidasProtocolAdapter {
         require(amount > 0, "zero amount");
 
         ICToken cToken = ICToken(cTokenAddress);
-        IComptroller comptroller = IComptroller(comptrollerAddress);
 
         // Enter the market if the contract didn't enter the market, otherwise skip
         if (comptroller.checkMembership(address(this), cToken)) {

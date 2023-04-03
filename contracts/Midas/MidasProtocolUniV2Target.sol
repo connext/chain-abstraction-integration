@@ -8,13 +8,38 @@ contract MidasProtocolUniV2Target is
     MidasProtocolAdapter,
     UniswapV2ForwarderXReceiver
 {
-    address public immutable COMPTROLLER_ADDRESS;
-
     constructor(
         address _connext,
         address _uniswapSwapRouter,
         address _comptroller
-    ) UniswapV2ForwarderXReceiver(_connext, _uniswapSwapRouter) {
-        COMPTROLLER_ADDRESS = _comptroller;
+    )
+        UniswapV2ForwarderXReceiver(_connext, _uniswapSwapRouter)
+        MidasProtocolAdapter(_comptroller)
+    {}
+
+    function _forwardFunctionCall(
+        bytes memory _preparedData,
+        bytes32,
+        uint256,
+        address
+    ) internal override returns (bool) {
+        // Decode calldata
+        (
+            uint256 amountOut,
+            address toAsset,
+            ,
+            ,
+            bytes memory forwardCallData
+        ) = abi.decode(
+                _preparedData,
+                (uint256, address, uint24, uint256, bytes)
+            );
+
+        (address cTokenAddress, address minter) = abi.decode(
+            forwardCallData,
+            (address, address)
+        );
+
+        mint(cTokenAddress, toAsset, amountOut, minter);
     }
 }
