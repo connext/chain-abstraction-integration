@@ -3,26 +3,20 @@ pragma solidity ^0.8.0;
 
 import {IConnext} from "@connext/interfaces/core/IConnext.sol";
 import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
-import {InstaTargetAuthInterface as IAT} from "./interfaces/InstaTargetAuthInterface.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {InstadappAdapter} from "./InstadappAdapter.sol";
 
-contract InstadappTarget is IXReceiver {
-    // Whitelist addresses allowed to  call xReceive
-    // function whitelistAddress()
-
+contract InstadappTarget is IXReceiver, InstadappAdapter {
     // The Connext contract on this domain
     IConnext public connext;
-
-    // The MetaTxAuthority contract on this domain
-    IAT public targetAuth;
 
     modifier onlyConnext() {
         require(msg.sender == address(connext), "Caller must be Connext");
         _;
     }
 
-    constructor(address _connext, address _targetAuth) {
+    constructor(address _connext) {
         connext = IConnext(_connext);
-        targetAuth = IAT(_targetAuth);
     }
 
     function xReceive(
@@ -38,9 +32,12 @@ contract InstadappTarget is IXReceiver {
             address dsaAddress,
             address auth,
             bytes memory signature,
-            IAT.CastData memory _castData
-        ) = abi.decode(_callData, (address, address, bytes, IAT.CastData));
+            CastData memory _castData
+        ) = abi.decode(_callData, (address, address, bytes, CastData));
 
-        targetAuth.authCast(dsaAddress, auth, signature, _castData);
+        require(dsaAddress != address(0), "!invalidFallback");
+        IERC20(_asset).transferFrom(msg.sender, dsaAddress, _amount);
+
+        authCast(dsaAddress, auth, signature, _castData);
     }
 }
