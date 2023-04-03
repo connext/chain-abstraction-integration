@@ -28,6 +28,7 @@ abstract contract UniswapV3ForwarderXReceiver is ForwarderXReceiver {
       uint256 value
     ) = abi.decode(_data, (address, uint24, uint256, address, uint256));
 
+    uint256 amountOut = _amount;
     if (_asset != toAsset) {
       TransferHelper.safeApprove(_asset, address(uniswapSwapRouter), _amount);
       // Set up uniswap swap params.
@@ -44,7 +45,7 @@ abstract contract UniswapV3ForwarderXReceiver is ForwarderXReceiver {
         });
 
       // The call to `exactInputSingle` executes the swap.
-      ISwapRouter(uniswapSwapRouter).exactInputSingle{ value: value }(params);
+      amountOut = ISwapRouter(uniswapSwapRouter).exactInputSingle{ value: value }(params);
     }
 
     // Overrider implements additional forwarding logic.
