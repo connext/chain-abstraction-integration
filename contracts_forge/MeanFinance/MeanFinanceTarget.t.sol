@@ -11,7 +11,8 @@ contract MeanFinanceTargetTest is TestHelper {
     // error ProposedOwnable__onlyOwner_notOwner();
 
     // ============ Events ============
-    event XReceiveDeposit( // must be amount in bridge asset less fees
+    event XReceiveDeposit(
+        // must be amount in bridge asset less fees
         bytes32 _transferId,
         uint256 _amount,
         address _asset,
@@ -23,7 +24,8 @@ contract MeanFinanceTargetTest is TestHelper {
 
     // ============ Storage ============
     address private connext = address(1);
-    address public notOriginSender = address(bytes20(keccak256("NotOriginSender")));
+    address public notOriginSender =
+        address(bytes20(keccak256("NotOriginSender")));
 
     address private deposit_from = address(2);
     address private deposit_to = address(3);
@@ -62,6 +64,13 @@ contract MeanFinanceTargetTest is TestHelper {
             deposit_permissions
         );
 
-        target.xReceive(transferId, amount, TokenA_ERC20, notOriginSender, GOERLI_DOMAIN_ID, _callData);
+        target.xReceive(
+            transferId,
+            amount,
+            TokenA_ERC20,
+            notOriginSender,
+            GOERLI_DOMAIN_ID,
+            _callData
+        );
     }
 }

@@ -40,7 +40,12 @@ contract MeanFinanceSource is UniswapAdapter {
             weth.deposit{value: amountIn}();
             inputAsset = address(weth);
         } else {
-            TransferHelper.safeTransferFrom(inputAsset, msg.sender, address(this), amountIn);
+            TransferHelper.safeTransferFrom(
+                inputAsset,
+                msg.sender,
+                address(this),
+                amountIn
+            );
         }
 
         // swap to donation asset if needed

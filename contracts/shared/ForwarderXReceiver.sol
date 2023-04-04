@@ -31,7 +31,7 @@ abstract contract ForwarderXReceiver {
   /**
    * @notice Receives funds from Connext and forwards them to a contract, using a two step process which is defined by the developer.
    * @dev _originSender and _origin are not used in this implementation because this is meant for an "unauthenticated" call. This means
-   * any router can call this function and no guarantees are made on the data passed in. This should only be used when there are 
+   * any router can call this function and no guarantees are made on the data passed in. This should only be used when there are
    * funds passed into the contract that need to be forwarded to another contract. This guarantees economically that there is no
    * reason to call this function maliciously, because the router would be spending their own funds.
    * @param _transferId - The transfer ID of the transfer that triggered this call
@@ -54,9 +54,9 @@ abstract contract ForwarderXReceiver {
     );
 
     bool successfulForward;
-    try
-      this.prepareAndForward(_transferId, _data, _amount, _asset)
-    returns (bool success) {
+    try this.prepareAndForward(_transferId, _data, _amount, _asset) returns (
+      bool success
+    ) {
       successfulForward = success;
       if (!success) {
         emit ForwardedFunctionCallFailed(_transferId);
@@ -91,7 +91,7 @@ abstract contract ForwarderXReceiver {
    * on a DEX, and _forwardFunctionCall can be used to call a contract with the swapped funds.
    * @dev This function is intended to be called by the xReceive function, and should not be called outside
    * of that context. The function is `public` so that it can be used with try-catch.
-   * 
+   *
    * @param _transferId - The transfer ID of the transfer that triggered this call
    * @param _data - The data to be prepared
    * @param _amount - The amount of funds received in this transfer
@@ -108,9 +108,8 @@ abstract contract ForwarderXReceiver {
     }
     // Prepare for forwarding
     bytes memory _prepared = _prepare(_transferId, _data, _amount, _asset);
-
-    // Forward the call
-    return _forwardFunctionCall(_prepared, _transferId, _amount, _asset);
+    // Forward the function call
+    return _forwardFunctionCall(_transferId, _prepared, _amount, _asset);
   }
 
   /// INTERNAL ABSTRACT
@@ -120,7 +119,7 @@ abstract contract ForwarderXReceiver {
    * prepared data to _forwardFunctionCall.
    * @dev This function needs to be overriden in implementations of this contract. If no preparation is needed, this
    * function can be overriden to return the data as is.
-   * 
+   *
    * @param _transferId - The transfer ID of the transfer that triggered this call
    * @param _data - The data to be prepared
    * @param _amount - The amount of funds received in this transfer
@@ -139,8 +138,8 @@ abstract contract ForwarderXReceiver {
    * @notice Forwards the function call. This can execute any arbitrary function call in a two step process.
    * The first step is to prepare the data, and the second step is to forward the function call to a
    * given contract.
-   * @dev This function needs to be overriden in implementations of this contract. 
-   * 
+   * @dev This function needs to be overriden in implementations of this contract.
+   *
    * @param _preparedData - The data to be forwarded, after processing in _prepare
    * @param _transferId - The transfer ID of the transfer that triggered this call
    * @param _amount - The amount of funds received in this transfer

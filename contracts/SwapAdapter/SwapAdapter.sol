@@ -22,7 +22,7 @@ contract SwapAdapter is Swapper {
     receive() external payable virtual {}
 
     /// TODO: Need to implement max-approve to avoid calling approve for every swap.
-    /// And then safety checks around it. 
+    /// And then safety checks around it.
     /// TODO: Add function to whitelist swappers
     /// TODO: Add function to remove whitelisted swappers
     /// TODO: Add roles for admin
