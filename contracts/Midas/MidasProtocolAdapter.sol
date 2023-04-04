@@ -27,7 +27,7 @@ contract MidasProtocolAdapter {
      * @param amount The amount of underlying asset
      * @param minter The recipient to transfer minted cTokens
      */
-    function mint(
+    function _mint(
         address cTokenAddress,
         address asset,
         uint256 amount,
@@ -47,7 +47,7 @@ contract MidasProtocolAdapter {
 
         // Approve underlying
         if (!cToken.isCEther()) {
-            safeApprove(IERC20(asset), cTokenAddress, amount);
+            _safeApprove(IERC20(asset), cTokenAddress, amount);
         } else {
             require(
                 asset == ICErc20(cTokenAddress).underlying(),
@@ -68,7 +68,7 @@ contract MidasProtocolAdapter {
     /**
      * @dev Internal function to approve unlimited tokens of `erc20Contract` to `to`.
      */
-    function safeApprove(IERC20 token, address to, uint256 minAmount) private {
+    function _safeApprove(IERC20 token, address to, uint256 minAmount) private {
         uint256 allowance = token.allowance(address(this), to);
 
         if (allowance < minAmount) {

@@ -40,6 +40,6 @@ contract MidasProtocolUniV2Target is
             (address, address)
         );
 
-        mint(cTokenAddress, toAsset, amountOut, minter);
+        _mint(cTokenAddress, toAsset, amountOut, minter);
     }
 }
