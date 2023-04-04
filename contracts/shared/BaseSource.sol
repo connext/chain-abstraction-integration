@@ -5,7 +5,7 @@ import {IConnext} from "@connext/interfaces/core/IConnext.sol";
 import {IWeth} from "@connext/interfaces/core/IWeth.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract ProtocolSource {
+contract BaseSource {
     // The Connext contract on this domain
     IConnext public immutable connext;
     /// @notice WETH address to handle native assets before swapping / sending.
