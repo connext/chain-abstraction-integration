@@ -10,6 +10,7 @@
     "compile": "hardhat compile",
     "test": "yarn run hardhat:test",
     "hardhat:test": "hardhat test",
+    "forge:install": "forge install",
     "forge:test": "forge test --via-ir",
     "lint": "yarn lint:sol && yarn prettier:check",
     "lint:sol": "forge fmt --check && yarn solhint \"{script,src,test}/**/*.sol\"",
