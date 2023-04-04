@@ -6,64 +6,90 @@ import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@mean-finance/dca-v2-core/contracts/interfaces/IDCAHub.sol";
 
-import {MeanFinanceAdapter} from "./MeanFinanceAdapter.sol";
-import {UniswapV3ForwarderXReceiver} from "../Uniswap/UniswapV3ForwarderXReceiver.sol";
+contract MeanFinanceTarget is MeanFinanceAdapter, UniswapAdapter {
+  // The Connext contract on this domain
+  IConnext public immutable connext;
 
-contract MeanFinanceTarget is MeanFinanceAdapter, UniswapV3ForwarderXReceiver {
-    constructor(
-        address _connext,
-        address _uniswapSwapRouter
-    ) UniswapV3ForwarderXReceiver(_connext, _uniswapSwapRouter) {}
+  receive() external payable virtual override(MeanFinanceAdapter, UniswapAdapter) {}
 
-    function _forwardFunctionCall(
-        bytes memory _preparedData,
-        bytes32,
-        uint256,
-        address
-    ) internal override returns (bool) {
-        // Decode calldata
-        (
-            uint256 amountOut,
-            address toAsset,
-            uint24 poolFee,
-            uint256 amountOutMin,
-            bytes memory forwardCallData
-        ) = abi.decode(
-                _preparedData,
-                (uint256, address, uint24, uint256, bytes)
-            );
+  /// Modifier
+  modifier onlyConnext() {
+    require(msg.sender == address(connext), "Caller must be Connext");
+    _;
+  }
 
-        (
-            address _from,
-            address _to,
-            uint256 _amount,
-            uint32 _amountOfSwaps,
-            uint32 _swapInterval,
-            address _owner,
-            IDCAPermissionManager.PermissionSet[] memory _permissions
-        ) = abi.decode(
-                forwardCallData,
-                (
-                    address,
-                    address,
-                    uint256,
-                    uint32,
-                    uint32,
-                    address,
-                    IDCAPermissionManager.PermissionSet[]
-                )
-            );
+  constructor(address _connext) {
+    connext = IConnext(_connext);
+  }
 
-        deposit(
-            _from,
-            _to,
-            amountOut,
-            _amountOfSwaps,
-            _swapInterval,
-            _owner,
-            _permissions
-        );
+  function xReceive(
+    bytes32 _transferId,
+    uint256 _amount, // Final Amount receive via Connext(After AMM calculation)
+    address _asset,
+    address _originSender,
+    uint32 _origin,
+    bytes calldata _callData
+  ) external returns (bytes memory) {
+    uint256 amount = _amount;
+    // Decode calldata
+    (
+      uint24 poolFee,
+      uint256 amountOutMin,
+      address from,
+      address to,
+      uint32 amountOfSwaps,
+      uint32 swapInterval,
+      address owner,
+      IDCAPermissionManager.PermissionSet[] memory permissions
+    ) = decode(_callData);
 
-        return true;
+    require(amount > 0, "!amount");
+    require(amountOutMin > 0, "!amountOut");
+    require(from != address(0), "!invalid");
+
+    if (from != _asset) {
+      // swap to deposit asset if needed
+      amount = swap(_asset, from, poolFee, amount, amountOutMin);
+      // TODO: add fallback to return funds to user address
     }
+
+    // deposit
+    deposit(from, to, amount, amountOfSwaps, swapInterval, owner, permissions);
+  }
+
+  function encode(
+    uint24 poolFee,
+    uint256 amountOutMin,
+    address from,
+    address to,
+    uint32 amountOfSwaps,
+    uint32 swapInterval,
+    address owner,
+    IDCAPermissionManager.PermissionSet[] memory permissions
+  ) external pure returns (bytes memory) {
+    return abi.encode(poolFee, amountOutMin, from, to, amountOfSwaps, swapInterval, owner, permissions);
+  }
+
+  /// INTERNAL
+  function decode(
+    bytes calldata data
+  )
+    internal
+    pure
+    returns (
+      uint24 poolFee,
+      uint256 amountOutMin,
+      address from,
+      address to,
+      uint32 amountOfSwaps,
+      uint32 swapInterval,
+      address owner,
+      IDCAPermissionManager.PermissionSet[] memory permissions
+    )
+  {
+    (poolFee, amountOutMin, from, to, amountOfSwaps, swapInterval, owner, permissions) = abi.decode(
+      data,
+      (uint24, uint256, address, address, uint32, uint32, address, IDCAPermissionManager.PermissionSet[])
+    );
+  }
 }

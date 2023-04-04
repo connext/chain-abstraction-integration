@@ -17,6 +17,11 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Install Foundry
+        uses: onbjerg/foundry-toolchain@v1
+        with:
+          version: nightly      
+
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
@@ -26,5 +31,8 @@ jobs:
       - name: Yarn install
         run: yarn install
 
-      - name: Run Hardhat tests
-        run: yarn test
+      - name: Forget install
+        run: yarn forge:install
+
+      - name: Run Forge tests
+        run: yarn forge:test

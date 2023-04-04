@@ -18,29 +18,28 @@ contract UniswapV3Adapter {
     /// Payable
     receive() external payable virtual {}
 
-    function swap(
-        address fromAsset,
-        address toAsset,
-        uint24 poolFee,
-        uint256 amountIn,
-        uint256 amountOutMin
-    ) public returns (uint256 amountOut) {
-        // Approve the uniswap router to spend fromAsset.
-        TransferHelper.safeApprove(fromAsset, address(swapRouter), amountIn);
-        // Set up uniswap swap params.
-        ISwapRouter.ExactInputSingleParams memory params = ISwapRouter
-            .ExactInputSingleParams({
-                tokenIn: fromAsset,
-                tokenOut: toAsset,
-                fee: poolFee,
-                recipient: address(this),
-                deadline: block.timestamp,
-                amountIn: amountIn,
-                amountOutMinimum: amountOutMin,
-                sqrtPriceLimitX96: 0
-            });
+  function swap(
+    address fromAsset,
+    address toAsset,
+    uint24 poolFee,
+    uint256 amountIn,
+    uint256 amountOutMin
+  ) public returns (uint256 amountOut) {
+    // Approve the uniswap router to spend fromAsset.
+    TransferHelper.safeApprove(fromAsset, address(swapRouter), amountIn);
+    // Set up uniswap swap params.
+    ISwapRouter.ExactInputSingleParams memory params = ISwapRouter.ExactInputSingleParams({
+      tokenIn: fromAsset,
+      tokenOut: toAsset,
+      fee: poolFee,
+      recipient: address(this),
+      deadline: block.timestamp,
+      amountIn: amountIn,
+      amountOutMinimum: amountOutMin,
+      sqrtPriceLimitX96: 0
+    });
 
-        // The call to `exactInputSingle` executes the swap.
-        amountOut = swapRouter.exactInputSingle(params);
-    }
+    // The call to `exactInputSingle` executes the swap.
+    amountOut = swapRouter.exactInputSingle(params);
+  }
 }

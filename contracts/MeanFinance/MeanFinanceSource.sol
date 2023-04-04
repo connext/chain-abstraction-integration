@@ -75,11 +75,23 @@ contract MeanFinanceSource is UniswapV3Adapter {
         );
     }
 
-    /// INTERNAL
-    function connextApprovedAssets(
-        address adopted
-    ) internal view returns (bool approved) {
-        TokenId memory canonical = connext.adoptedToCanonical(adopted);
-        approved = connext.approvedAssets(canonical);
-    }
+    TransferHelper.safeApprove(connextAsset, address(connext), amountOut);
+    // xcall
+    // Perform connext transfer
+    transferId = connext.xcall{value: msg.value}(
+      destinationDomain, //
+      target, //
+      connextAsset, //
+      msg.sender, //
+      amountOut, //
+      connextSlippage, //
+      _callData //
+    );
+  }
+
+  /// INTERNAL
+  function connextApprovedAssets(address adopted) internal view returns (bool approved) {
+    TokenId memory canonical = connext.adoptedToCanonical(adopted);
+    approved = connext.approvedAssets(canonical);
+  }
 }

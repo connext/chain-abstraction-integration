@@ -6,8 +6,8 @@ import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 abstract contract ForwarderXReceiver {
-    // The Connext contract on this domain
-    IConnext public immutable connext;
+  // The Connext contract on this domain
+  IConnext public immutable connext;
 
     /// EVENTS
     event ForwardedFunctionCallFailed(bytes32 _transferId);
@@ -26,6 +26,7 @@ abstract contract ForwarderXReceiver {
         require(msg.sender == address(connext), "Caller must be Connext");
         _;
     }
+  }
 
     constructor(address _connext) {
         connext = IConnext(_connext);
