@@ -6,11 +6,14 @@ import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IER
 import {ISwapRouter} from "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 
-contract UniswapAdapter {
+contract UniswapV3Adapter {
     /// @notice UniswapV3 swap router contract to swap
     /// @dev If deploying to celo, change hardcoded address. see https://docs.uniswap.org/contracts/v3/reference/deployments
-    ISwapRouter public immutable swapRouter =
-        ISwapRouter(0xE592427A0AEce92De3Edee1F18E0157C05861564);
+    ISwapRouter public immutable swapRouter;
+
+    constructor(address _uniswapSwapRouter) {
+        swapRouter = ISwapRouter(_uniswapSwapRouter);
+    }
 
     /// Payable
     receive() external payable virtual {}

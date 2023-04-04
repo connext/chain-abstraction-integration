@@ -4,17 +4,17 @@ pragma solidity ^0.8.13;
 import {IConnext, TokenId} from "@connext/interfaces/core/IConnext.sol";
 import {IWeth} from "@connext/interfaces/core/IWeth.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "../Uniswap/UniswapAdapter.sol";
+import {UniswapV3Adapter} from "../Uniswap/UniswapV3Adapter.sol";
 
-contract MeanFinanceSource is UniswapAdapter {
+contract MeanFinanceSource is UniswapV3Adapter {
     // The Connext contract on this domain
     IConnext public immutable connext;
     /// @notice WETH address to handle native assets before swapping / sending.
     IWeth public immutable weth;
 
-    receive() external payable virtual override(UniswapAdapter) {}
+    receive() external payable virtual override(UniswapV3Adapter) {}
 
-    constructor(address _connext, address _weth) {
+    constructor(address _connext, address _weth, address _swaprouter) UniswapV3Adapter(_swaprouter) {
         connext = IConnext(_connext);
         weth = IWeth(_weth);
     }
