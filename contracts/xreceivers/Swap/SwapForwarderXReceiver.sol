@@ -5,8 +5,8 @@ import {IUniswapV2Router02} from "@uniswap/v2-periphery/contracts/interfaces/IUn
 import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
-import {ForwarderXReceiver} from "../shared/ForwarderXReceiver.sol";
-import {SwapAdapter} from "../SwapAdapter/SwapAdapter.sol";
+import {ForwarderXReceiver} from "../ForwarderXReceiver.sol";
+import {SwapAdapter} from "./SwapAdapter.sol";
 
 abstract contract SwapForwarderXReceiver is ForwarderXReceiver, SwapAdapter {
   using Address for address;
