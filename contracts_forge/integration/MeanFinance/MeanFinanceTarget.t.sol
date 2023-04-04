@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IDCAHubPositionHandler, IDCAPermissionManager} from "@mean-finance/dca-v2-core/contracts/interfaces/IDCAHub.sol";
+
 import {TestHelper} from "../../utils/TestHelper.sol";
 import {MeanFinanceTarget} from "../../../contracts/integration/MeanFinance/MeanFinanceTarget.sol";
 import {MeanFinanceAdapter} from "../../../contracts/integration/MeanFinance/MeanFinanceAdapter.sol";
-import {IDCAHubPositionHandler, IDCAPermissionManager} from "@mean-finance/dca-v2-core/contracts/interfaces/IDCAHub.sol";
 
 contract MeanTest is MeanFinanceTarget {
-  constructor(address _connext, address _uniswapSwapRouter) MeanFinanceTarget(_connext) {}
+  constructor(address _connext, address _hub) MeanFinanceTarget(_connext, _hub) {}
 
   function forwardFunctionCall(
     bytes memory _preparedData,
@@ -37,6 +39,7 @@ contract MeanFinanceTargetTest is TestHelper {
 
   // ============ Storage ============
   address private connext = address(1);
+  address private hub = address(2);
   address public notOriginSender = address(bytes20(keccak256("NotOriginSender")));
 
   address private deposit_from = address(2);
@@ -57,36 +60,36 @@ contract MeanFinanceTargetTest is TestHelper {
 
   function setUp() public override {
     super.setUp();
-    // target = new MeanTest(MOCK_CONNEXT, UNISWAP);
+    target = new MeanTest(MOCK_CONNEXT, UNISWAP);
 
-    // vm.label(address(this), "TestContract");
-    // vm.label(address(target), "MeanFinanceTarget");
+    vm.label(address(this), "TestContract");
+    vm.label(address(target), "MeanFinanceTarget");
   }
 
   // ============ MeanFinanceTarget._forwardFunctionCall ============
   function test_MeanFinanceTargetTest___forwardFunctionCall_shouldWork() public {
-    // vm.prank(address(target));
-    // uint256 amountOut = 42;
-    // address toAsset = address(6);
-    // uint24 poolFee = 2;
-    // uint256 amountOutMin = 40;
-    // address from = address(7);
-    // address to = address(8);
-    // uint32 amountOfSwaps = 1;
-    // uint32 swapInterval = 2;
-    // address owner = address(9);
-    // IDCAPermissionManager.PermissionSet[] memory permissions = new IDCAPermissionManager.PermissionSet[](1);
-    // IDCAPermissionManager.Permission[] memory permission = new IDCAPermissionManager.Permission[](1);
-    // permission[0] = IDCAPermissionManager.Permission.INCREASE;
-    // permissions[0] = IDCAPermissionManager.PermissionSet(address(10), permission);
-    // bytes memory forwardCallData = abi.encode(from, to, amountOfSwaps, swapInterval, owner, permissions);
-    // bytes memory _preparedData = abi.encode(amountOut, toAsset, poolFee, amountOutMin, forwardCallData);
-    // // vm.mockCall(
-    // //   address(target),
-    // //   abi.encodeWithSelector(IDCAHubPositionHandler.deposit.selector),
-    // //   abi.encode(10)
-    // // );
-    // bool ret = target.forwardFunctionCall(_preparedData, transferId, amount, notOriginSender);
-    // assertEq(ret, true);
+    vm.prank(address(target));
+    uint256 amountOut = 42;
+    address from = address(7);
+    address to = address(8);
+    uint32 amountOfSwaps = 1;
+    uint32 swapInterval = 2;
+    address owner = address(9);
+    IDCAPermissionManager.PermissionSet[] memory permissions = new IDCAPermissionManager.PermissionSet[](1);
+    IDCAPermissionManager.Permission[] memory permission = new IDCAPermissionManager.Permission[](1);
+    permission[0] = IDCAPermissionManager.Permission.INCREASE;
+    permissions[0] = IDCAPermissionManager.PermissionSet(address(10), permission);
+    bytes memory forwardCallData = abi.encode(from, to, amountOfSwaps, swapInterval, owner, permissions);
+    bytes memory _preparedData = abi.encode(amountOut, forwardCallData);
+    vm.mockCall(address(from), abi.encodeWithSelector(IERC20.approve.selector), abi.encode(10));
+    vm.mockCall(
+      address(hub),
+      abi.encodeWithSignature(
+        "deposit(address,address,uint256,uint32,uint32,address,IDCAPermissionManager.PermissionSet[])"
+      ),
+      abi.encode(10)
+    );
+    bool ret = target.forwardFunctionCall(_preparedData, transferId, amount, notOriginSender);
+    assertEq(ret, true);
   }
 }

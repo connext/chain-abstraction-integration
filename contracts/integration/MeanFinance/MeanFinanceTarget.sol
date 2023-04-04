@@ -3,26 +3,17 @@ pragma solidity ^0.8.13;
 
 import {IConnext} from "@connext/interfaces/core/IConnext.sol";
 import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@mean-finance/dca-v2-core/contracts/interfaces/IDCAHub.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IDCAHubPositionHandler, IDCAPermissionManager} from "@mean-finance/dca-v2-core/contracts/interfaces/IDCAHub.sol";
 
 import {MeanFinanceAdapter} from "./MeanFinanceAdapter.sol";
-import {SwapAdapter} from "../../xreceivers/Swap/SwapAdapter.sol";
+import {SwapForwarderXReceiver} from "../../xreceivers/Swap/SwapForwarderXReceiver.sol";
 
-contract MeanFinanceTarget is MeanFinanceAdapter, SwapAdapter {
-  // The Connext contract on this domain
-  IConnext public immutable connext;
+contract MeanFinanceTarget is SwapForwarderXReceiver {
+  IDCAHubPositionHandler public immutable hub;
 
-  receive() external payable virtual override(MeanFinanceAdapter, SwapAdapter) {}
-
-  /// Modifier
-  modifier onlyConnext() {
-    require(msg.sender == address(connext), "Caller must be Connext");
-    _;
-  }
-
-  constructor(address _connext) {
-    connext = IConnext(_connext);
+  constructor(address _connext, address _hub) SwapForwarderXReceiver(_connext) {
+    hub = IDCAHubPositionHandler(_hub);
   }
 
   function _forwardFunctionCall(
@@ -30,7 +21,7 @@ contract MeanFinanceTarget is MeanFinanceAdapter, SwapAdapter {
     bytes32 /*_transferId*/,
     uint256 /*_amount*/,
     address /*_asset*/
-  ) internal virtual returns (bool) {
+  ) internal override returns (bool) {
     (uint256 _amountOut, bytes memory _forwardCallData) = abi.decode(_preparedData, (uint256, bytes));
     (
       address _from,
