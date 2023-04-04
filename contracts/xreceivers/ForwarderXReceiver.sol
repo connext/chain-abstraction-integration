@@ -5,7 +5,7 @@ import {IConnext} from "@connext/interfaces/core/IConnext.sol";
 import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-abstract contract ForwarderXReceiver {
+abstract contract ForwarderXReceiver is IXReceiver {
   // The Connext contract on this domain
   IConnext public immutable connext;
 
@@ -46,7 +46,7 @@ abstract contract ForwarderXReceiver {
     address /*_originSender*/,
     uint32 /*_origin*/,
     bytes calldata _callData
-  ) external onlyConnext {
+  ) external onlyConnext returns (bytes memory) {
     // Decode calldata
     (address _fallbackAddress, bytes memory _data) = abi.decode(_callData, (address, bytes));
 
