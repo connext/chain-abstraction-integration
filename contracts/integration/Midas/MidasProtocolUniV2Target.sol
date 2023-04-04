@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {MidasProtocolAdapter} from "./MidasProtocolAdapter.sol";
-import {UniswapV2ForwarderXReceiver} from "../Uniswap/UniswapV2ForwarderXReceiver.sol";
+import {UniswapV2ForwarderXReceiver} from "../../xreceivers/Uniswap/UniswapV2ForwarderXReceiver.sol";
 
 contract MidasProtocolUniV2Target is MidasProtocolAdapter, UniswapV2ForwarderXReceiver {
   constructor(

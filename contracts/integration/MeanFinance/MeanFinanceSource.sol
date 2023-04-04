@@ -4,8 +4,9 @@ pragma solidity ^0.8.13;
 import {IConnext, TokenId} from "@connext/interfaces/core/IConnext.sol";
 import {IWeth} from "@connext/interfaces/core/IWeth.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {UniswapV3Adapter} from "../Uniswap/UniswapV3Adapter.sol";
 import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
+
+import {UniswapV3Adapter} from "../../xreceivers/Uniswap/UniswapV3Adapter.sol";
 
 contract MeanFinanceSource is UniswapV3Adapter {
     // The Connext contract on this domain
