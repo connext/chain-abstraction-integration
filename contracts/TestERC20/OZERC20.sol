@@ -91,12 +91,7 @@ contract ERC20 is IERC20Metadata, IERC20Permit {
    *
    * It's a good idea to use the same `name` that is defined as the ERC20 token name.
    */
-  constructor(
-    uint8 decimals_,
-    string memory name_,
-    string memory symbol_,
-    string memory version_
-  ) {
+  constructor(uint8 decimals_, string memory name_, string memory symbol_, string memory version_) {
     // ERC20
     _name = name_;
     _symbol = symbol_;
@@ -206,11 +201,7 @@ contract ERC20 is IERC20Metadata, IERC20Permit {
    * - the caller must have allowance for ``_sender``'s tokens of at least
    * `amount`.
    */
-  function transferFrom(
-    address _sender,
-    address _recipient,
-    uint256 _amount
-  ) public virtual override returns (bool) {
+  function transferFrom(address _sender, address _recipient, uint256 _amount) public virtual override returns (bool) {
     _spendAllowance(_sender, msg.sender, _amount);
     _transfer(_sender, _recipient, _amount);
     return true;
@@ -271,11 +262,7 @@ contract ERC20 is IERC20Metadata, IERC20Permit {
    * - `_recipient` cannot be the zero address.
    * - `_sender` must have a balance of at least `amount`.
    */
-  function _transfer(
-    address _sender,
-    address _recipient,
-    uint256 _amount
-  ) internal virtual {
+  function _transfer(address _sender, address _recipient, uint256 _amount) internal virtual {
     require(_sender != address(0), "ERC20: transfer from the zero address");
     require(_recipient != address(0), "ERC20: transfer to the zero address");
 
@@ -361,11 +348,7 @@ contract ERC20 is IERC20Metadata, IERC20Permit {
    * - `_owner` cannot be the zero address.
    * - `_spender` cannot be the zero address.
    */
-  function _approve(
-    address _owner,
-    address _spender,
-    uint256 _amount
-  ) internal virtual {
+  function _approve(address _owner, address _spender, uint256 _amount) internal virtual {
     require(_owner != address(0), "ERC20: approve from the zero address");
     require(_spender != address(0), "ERC20: approve to the zero address");
 
@@ -381,11 +364,7 @@ contract ERC20 is IERC20Metadata, IERC20Permit {
    *
    * Might emit an {Approval} event.
    */
-  function _spendAllowance(
-    address _owner,
-    address _spender,
-    uint256 _amount
-  ) internal virtual {
+  function _spendAllowance(address _owner, address _spender, uint256 _amount) internal virtual {
     uint256 currentAllowance = allowance(_owner, _spender);
     if (currentAllowance != type(uint256).max) {
       require(currentAllowance >= _amount, "ERC20: insufficient allowance");
@@ -409,11 +388,7 @@ contract ERC20 is IERC20Metadata, IERC20Permit {
    *
    * To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
    */
-  function _beforeTokenTransfer(
-    address _from,
-    address _to,
-    uint256 _amount
-  ) internal virtual {}
+  function _beforeTokenTransfer(address _from, address _to, uint256 _amount) internal virtual {}
 
   /**
    * @dev Hook that is called after any transfer of tokens. This includes
@@ -429,11 +404,7 @@ contract ERC20 is IERC20Metadata, IERC20Permit {
    *
    * To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
    */
-  function _afterTokenTransfer(
-    address _from,
-    address _to,
-    uint256 _amount
-  ) internal virtual {}
+  function _afterTokenTransfer(address _from, address _to, uint256 _amount) internal virtual {}
 
   /**
    * @dev See {IERC20Permit-permit}.
