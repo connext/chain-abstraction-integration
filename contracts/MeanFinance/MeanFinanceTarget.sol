@@ -5,8 +5,8 @@ import {IConnext} from "@connext/interfaces/core/IConnext.sol";
 import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-import "./MeanFinanceAdapter.sol";
-import "../Uniswap/UniswapV3ForwarderXReceiver.sol";
+import {MeanFinanceAdapter} from "./MeanFinanceAdapter.sol";
+import {UniswapV3ForwarderXReceiver} from "../Uniswap/UniswapV3ForwarderXReceiver.sol";
 
 contract MeanFinanceTarget is MeanFinanceAdapter, UniswapV3ForwarderXReceiver {
     constructor(
