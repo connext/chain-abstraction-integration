@@ -4,8 +4,7 @@ pragma solidity ^0.8.13;
 import {TestHelper} from "../../utils/TestHelper.sol";
 import {MeanFinanceTarget} from "../../../contracts/integration/MeanFinance/MeanFinanceTarget.sol";
 import {MeanFinanceAdapter} from "../../../contracts/integration/MeanFinance/MeanFinanceAdapter.sol";
-import "@mean-finance/nft-descriptors/solidity/interfaces/IDCAHubPositionDescriptor.sol";
-import {IDCAHubPositionHandler} from "@mean-finance/dca-v2-core/contracts/interfaces/IDCAHub.sol";
+import {IDCAHubPositionHandler, IDCAPermissionManager} from "@mean-finance/dca-v2-core/contracts/interfaces/IDCAHub.sol";
 
 contract MeanTest is MeanFinanceTarget {
   constructor(address _connext, address _uniswapSwapRouter) MeanFinanceTarget(_connext) {}
@@ -16,7 +15,7 @@ contract MeanTest is MeanFinanceTarget {
     uint256 _amount,
     address _asset
   ) public returns (bool) {
-    return forwardFunctionCall(_preparedData, _transferId, _amount, _asset);
+    return _forwardFunctionCall(_preparedData, _transferId, _amount, _asset);
   }
 }
 

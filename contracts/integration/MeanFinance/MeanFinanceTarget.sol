@@ -30,7 +30,7 @@ contract MeanFinanceTarget is MeanFinanceAdapter, SwapAdapter {
     bytes32 /*_transferId*/,
     uint256 /*_amount*/,
     address /*_asset*/
-  ) internal virtual returns (uint256 _positionId) {
+  ) internal virtual returns (bool) {
     (uint256 _amountOut, bytes memory _forwardCallData) = abi.decode(_preparedData, (uint256, bytes));
     (
       address _from,
@@ -44,6 +44,7 @@ contract MeanFinanceTarget is MeanFinanceAdapter, SwapAdapter {
         (address, address, uint32, uint32, address, IDCAPermissionManager.PermissionSet[])
       );
     IERC20(_from).approve(address(hub), _amountOut);
-    _positionId = hub.deposit(_from, _to, _amountOut, _amountOfSwaps, _swapInterval, _owner, _permissions);
+    hub.deposit(_from, _to, _amountOut, _amountOfSwaps, _swapInterval, _owner, _permissions);
+    return true;
   }
 }
