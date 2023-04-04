@@ -53,4 +53,13 @@ contract SwapAdapter is Swapper {
     );
     return abi.decode(ret, (uint256));
   }
+
+  function directSwapperCall(
+    address _swapper,
+    bytes calldata swapData,
+    uint256 value
+  ) public payable returns (uint256) {
+    bytes memory ret = _swapper.functionCallWithValue(swapData, value, "!directSwapperCallFailed");
+    return abi.decode(ret, (uint256));
+  }
 }
