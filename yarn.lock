@@ -4074,6 +4074,46 @@ __metadata:
   languageName: node
   linkType: hard
 
+"connext-integration@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "connext-integration@workspace:."
+  dependencies:
+    "@0xgafu/common-abi": ^1.0.3
+    "@connext/interfaces": ^2.0.3
+    "@connext/utils": ^7.3.17
+    "@ethersproject/abi": ^5.7.0
+    "@ethersproject/providers": ^5.7.2
+    "@mean-finance/dca-v2-core": ^3.2.0
+    "@nomicfoundation/hardhat-chai-matchers": ^1.0.6
+    "@nomicfoundation/hardhat-network-helpers": ^1.0.8
+    "@nomicfoundation/hardhat-toolbox": ^2.0.1
+    "@nomiclabs/hardhat-ethers": ^2.2.2
+    "@nomiclabs/hardhat-etherscan": ^3.1.7
+    "@nomiclabs/hardhat-waffle": ^2.0.1
+    "@openzeppelin/contracts": ^4.8.2
+    "@typechain/ethers-v5": ^10.2.0
+    "@typechain/hardhat": ^6.1.5
+    "@types/chai": ^4.2.0
+    "@types/mocha": ">=9.1.0"
+    "@types/node": ">=12.0.0"
+    chai: ^4.3.7
+    dotenv: ^16.0.3
+    ethereum-waffle: ^3.4.0
+    ethers: ^5.5.2
+    ethers-eip712: ^0.2.0
+    hardhat: ^2.12.6
+    hardhat-deploy: ^0.11.23
+    hardhat-deploy-ethers: ^0.3.0-beta.11
+    hardhat-gas-reporter: ^1.0.8
+    prettier: ^2.8.7
+    rimraf: ^4.4.0
+    solidity-coverage: ^0.8.2
+    ts-node: ">=8.0.0"
+    typechain: ^8.1.1
+    typescript: ">=4.5.0"
+  languageName: unknown
+  linkType: soft
+
 "console-control-strings@npm:^1.1.0":
   version: 1.1.0
   resolution: "console-control-strings@npm:1.1.0"
@@ -8632,46 +8672,6 @@ __metadata:
   checksum: 098494d885684bcc4f92294b18ba61b7bd353c23147fbc4688c75b45cb8590f5a95fd4584d742415dcc52487f7a1ef6ea611cfa1543b0dc4492fe026357f3f0c
   languageName: node
   linkType: hard
-
-"mean-finance-integration@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "mean-finance-integration@workspace:."
-  dependencies:
-    "@0xgafu/common-abi": ^1.0.3
-    "@connext/interfaces": ^2.0.3
-    "@connext/utils": ^7.3.17
-    "@ethersproject/abi": ^5.7.0
-    "@ethersproject/providers": ^5.7.2
-    "@mean-finance/dca-v2-core": ^3.2.0
-    "@nomicfoundation/hardhat-chai-matchers": ^1.0.6
-    "@nomicfoundation/hardhat-network-helpers": ^1.0.8
-    "@nomicfoundation/hardhat-toolbox": ^2.0.1
-    "@nomiclabs/hardhat-ethers": ^2.2.2
-    "@nomiclabs/hardhat-etherscan": ^3.1.7
-    "@nomiclabs/hardhat-waffle": ^2.0.1
-    "@openzeppelin/contracts": ^4.8.2
-    "@typechain/ethers-v5": ^10.2.0
-    "@typechain/hardhat": ^6.1.5
-    "@types/chai": ^4.2.0
-    "@types/mocha": ">=9.1.0"
-    "@types/node": ">=12.0.0"
-    chai: ^4.3.7
-    dotenv: ^16.0.3
-    ethereum-waffle: ^3.4.0
-    ethers: ^5.5.2
-    ethers-eip712: ^0.2.0
-    hardhat: ^2.12.6
-    hardhat-deploy: ^0.11.23
-    hardhat-deploy-ethers: ^0.3.0-beta.11
-    hardhat-gas-reporter: ^1.0.8
-    prettier: ^2.8.7
-    rimraf: ^4.4.0
-    solidity-coverage: ^0.8.2
-    ts-node: ">=8.0.0"
-    typechain: ^8.1.1
-    typescript: ">=4.5.0"
-  languageName: unknown
-  linkType: soft
 
 "media-typer@npm:0.3.0":
   version: 0.3.0
