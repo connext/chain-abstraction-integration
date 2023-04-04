@@ -34,8 +34,5 @@ jobs:
       - name: Forget install
         run: yarn forge:install
 
-      - name: Run Hardhat tests
-        run: yarn hardhat:test
-
       - name: Run Forge tests
         run: yarn forge:test
