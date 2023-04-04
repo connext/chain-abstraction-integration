@@ -26,7 +26,6 @@ abstract contract ForwarderXReceiver {
         require(msg.sender == address(connext), "Caller must be Connext");
         _;
     }
-  }
 
     constructor(address _connext) {
         connext = IConnext(_connext);
