@@ -25,8 +25,8 @@ contract InstadappTarget is IXReceiver, InstadappAdapter {
     bytes32 _transferId,
     uint256 _amount, // must be amount in bridge asset less fees
     address _asset,
-    address _originSender,
-    uint32 _origin,
+    address,
+    uint32,
     bytes memory _callData
   ) external onlyConnext returns (bytes memory) {
     // Decode signed calldata
@@ -43,5 +43,7 @@ contract InstadappTarget is IXReceiver, InstadappAdapter {
     );
 
     emit AuthCast(_transferId, dsaAddress, auth, success, returnedData);
+
+    return returnedData;
   }
 }
