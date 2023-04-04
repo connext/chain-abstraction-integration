@@ -109,7 +109,7 @@ abstract contract ForwarderXReceiver {
     // Prepare for forwarding
     bytes memory _prepared = _prepare(_transferId, _data, _amount, _asset);
     // Forward the function call
-    return _forwardFunctionCall(_transferId, _prepared, _amount, _asset);
+    return _forwardFunctionCall(_prepared, _transferId, _amount, _asset);
   }
 
   /// INTERNAL ABSTRACT
