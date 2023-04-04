@@ -20,7 +20,7 @@ jobs:
       - name: Install Foundry
         uses: onbjerg/foundry-toolchain@v1
         with:
-          version: nightly      
+          version: nightly
 
       - name: Setup Node
         uses: actions/setup-node@v2
@@ -31,10 +31,10 @@ jobs:
       - name: Yarn install
         run: yarn install
 
-      - name: Forget install
+      - name: Forge install
         run: yarn forge:install
 
-      - name: Forget build
+      - name: Forge build
         run: yarn forge:build
 
       - name: Run Forge tests
