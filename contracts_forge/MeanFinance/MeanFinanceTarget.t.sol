@@ -2,8 +2,8 @@
 pragma solidity ^0.8.13;
 
 import "../utils/TestHelper.sol";
-import "../../contracts/MeanFinance/MeanFinanceTarget.sol";
-import "../../contracts/MeanFinance/MeanFinanceAdapter.sol";
+import "../../contracts/integration/MeanFinance/MeanFinanceTarget.sol";
+import "../../contracts/integration/MeanFinance/MeanFinanceAdapter.sol";
 import "@mean-finance/nft-descriptors/solidity/interfaces/IDCAHubPositionDescriptor.sol";
 import { IDCAHubPositionHandler } from "@mean-finance/dca-v2-core/contracts/interfaces/IDCAHub.sol";
 
@@ -11,7 +11,7 @@ contract MeanTest is MeanFinanceTarget {
   constructor(
     address _connext,
     address _uniswapSwapRouter
-  ) MeanFinanceTarget(_connext, _uniswapSwapRouter) {}
+  ) MeanFinanceTarget(_connext) {}
 
   function forwardFunctionCall(
     bytes memory _preparedData,
@@ -19,7 +19,7 @@ contract MeanTest is MeanFinanceTarget {
     uint256 _amount,
     address _asset
   ) public returns (bool) {
-    return _forwardFunctionCall(_preparedData, _transferId, _amount, _asset);
+    return forwardFunctionCall(_preparedData, _transferId, _amount, _asset);
   }
 }
 
@@ -111,11 +111,11 @@ contract MeanFinanceTargetTest is TestHelper {
       forwardCallData
     );
 
-    vm.mockCall(
-      address(target),
-      abi.encodeWithSelector(IDCAHubPositionHandler.deposit.selector),
-      abi.encode(10)
-    );
+    // vm.mockCall(
+    //   address(target),
+    //   abi.encodeWithSelector(IDCAHubPositionHandler.deposit.selector),
+    //   abi.encode(10)
+    // );
 
     bool ret = target.forwardFunctionCall(
       _preparedData,

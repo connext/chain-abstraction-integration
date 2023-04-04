@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import "../utils/TestHelper.sol";
-import "../../contracts/MeanFinance/MeanFinanceAdapter.sol";
+import "../../contracts/integration/MeanFinance/MeanFinanceAdapter.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@mean-finance/nft-descriptors/solidity/interfaces/IDCAHubPositionDescriptor.sol";
 import {IDCAHub} from "@mean-finance/dca-v2-core/contracts/interfaces/IDCAHub.sol";
