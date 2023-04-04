@@ -2,7 +2,7 @@
 pragma solidity >=0.8.7 <0.9.0;
 
 import "@openzeppelin/contracts/utils/Address.sol";
-import { Swapper } from "./Swapper.sol";
+import {Swapper} from "./Swapper.sol";
 
 contract SwapAdapter is Swapper {
   using Address for address;
@@ -10,8 +10,7 @@ contract SwapAdapter is Swapper {
 
   mapping(address => bool) public allowedSwappers;
 
-  address public immutable uniswapSwapRouter =
-    address(0xE592427A0AEce92De3Edee1F18E0157C05861564);
+  address public immutable uniswapSwapRouter = address(0xE592427A0AEce92De3Edee1F18E0157C05861564);
 
   constructor() {
     allowedSwappers[address(this)] = true;
@@ -37,20 +36,8 @@ contract SwapAdapter is Swapper {
     bytes calldata _swapData
   ) public payable returns (uint256) {
     require(allowedSwappers[_swapper], "!allowedSwapper");
-    bytes memory swapData = (
-      abi.encodeWithSelector(
-        _selector,
-        _swapper,
-        _amountIn,
-        _fromAsset,
-        _swapData
-      )
-    );
-    bytes memory ret = address(this).functionCallWithValue(
-      swapData,
-      msg.value,
-      "!exactSwap"
-    );
+    bytes memory swapData = (abi.encodeWithSelector(_selector, _swapper, _amountIn, _fromAsset, _swapData));
+    bytes memory ret = address(this).functionCallWithValue(swapData, msg.value, "!exactSwap");
     return abi.decode(ret, (uint256));
   }
 

@@ -14,12 +14,10 @@ contract UniswapV3 {
     bytes calldata _data,
     uint256 _value
   ) public returns (uint256 amountOut) {
-    (
-      address toAsset,
-      uint24 poolFee,
-      uint256 amountOutMin,
-      address recipient
-    ) = abi.decode(_data, (address, uint24, uint256, address));
+    (address toAsset, uint24 poolFee, uint256 amountOutMin, address recipient) = abi.decode(
+      _data,
+      (address, uint24, uint256, address)
+    );
 
     TransferHelper.safeApprove(_fromAsset, address(_swapper), _amountIn);
     // Set up uniswap swap params.

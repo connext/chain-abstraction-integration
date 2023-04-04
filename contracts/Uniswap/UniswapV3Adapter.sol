@@ -7,16 +7,16 @@ import {ISwapRouter} from "@uniswap/v3-periphery/contracts/interfaces/ISwapRoute
 import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 
 contract UniswapV3Adapter {
-    /// @notice UniswapV3 swap router contract to swap
-    /// @dev If deploying to celo, change hardcoded address. see https://docs.uniswap.org/contracts/v3/reference/deployments
-    ISwapRouter public immutable swapRouter;
+  /// @notice UniswapV3 swap router contract to swap
+  /// @dev If deploying to celo, change hardcoded address. see https://docs.uniswap.org/contracts/v3/reference/deployments
+  ISwapRouter public immutable swapRouter;
 
-    constructor(address _uniswapSwapRouter) {
-        swapRouter = ISwapRouter(_uniswapSwapRouter);
-    }
+  constructor(address _uniswapSwapRouter) {
+    swapRouter = ISwapRouter(_uniswapSwapRouter);
+  }
 
-    /// Payable
-    receive() external payable virtual {}
+  /// Payable
+  receive() external payable virtual {}
 
   function swap(
     address fromAsset,
