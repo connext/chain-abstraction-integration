@@ -6,11 +6,14 @@ import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@mean-finance/dca-v2-core/contracts/interfaces/IDCAHub.sol";
 
-contract MeanFinanceTarget is MeanFinanceAdapter, UniswapAdapter {
+import {MeanFinanceAdapter} from "./MeanFinanceAdapter.sol";
+import {SwapAdapter} from "../../xreceivers/Swap/SwapAdapter.sol";
+
+contract MeanFinanceTarget is MeanFinanceAdapter, SwapAdapter {
   // The Connext contract on this domain
   IConnext public immutable connext;
 
-  receive() external payable virtual override(MeanFinanceAdapter, UniswapAdapter) {}
+  receive() external payable virtual override(MeanFinanceAdapter, SwapAdapter) {}
 
   /// Modifier
   modifier onlyConnext() {
@@ -49,7 +52,7 @@ contract MeanFinanceTarget is MeanFinanceAdapter, UniswapAdapter {
 
     if (from != _asset) {
       // swap to deposit asset if needed
-      amount = swap(_asset, from, poolFee, amount, amountOutMin);
+      // amount = swap(_asset, from, poolFee, amount, amountOutMin);
       // TODO: add fallback to return funds to user address
     }
 
