@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import "../utils/TestHelper.sol";
-import "../../contracts/integration/MeanFinance/MeanFinanceTarget.sol";
-import "../../contracts/integration/MeanFinance/MeanFinanceAdapter.sol";
+import {TestHelper} from "../../utils/TestHelper.sol";
+import {MeanFinanceTarget} from "../../../contracts/integration/MeanFinance/MeanFinanceTarget.sol";
+import {MeanFinanceAdapter} from "../../../contracts/integration/MeanFinance/MeanFinanceAdapter.sol";
 import "@mean-finance/nft-descriptors/solidity/interfaces/IDCAHubPositionDescriptor.sol";
 import {IDCAHubPositionHandler} from "@mean-finance/dca-v2-core/contracts/interfaces/IDCAHub.sol";
 
