@@ -23,8 +23,6 @@ yarn-error.log*
 /broadcast/*
 /broadcast/*/31337/
 
-.vscode/
-
 node_modules
 .env
 coverage
@@ -36,4 +34,3 @@ typechain-types
 cache
 artifacts
 deployments/*/solcInputs
-
