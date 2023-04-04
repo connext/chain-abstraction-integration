@@ -48,7 +48,7 @@ contract MeanFinanceSource is SwapAdapter {
     // swap to donation asset if needed
     if (inputAsset != connextAsset) {
       require(connextApprovedAssets(connextAsset), "!connextAsset");
-    //   amountOut = swap(inputAsset, connextAsset, sourcePoolFee, amountIn, sourceAmountOutMin);
+      //   amountOut = swap(inputAsset, connextAsset, sourcePoolFee, amountIn, sourceAmountOutMin);
     }
 
     TransferHelper.safeApprove(connextAsset, address(connext), amountOut);
