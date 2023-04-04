@@ -1,6 +1,6 @@
 name: Build And Test
 
-on: 
+on:
   push:
   pull_request:
 
@@ -33,6 +33,9 @@ jobs:
 
       - name: Forget install
         run: yarn forge:install
+
+      - name: Forget build
+        run: yarn forge:build
 
       - name: Run Forge tests
         run: yarn forge:test
