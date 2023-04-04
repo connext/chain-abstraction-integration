@@ -10,6 +10,7 @@
     "compile": "hardhat compile",
     "test": "yarn run hardhat:test",
     "hardhat:test": "hardhat test",
+    "forge": "forge",
     "forge:install": "forge install",
     "forge:build": "forge build",
     "forge:test": "forge test --via-ir",
