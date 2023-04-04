@@ -8,33 +8,33 @@ import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/Transfer
 
 contract UniswapV3 {
   function uniswapV3ExactInputSingle(
-    address swapper,
+    address _swapper,
+    uint256 _amountIn,
+    address _fromAsset,
     bytes calldata _data,
-    uint256 value
+    uint256 _value
   ) public returns (uint256 amountOut) {
     (
-      address fromAsset,
       address toAsset,
       uint24 poolFee,
-      uint256 amountIn,
       uint256 amountOutMin,
       address recipient
-    ) = abi.decode(_data, (address, address, uint24, uint256, uint256, address));
+    ) = abi.decode(_data, (address, uint24, uint256, address));
 
-    TransferHelper.safeApprove(fromAsset, address(swapper), amountIn);
+    TransferHelper.safeApprove(_fromAsset, address(_swapper), _amountIn);
     // Set up uniswap swap params.
     ISwapRouter.ExactInputSingleParams memory params = ISwapRouter.ExactInputSingleParams({
-      tokenIn: fromAsset,
+      tokenIn: _fromAsset,
       tokenOut: toAsset,
       fee: poolFee,
       recipient: recipient,
       deadline: block.timestamp,
-      amountIn: amountIn,
+      amountIn: _amountIn,
       amountOutMinimum: amountOutMin,
       sqrtPriceLimitX96: 0
     });
 
     // The call to `exactInputSingle` executes the swap.
-    amountOut = ISwapRouter(swapper).exactInputSingle{value: value}(params);
+    amountOut = ISwapRouter(_swapper).exactInputSingle{value: _value}(params);
   }
 }

@@ -2,7 +2,7 @@
 pragma solidity >=0.8.7 <0.9.0;
 
 import "@openzeppelin/contracts/utils/Address.sol";
-import {Swapper} from "./Swapper.sol";
+import { Swapper } from "./Swapper.sol";
 
 contract SwapAdapter is Swapper {
   using Address for address;
@@ -10,11 +10,12 @@ contract SwapAdapter is Swapper {
 
   mapping(address => bool) public allowedSwappers;
 
-  address public immutable UniswapSwapRouter = address(0xE592427A0AEce92De3Edee1F18E0157C05861564);
+  address public immutable uniswapSwapRouter =
+    address(0xE592427A0AEce92De3Edee1F18E0157C05861564);
 
   constructor() {
     allowedSwappers[address(this)] = true;
-    allowedSwappers[UniswapSwapRouter] = true;
+    allowedSwappers[uniswapSwapRouter] = true;
   }
 
   /// Payable
@@ -28,13 +29,37 @@ contract SwapAdapter is Swapper {
   /// TODO: Make the contract ownable
   /// TODO: ...
 
-  function _exactSwap(address swapper, bytes4 _selector, bytes calldata _swapData) external payable {
-    require(allowedSwappers[swapper], "!allowedSwapper");
-    bytes memory swapData = (abi.encodeWithSelector(_selector, swapper, _swapData));
-    address(this).functionCallWithValue(swapData, msg.value, "!exactSwap");
+  function exactSwap(
+    address _swapper,
+    uint256 _amountIn,
+    address _fromAsset,
+    bytes4 _selector,
+    bytes calldata _swapData
+  ) public payable returns (uint256) {
+    require(allowedSwappers[_swapper], "!allowedSwapper");
+    bytes memory swapData = (
+      abi.encodeWithSelector(
+        _selector,
+        _swapper,
+        _amountIn,
+        _fromAsset,
+        _swapData
+      )
+    );
+    bytes memory ret = address(this).functionCallWithValue(
+      swapData,
+      msg.value,
+      "!exactSwap"
+    );
+    return abi.decode(ret, (uint256));
   }
 
-  function _directSwapperCall(address _swapper, bytes calldata swapData, uint256 value) internal virtual {
-    _swapper.functionCallWithValue(swapData, value, "!directSwapperCallFailed");
+  function directSwapperCall(
+    address _swapper,
+    bytes calldata swapData,
+    uint256 value
+  ) public payable returns (uint256) {
+    bytes memory ret = _swapper.functionCallWithValue(swapData, value, "!directSwapperCallFailed");
+    return abi.decode(ret, (uint256));
   }
 }

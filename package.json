@@ -55,6 +55,8 @@
     "@connext/interfaces": "^2.0.3",
     "@mean-finance/dca-v2-core": "^3.2.0",
     "@openzeppelin/contracts": "^4.8.2",
+    "@uniswap/v2-core": "^1.0.1",
+    "@uniswap/v2-periphery": "^1.1.0-beta.0",
     "prettier": "^2.8.7",
     "prettier-plugin-solidity": "^1.1.3"
   },
