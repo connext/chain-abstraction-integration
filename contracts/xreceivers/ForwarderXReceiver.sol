@@ -4,10 +4,8 @@ pragma solidity ^0.8.13;
 import {IConnext} from "@connext/interfaces/core/IConnext.sol";
 import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
 abstract contract ForwarderXReceiver {
-  using Address for address payable;
   // The Connext contract on this domain
   IConnext public immutable connext;
 

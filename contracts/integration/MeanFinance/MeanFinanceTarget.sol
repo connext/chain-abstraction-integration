@@ -25,74 +25,25 @@ contract MeanFinanceTarget is MeanFinanceAdapter, SwapAdapter {
     connext = IConnext(_connext);
   }
 
-  function xReceive(
-    bytes32 _transferId,
-    uint256 _amount, // Final Amount receive via Connext(After AMM calculation)
-    address _asset,
-    address _originSender,
-    uint32 _origin,
-    bytes calldata _callData
-  ) external returns (bytes memory) {
-    uint256 amount = _amount;
-    // Decode calldata
+  function _forwardFunctionCall(
+    bytes memory _preparedData,
+    bytes32 /*_transferId*/,
+    uint256 /*_amount*/,
+    address /*_asset*/
+  ) internal virtual returns (uint256 _positionId) {
+    (uint256 _amountOut, bytes memory _forwardCallData) = abi.decode(_preparedData, (uint256, bytes));
     (
-      uint24 poolFee,
-      uint256 amountOutMin,
-      address from,
-      address to,
-      uint32 amountOfSwaps,
-      uint32 swapInterval,
-      address owner,
-      IDCAPermissionManager.PermissionSet[] memory permissions
-    ) = decode(_callData);
-
-    require(amount > 0, "!amount");
-    require(amountOutMin > 0, "!amountOut");
-    require(from != address(0), "!invalid");
-
-    if (from != _asset) {
-      // swap to deposit asset if needed
-      // amount = swap(_asset, from, poolFee, amount, amountOutMin);
-      // TODO: add fallback to return funds to user address
-    }
-
-    // deposit
-    deposit(from, to, amount, amountOfSwaps, swapInterval, owner, permissions);
-  }
-
-  function encode(
-    uint24 poolFee,
-    uint256 amountOutMin,
-    address from,
-    address to,
-    uint32 amountOfSwaps,
-    uint32 swapInterval,
-    address owner,
-    IDCAPermissionManager.PermissionSet[] memory permissions
-  ) external pure returns (bytes memory) {
-    return abi.encode(poolFee, amountOutMin, from, to, amountOfSwaps, swapInterval, owner, permissions);
-  }
-
-  /// INTERNAL
-  function decode(
-    bytes calldata data
-  )
-    internal
-    pure
-    returns (
-      uint24 poolFee,
-      uint256 amountOutMin,
-      address from,
-      address to,
-      uint32 amountOfSwaps,
-      uint32 swapInterval,
-      address owner,
-      IDCAPermissionManager.PermissionSet[] memory permissions
-    )
-  {
-    (poolFee, amountOutMin, from, to, amountOfSwaps, swapInterval, owner, permissions) = abi.decode(
-      data,
-      (uint24, uint256, address, address, uint32, uint32, address, IDCAPermissionManager.PermissionSet[])
-    );
+      address _from,
+      address _to,
+      uint32 _amountOfSwaps,
+      uint32 _swapInterval,
+      address _owner,
+      IDCAPermissionManager.PermissionSet[] memory _permissions
+    ) = abi.decode(
+        _forwardCallData,
+        (address, address, uint32, uint32, address, IDCAPermissionManager.PermissionSet[])
+      );
+    IERC20(_from).approve(address(hub), _amountOut);
+    _positionId = hub.deposit(_from, _to, _amountOut, _amountOfSwaps, _swapInterval, _owner, _permissions);
   }
 }
