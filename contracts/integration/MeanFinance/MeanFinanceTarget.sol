@@ -12,7 +12,7 @@ import {SwapForwarderXReceiver} from "../../xreceivers/Swap/SwapForwarderXReceiv
 contract MeanFinanceTarget is SwapForwarderXReceiver {
   IDCAHubPositionHandler public immutable hub;
 
-  constructor(address _connext, address _hub) SwapForwarderXReceiver(_connext) {
+  constructor(address _connext, address _hub, address _swapAdapter) SwapForwarderXReceiver(_connext, _swapAdapter) {
     hub = IDCAHubPositionHandler(_hub);
   }
 

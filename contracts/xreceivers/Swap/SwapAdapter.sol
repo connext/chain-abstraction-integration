@@ -36,8 +36,11 @@ contract SwapAdapter is Swapper {
     bytes calldata _swapData
   ) public payable returns (uint256) {
     require(allowedSwappers[_swapper], "!allowedSwapper");
-    bytes memory swapData = (abi.encodeWithSelector(_selector, _swapper, _amountIn, _fromAsset, _swapData));
-    bytes memory ret = address(this).functionCallWithValue(swapData, msg.value, "!exactSwap");
+    bytes memory ret = address(this).functionCallWithValue(
+      abi.encodeWithSelector(_selector, _swapper, _amountIn, _fromAsset, _swapData),
+      msg.value,
+      "!exactSwap"
+    );
     return abi.decode(ret, (uint256));
   }
 
