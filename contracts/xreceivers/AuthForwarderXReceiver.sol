@@ -46,8 +46,23 @@ abstract contract AuthForwarderXReceiver is IXReceiver {
     _;
   }
 
+  /**
+   * @dev The elements in the _origin* array params must be passed in the same relative positions.
+   * @param _connext - The address of the Connext contract on this domain
+   */
   constructor(address _connext) {
     connext = IConnext(_connext);
+  }
+
+  /**
+   * @dev Add an origin to the originRegistry.
+   * @param _originDomain - Origin domain to be registered in the OriginRegistry
+   * @param _originConnext - Connext contract on origin domain
+   * @param _originSender - Sender on origin domain that is expected to call this contract
+   */
+  function addOrigin(uint32 _originDomain, address _originConnext, address _originSender) public {
+    originDomains.push(_originDomain);
+    originRegistry[_originDomain] = OriginInfo(_originConnext, _originSender);
   }
 
   /**

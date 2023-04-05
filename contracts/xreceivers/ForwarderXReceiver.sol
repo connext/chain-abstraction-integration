@@ -24,6 +24,9 @@ abstract contract ForwarderXReceiver is IXReceiver {
     _;
   }
 
+  /**
+   * @param _connext - The address of the Connext contract on this domain
+   */
   constructor(address _connext) {
     connext = IConnext(_connext);
   }
