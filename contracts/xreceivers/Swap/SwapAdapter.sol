@@ -2,9 +2,10 @@
 pragma solidity >=0.8.7 <0.9.0;
 
 import "@openzeppelin/contracts/utils/Address.sol";
-import {Swapper} from "./Swapper.sol";
 
-contract SwapAdapter is Swapper {
+import {ISwapper} from "./interfaces/ISwapper.sol";
+
+contract SwapAdapter {
   using Address for address;
   using Address for address payable;
 
@@ -32,16 +33,10 @@ contract SwapAdapter is Swapper {
     address _swapper,
     uint256 _amountIn,
     address _fromAsset,
-    bytes4 _selector,
-    bytes calldata _swapData
-  ) public payable returns (uint256) {
+    bytes calldata _swapData // comes directly from API with swap data encoded
+  ) public payable returns (uint256 amountOut) {
     require(allowedSwappers[_swapper], "!allowedSwapper");
-    bytes memory ret = address(this).functionCallWithValue(
-      abi.encodeWithSelector(_selector, _swapper, _amountIn, _fromAsset, _swapData),
-      msg.value,
-      "!exactSwap"
-    );
-    return abi.decode(ret, (uint256));
+    amountOut = ISwapper(_swapper).swap(_swapper, _amountIn, _fromAsset, _swapData);
   }
 
   function directSwapperCall(

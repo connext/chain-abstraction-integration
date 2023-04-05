@@ -7,6 +7,8 @@ import {ISwapRouter} from "@uniswap/v3-periphery/contracts/interfaces/ISwapRoute
 import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
+import {ISwapper} from "../interfaces/ISwapper.sol";
+
 interface IUniswapV3Router {
   function uniswapV3Swap(
     uint256 amount,
@@ -15,10 +17,10 @@ interface IUniswapV3Router {
   ) external payable returns (uint256 returnAmount);
 }
 
-contract UniswapV3 {
+contract OneInchUniswapV3 is ISwapper {
   using Address for address;
 
-  function uniswapV3Swap(
+  function swap(
     address _swapper,
     uint256 _amountIn,
     address _tokenIn,

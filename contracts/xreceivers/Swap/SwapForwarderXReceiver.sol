@@ -6,25 +6,12 @@ import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/Transfer
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
 import {ForwarderXReceiver} from "../ForwarderXReceiver.sol";
+import {SwapAdapter} from "./SwapAdapter.sol";
 
-interface ISwapAdapter {
-  function exactSwap(
-    address _swapper,
-    uint256 _amountIn,
-    address _fromAsset,
-    bytes4 _selector,
-    bytes calldata _swapData
-  ) external payable returns (uint256);
-}
-
-abstract contract SwapForwarderXReceiver is ForwarderXReceiver {
+abstract contract SwapForwarderXReceiver is ForwarderXReceiver, SwapAdapter {
   using Address for address;
 
-  ISwapAdapter public immutable swapAdapter;
-
-  constructor(address _connext, address _swapAdapter) ForwarderXReceiver(_connext) {
-    swapAdapter = ISwapAdapter(_swapAdapter);
-  }
+  constructor(address _connext) ForwarderXReceiver(_connext) {}
 
   /// INTERNAL
   function _prepare(
@@ -33,12 +20,12 @@ abstract contract SwapForwarderXReceiver is ForwarderXReceiver {
     uint256 _amount,
     address _asset
   ) internal override returns (bytes memory) {
-    (address _swapper, bytes4 _selector, bytes memory _swapData, bytes memory _forwardCallData) = abi.decode(
+    (address _swapper, bytes memory _swapData, bytes memory _forwardCallData) = abi.decode(
       _data,
-      (address, bytes4, bytes, bytes)
+      (address, bytes, bytes)
     );
 
-    uint256 _amountOut = swapAdapter.exactSwap(_swapper, _amount, _asset, _selector, _swapData);
+    uint256 _amountOut = this.exactSwap(_swapper, _amount, _asset, _swapData);
 
     return abi.encode(_amountOut, _forwardCallData);
   }

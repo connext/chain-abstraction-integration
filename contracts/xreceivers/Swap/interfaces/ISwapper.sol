@@ -1,0 +1,12 @@
+// SPDX-License-Identifier: Unlicense
+
+pragma solidity ^0.8.17;
+
+interface ISwapper {
+  function swap(
+    address _swapper,
+    uint256 _amountIn,
+    address _tokenIn,
+    bytes calldata _swapData
+  ) external payable returns (uint256 amountOut);
+}
