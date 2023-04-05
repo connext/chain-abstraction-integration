@@ -72,7 +72,9 @@ contract InstadappAdapterTest is TestHelper {
 
     InstadappAdapter.CastData memory castData = InstadappAdapter.CastData(_targetNames, _datas, _origin);
 
-    bytes memory signature = bytes("0x111");
+    bytes memory signature = bytes(
+      "0xe91f49cb8bf236eafb590ba328a6ca75f4d189fa51bfce2ac774541801c17d3f2d3df798f18c0520db5a98d33362d507f890d5904c2aea1dd059a9b0f05fb3ad1c"
+    );
     address auth = originSender;
 
     vm.expectRevert(bytes("Invalid signature"));
