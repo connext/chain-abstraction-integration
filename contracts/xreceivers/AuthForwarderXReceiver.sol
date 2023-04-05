@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
+import "@openzeppelin/contracts/access/Ownable.sol";
 import {IConnext} from "@connext/interfaces/core/IConnext.sol";
 import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-abstract contract AuthForwarderXReceiver is IXReceiver {
+abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
   struct OriginInfo {
     address originConnext;
     address originSender;
@@ -68,12 +69,12 @@ abstract contract AuthForwarderXReceiver is IXReceiver {
   }
 
   /**
-   * @dev Add a single origin domain to the originRegistry.
+   * @dev Add an origin domain to the originRegistry.
    * @param _originDomain - Origin domain to be registered in the OriginRegistry
    * @param _originConnext - Connext contract on origin domain
    * @param _originSender - Sender on origin domain that is expected to call this contract
    */
-  function addOrigin(uint32 _originDomain, address _originConnext, address _originSender) public {
+  function addOrigin(uint32 _originDomain, address _originConnext, address _originSender) public onlyOwner {
     originDomains.push(_originDomain);
     originRegistry[_originDomain] = OriginInfo(_originConnext, _originSender);
   }
