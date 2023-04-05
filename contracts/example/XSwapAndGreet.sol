@@ -3,24 +3,16 @@ pragma solidity ^0.8.13;
 
 import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 
-import {UniswapV3ForwarderXReceiver} from "../xreceivers/Uniswap/UniswapV3ForwarderXReceiver.sol";
+import {SwapForwarderXReceiver} from "../xreceivers/Swap/SwapForwarderXReceiver.sol";
 
 interface IGreeter {
-  function greetWithTokens(
-    address _token,
-    uint256 _amount,
-    string calldata _greeting
-  ) external view returns (string memory);
+  function greetWithTokens(address _token, uint256 _amount, string calldata _greeting) external;
 }
 
-contract XSwapAndGreet is UniswapV3ForwarderXReceiver {
+contract XSwapAndGreet is SwapForwarderXReceiver {
   IGreeter public immutable greeter;
 
-  constructor(
-    address _greeter,
-    address _connext,
-    address _uniswapSwapRouter
-  ) UniswapV3ForwarderXReceiver(_connext, _uniswapSwapRouter) {
+  constructor(address _greeter, address _connext) SwapForwarderXReceiver(_connext) {
     greeter = IGreeter(_greeter);
   }
 
@@ -31,17 +23,17 @@ contract XSwapAndGreet is UniswapV3ForwarderXReceiver {
     uint256 /*_amount*/,
     address /*_asset*/
   ) internal override returns (bool) {
-    (uint256 amountOut, address toAsset, bytes memory forwardCallData) = abi.decode(
+    (uint256 _amountOut, address _toAsset, bytes memory _forwardCallData) = abi.decode(
       _preparedData,
       (uint256, address, bytes)
     );
 
     // Decode calldata
-    string memory greeting = abi.decode(forwardCallData, (string));
+    string memory greeting = abi.decode(_forwardCallData, (string));
 
     // Forward the call
-    TransferHelper.safeApprove(toAsset, address(greeter), amountOut);
-    greeter.greetWithTokens(toAsset, amountOut, greeting);
+    TransferHelper.safeApprove(_toAsset, address(greeter), _amountOut);
+    greeter.greetWithTokens(_toAsset, _amountOut, greeting);
     return true;
   }
 }

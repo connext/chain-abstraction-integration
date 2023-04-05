@@ -27,6 +27,6 @@ abstract contract SwapForwarderXReceiver is ForwarderXReceiver, SwapAdapter {
 
     uint256 _amountOut = this.exactSwap(_swapper, _amount, _asset, _swapData);
 
-    return abi.encode(_amountOut, _forwardCallData);
+    return abi.encode(_amountOut, _asset, _forwardCallData);
   }
 }

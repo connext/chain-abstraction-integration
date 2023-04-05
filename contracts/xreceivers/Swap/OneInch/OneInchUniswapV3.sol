@@ -26,19 +26,22 @@ contract OneInchUniswapV3 is ISwapper {
     address _tokenIn,
     bytes calldata _swapData // from 1inch API
   ) public payable returns (uint256 amountOut) {
+    // transfer the funds into this contract
+    TransferHelper.safeTransferFrom(_tokenIn, msg.sender, address(this), _amountIn);
+
     // decode the swap data
     // the data included with the swap encodes with the selector so we need to remove it
     // https://docs.1inch.io/docs/aggregation-protocol/smart-contract/UnoswapV3Router#uniswapv3swap
     (, uint256 _minReturn, uint256[] memory _pools) = abi.decode(_swapData[4:], (uint256, uint256, uint256[]));
 
     // Set up swap params
+    // Approve the swapper if needed
+    if (IERC20(_tokenIn).allowance(address(this), _swapper) < _amountIn) {
+      TransferHelper.safeApprove(_tokenIn, _swapper, type(uint256).max);
+    }
+
+    // The call to `uniswapV3Swap` executes the swap.
     // use actual amountIn that was sent to the xReceiver
-    TransferHelper.safeApprove(_tokenIn, address(_swapper), _amountIn);
-    // The call to `exactInputSingle` executes the swap.
-    bytes memory ret = _swapper.functionCallWithValue(
-      abi.encodeWithSelector(IUniswapV3Router.uniswapV3Swap.selector, _amountIn, _minReturn, _pools),
-      msg.value
-    );
-    amountOut = abi.decode(ret, (uint256));
+    amountOut = IUniswapV3Router(_swapper).uniswapV3Swap(_amountIn, 1, _pools);
   }
 }

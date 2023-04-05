@@ -1,11 +1,14 @@
 //SPDX-License-Identifier: MIT
 pragma solidity >=0.8.7 <0.9.0;
 
-import "@openzeppelin/contracts/utils/Address.sol";
+import {Address} from "@openzeppelin/contracts/utils/Address.sol";
+import {Ownable2Step} from "@openzeppelin/contracts/access/Ownable2Step.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 
 import {ISwapper} from "./interfaces/ISwapper.sol";
 
-contract SwapAdapter {
+contract SwapAdapter is Ownable2Step {
   using Address for address;
   using Address for address payable;
 
@@ -21,14 +24,16 @@ contract SwapAdapter {
   /// Payable
   receive() external payable virtual {}
 
-  /// TODO: Need to implement max-approve to avoid calling approve for every swap.
-  /// And then safety checks around it.
-  /// TODO: Add function to whitelist swappers
-  /// TODO: Add function to remove whitelisted swappers
-  /// TODO: Add roles for admin
-  /// TODO: Make the contract ownable
-  /// TODO: ...
+  /// ADMIN
+  function addSwapper(address _swapper) external onlyOwner {
+    allowedSwappers[_swapper] = true;
+  }
 
+  function removeSwapper(address _swapper) external onlyOwner {
+    allowedSwappers[_swapper] = false;
+  }
+
+  /// EXTERNAL
   function exactSwap(
     address _swapper,
     uint256 _amountIn,
@@ -36,6 +41,9 @@ contract SwapAdapter {
     bytes calldata _swapData // comes directly from API with swap data encoded
   ) public payable returns (uint256 amountOut) {
     require(allowedSwappers[_swapper], "!allowedSwapper");
+    if (IERC20(_fromAsset).allowance(address(this), _swapper) < _amountIn) {
+      TransferHelper.safeApprove(_fromAsset, _swapper, type(uint256).max);
+    }
     amountOut = ISwapper(_swapper).swap(_swapper, _amountIn, _fromAsset, _swapData);
   }
 
