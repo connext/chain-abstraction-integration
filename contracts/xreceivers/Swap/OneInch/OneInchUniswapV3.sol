@@ -29,10 +29,7 @@ contract OneInchUniswapV3 is ISwapper {
     // decode the swap data
     // the data included with the swap encodes with the selector so we need to remove it
     // https://docs.1inch.io/docs/aggregation-protocol/smart-contract/UnoswapV3Router#uniswapv3swap
-    (uint256 _amount, uint256 _minReturn, uint256[] memory _pools) = abi.decode(
-      _swapData[4:],
-      (uint256, uint256, uint256[])
-    );
+    (, uint256 _minReturn, uint256[] memory _pools) = abi.decode(_swapData[4:], (uint256, uint256, uint256[]));
 
     // Set up swap params
     // use actual amountIn that was sent to the xReceiver
