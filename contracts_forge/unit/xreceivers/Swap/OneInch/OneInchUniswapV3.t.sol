@@ -7,6 +7,14 @@ import {IDCAHubPositionHandler, IDCAPermissionManager} from "@mean-finance/dca-v
 import {TestHelper} from "../../../../utils/TestHelper.sol";
 import {OneInchUniswapV3} from "../../../../../contracts/xreceivers/Swap/OneInch/OneInchUniswapV3.sol";
 
+interface IUniswapV3Router {
+  function uniswapV3Swap(
+    uint256 amount,
+    uint256 minReturn,
+    uint256[] calldata pools
+  ) external payable returns (uint256 returnAmount);
+}
+
 // data from 1inch API: 0xe449022e000000000000000000000000000000000000000000000000002386f26fc10000000000000000000000000000000000000000000000000000000000000120fd1200000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000e0554a476a092703abdb3ef35c80e0d76d32939fcfee7c08
 
 contract OneInchUniswapV3Test is TestHelper {
@@ -26,7 +34,16 @@ contract OneInchUniswapV3Test is TestHelper {
     bytes
       memory _swapData = hex"e449022e000000000000000000000000000000000000000000000000002386f26fc10000000000000000000000000000000000000000000000000000000000000120fd1200000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000e0554a476a092703abdb3ef35c80e0d76d32939fcfee7c08";
 
-    vm.mockCall(_tokenIn, abi.encodeWithSelector(IERC20.approve.selector, address(swapper)), abi.encode(true));
+    // remove 4 byte selector, not possible with memory bytes to use array indexing???
+    bytes
+      memory _s = hex"000000000000000000000000000000000000000000000000002386f26fc10000000000000000000000000000000000000000000000000000000000000120fd1200000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000e0554a476a092703abdb3ef35c80e0d76d32939fcfee7c08";
+    (, uint256 _minReturn, uint256[] memory _pools) = abi.decode(_s, (uint256, uint256, uint256[]));
+    vm.mockCall(_tokenIn, abi.encodeWithSelector(IERC20.approve.selector), abi.encode(true));
+    vm.mockCall(_swapper, abi.encodeWithSelector(IUniswapV3Router.uniswapV3Swap.selector), abi.encode(10));
+
+    vm.expectCall(_swapper, abi.encodeCall(IUniswapV3Router.uniswapV3Swap, (_amountIn, _minReturn, _pools)));
+
     uint256 amountOut = swapper.swap(_swapper, _amountIn, _tokenIn, _swapData);
+    assertEq(amountOut, 10);
   }
 }
