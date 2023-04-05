@@ -42,6 +42,6 @@ contract OneInchUniswapV3 is ISwapper {
 
     // The call to `uniswapV3Swap` executes the swap.
     // use actual amountIn that was sent to the xReceiver
-    amountOut = IUniswapV3Router(_swapper).uniswapV3Swap(_amountIn, 1, _pools);
+    amountOut = IUniswapV3Router(_swapper).uniswapV3Swap(_amountIn, _minReturn, _pools);
   }
 }
