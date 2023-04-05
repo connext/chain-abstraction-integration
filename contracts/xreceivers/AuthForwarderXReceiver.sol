@@ -60,6 +60,12 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
     address[] memory _originConnexts,
     address[] memory _originSenders
   ) {
+    require(
+      _originDomains.length == _originConnexts.length && 
+        _originDomains.length == _originSenders.length, 
+      "Lengths of origin params must match"
+    );
+
     connext = IConnext(_connext);
 
     for (uint32 i = 0; i < _originConnexts.length; i++) {
@@ -78,6 +84,30 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
     originDomains.push(_originDomain);
     originRegistry[_originDomain] = OriginInfo(_originConnext, _originSender);
   }
+
+  /**
+   * @dev Remove an origin domain from the originRegistry.
+   * @param _originDomain - Origin domain to be removed from the OriginRegistry
+   */
+  function removeOrigin(uint32 _originDomain) public onlyOwner {
+    // Assign an out-of-bounds index by default
+    uint32 indexToRemove = uint32(originDomains.length); 
+    for (uint32 i = 0; i < originDomains.length; i++) {
+      if (originDomains[i] == _originDomain) {
+        indexToRemove = i;
+        break;
+      }
+    }
+
+    require(indexToRemove < originDomains.length, "Origin domain not found");
+
+    // Constant operation to remove origin since we don't need to preserve order
+    originDomains[indexToRemove] = originDomains[originDomains.length - 1];
+    originDomains.pop();
+
+    delete originRegistry[_originDomain];
+  }
+}
 
   /**
    * @notice Receives funds from Connext and forwards them to a contract, using a two step process which is defined by the developer.
