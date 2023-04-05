@@ -27,7 +27,6 @@ contract InstadappAdapter is EIP712 {
     require(verify(auth, signature, castData), "Invalid signature");
     // increment nonce
     nonces[auth]++;
-
     // send funds to DSA
     dsa.cast{value: msg.value}(castData._targetNames, castData._datas, castData._origin);
   }
