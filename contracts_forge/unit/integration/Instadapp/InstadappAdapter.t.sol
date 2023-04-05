@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {IDSA} from "../../../contracts/integration/Instadapp/interfaces/IDSA.sol";
-import {TestHelper} from "../../utils/TestHelper.sol";
-import {InstadappAdapter} from "../../../contracts/integration/Instadapp/InstadappAdapter.sol";
+import {IDSA} from "../../../../contracts/integration/Instadapp/interfaces/IDSA.sol";
+import {TestHelper} from "../../../utils/TestHelper.sol";
+import {InstadappAdapter} from "../../../../contracts/integration/Instadapp/InstadappAdapter.sol";
 import "forge-std/console.sol";
 
 contract MockInstadappReceiver is InstadappAdapter {

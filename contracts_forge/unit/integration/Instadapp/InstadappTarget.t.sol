@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {TestHelper} from "../../utils/TestHelper.sol";
+import {TestHelper} from "../../../utils/TestHelper.sol";
 
 contract InstadappTargetTest is TestHelper {
   function setUp() public override {}
