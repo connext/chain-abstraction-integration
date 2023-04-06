@@ -38,13 +38,14 @@ contract SwapAdapter is Ownable2Step {
     address _swapper,
     uint256 _amountIn,
     address _fromAsset,
+    address _toAsset,
     bytes calldata _swapData // comes directly from API with swap data encoded
   ) public payable returns (uint256 amountOut) {
     require(allowedSwappers[_swapper], "!allowedSwapper");
     if (IERC20(_fromAsset).allowance(address(this), _swapper) < _amountIn) {
       TransferHelper.safeApprove(_fromAsset, _swapper, type(uint256).max);
     }
-    amountOut = ISwapper(_swapper).swap(_swapper, _amountIn, _fromAsset, _swapData);
+    amountOut = ISwapper(_swapper).swap(_amountIn, _fromAsset, _toAsset, _swapData);
   }
 
   function directSwapperCall(

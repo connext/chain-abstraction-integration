@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
     "compile": "hardhat compile",
-    "test": "yarn run hardhat:test",
+    "test": "yarn forge:test",
     "hardhat:test": "hardhat test",
     "forge": "forge",
     "forge:install": "forge install",

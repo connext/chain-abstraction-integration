@@ -20,13 +20,13 @@ abstract contract SwapForwarderXReceiver is ForwarderXReceiver, SwapAdapter {
     uint256 _amount,
     address _asset
   ) internal override returns (bytes memory) {
-    (address _swapper, bytes memory _swapData, bytes memory _forwardCallData) = abi.decode(
+    (address _swapper, address _toAsset, bytes memory _swapData, bytes memory _forwardCallData) = abi.decode(
       _data,
-      (address, bytes, bytes)
+      (address, address, bytes, bytes)
     );
 
-    uint256 _amountOut = this.exactSwap(_swapper, _amount, _asset, _swapData);
+    uint256 _amountOut = this.exactSwap(_swapper, _amount, _asset, _toAsset, _swapData);
 
-    return abi.encode(_amountOut, _asset, _forwardCallData);
+    return abi.encode(_forwardCallData, _amountOut, _asset, _toAsset);
   }
 }

@@ -23,9 +23,9 @@ contract XSwapAndGreet is SwapForwarderXReceiver {
     uint256 /*_amount*/,
     address /*_asset*/
   ) internal override returns (bool) {
-    (uint256 _amountOut, address _toAsset, bytes memory _forwardCallData) = abi.decode(
+    (bytes memory _forwardCallData, uint256 _amountOut, , address _toAsset) = abi.decode(
       _preparedData,
-      (uint256, address, bytes)
+      (bytes, uint256, address, address)
     );
 
     // Decode calldata

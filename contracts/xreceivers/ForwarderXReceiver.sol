@@ -46,11 +46,10 @@ abstract contract ForwarderXReceiver {
     address /*_originSender*/,
     uint32 /*_origin*/,
     bytes calldata _callData
-  ) external onlyConnext {
+  ) external onlyConnext returns (bool successfulForward) {
     // Decode calldata
     (address _fallbackAddress, bytes memory _data) = abi.decode(_callData, (address, bytes));
 
-    bool successfulForward;
     try this.prepareAndForward(_transferId, _data, _amount, _asset) returns (bool success) {
       successfulForward = success;
       if (!success) {

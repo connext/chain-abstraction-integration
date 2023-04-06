@@ -20,14 +20,20 @@ interface IUniswapV3Router {
 contract OneInchUniswapV3 is ISwapper {
   using Address for address;
 
+  IUniswapV3Router public immutable oneInchUniRouter;
+
+  constructor(address _oneInchUniRouter) {
+    oneInchUniRouter = IUniswapV3Router(_oneInchUniRouter);
+  }
+
   function swap(
-    address _swapper,
     uint256 _amountIn,
-    address _tokenIn,
+    address _fromAsset,
+    address _toAsset,
     bytes calldata _swapData // from 1inch API
   ) public payable returns (uint256 amountOut) {
-    // transfer the funds into this contract
-    TransferHelper.safeTransferFrom(_tokenIn, msg.sender, address(this), _amountIn);
+    // transfer the funds to be swapped from the sender into this contract
+    TransferHelper.safeTransferFrom(_fromAsset, msg.sender, address(this), _amountIn);
 
     // decode the swap data
     // the data included with the swap encodes with the selector so we need to remove it
@@ -36,12 +42,15 @@ contract OneInchUniswapV3 is ISwapper {
 
     // Set up swap params
     // Approve the swapper if needed
-    if (IERC20(_tokenIn).allowance(address(this), _swapper) < _amountIn) {
-      TransferHelper.safeApprove(_tokenIn, _swapper, type(uint256).max);
+    if (IERC20(_fromAsset).allowance(address(this), address(oneInchUniRouter)) < _amountIn) {
+      TransferHelper.safeApprove(_fromAsset, address(oneInchUniRouter), type(uint256).max);
     }
 
     // The call to `uniswapV3Swap` executes the swap.
     // use actual amountIn that was sent to the xReceiver
-    amountOut = IUniswapV3Router(_swapper).uniswapV3Swap(_amountIn, _minReturn, _pools);
+    amountOut = oneInchUniRouter.uniswapV3Swap(_amountIn, _minReturn, _pools);
+
+    // transfer the swapped funds back to the sender
+    TransferHelper.safeTransfer(_toAsset, msg.sender, amountOut);
   }
 }
