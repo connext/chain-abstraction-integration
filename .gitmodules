@@ -9,3 +9,6 @@
 	path = lib/vulcan
 	url = https://github.com/nomoixyz/vulcan
 	branch = alpha-1
+[submodule "lib/connext-interfaces"]
+	path = lib/connext-interfaces
+	url = https://github.com/connext/interfaces
