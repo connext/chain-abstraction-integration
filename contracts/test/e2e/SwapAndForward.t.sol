@@ -21,10 +21,8 @@ contract SwapAndForwardTest is TestHelper {
 
   function setUp() public override {
     super.setUp();
-    string memory defaultRpc = "https://arb1.arbitrum.io/rpc";
-    string memory rpc = vm.envOr("ARBITRUM_RPC_URL", defaultRpc);
-    uint256 forkId = vm.createFork(rpc, 77657931);
-    vm.selectFork(forkId);
+    string memory rpc = getRpc(42161);
+    vm.createFork(rpc, 77988525);
   }
 
   function utils_testSetup() public {
