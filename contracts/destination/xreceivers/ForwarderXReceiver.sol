@@ -41,10 +41,10 @@ abstract contract ForwarderXReceiver {
    * any router can call this function and no guarantees are made on the data passed in. This should only be used when there are
    * funds passed into the contract that need to be forwarded to another contract. This guarantees economically that there is no
    * reason to call this function maliciously, because the router would be spending their own funds.
-   * @param _transferId - The transfer ID of the transfer that triggered this call
-   * @param _amount - The amount of funds received in this transfer
-   * @param _asset - The asset of the funds received in this transfer
-   * @param _callData - The data to be prepared and forwarded
+   * @param _transferId - The transfer ID of the transfer that triggered this call.
+   * @param _amount - The amount of funds received in this transfer.
+   * @param _asset - The asset of the funds received in this transfer.
+   * @param _callData - The data to be prepared and forwarded. Fallback address needs to be encoded in the data to be used in case the forward fails.
    */
   function xReceive(
     bytes32 _transferId,
