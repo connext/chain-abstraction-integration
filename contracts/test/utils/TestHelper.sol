@@ -52,12 +52,12 @@ contract TestHelper is Test {
   }
 
   function setUpArbitrum(uint256 blockNumber) public {
-    vm.createSelectFork(getRpc(42161), blockNumber);
+    arbitrumForkUrl = vm.createFork(getRpc(42161), blockNumber);
     vm.label(CONNEXT_ARBITRUM, "Connext Arbitrum");
   }
 
   function setUpOptimism(uint256 blockNumber) public {
-    vm.createSelectFork(getRpc(10), blockNumber);
+    optimismForkUrl = vm.createFork(getRpc(10), blockNumber);
     vm.label(CONNEXT_OPTIMISM, "Connext Optimism");
   }
 
