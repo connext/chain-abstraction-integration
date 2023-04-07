@@ -52,22 +52,34 @@ contract TestHelper is Test {
   }
 
   function setUpArbitrum(uint256 blockNumber) public {
-    arbitrumForkUrl = vm.createSelectFork(vm.envOr("ARBITRUM_RPC_URL", ARBITRUM_DEFAULT_RPC), blockNumber);
+    vm.createSelectFork(getRpc(42161), blockNumber);
     vm.label(CONNEXT_ARBITRUM, "Connext Arbitrum");
   }
 
   function setUpOptimism(uint256 blockNumber) public {
-    optimismForkUrl = vm.createSelectFork(vm.envOr("OPTIMISM_RPC_URL", OPTIMISM_DEFAULT_RPC), blockNumber);
+    vm.createSelectFork(getRpc(10), blockNumber);
     vm.label(CONNEXT_OPTIMISM, "Connext Optimism");
   }
 
   function getRpc(uint256 chainId) internal view returns (string memory) {
+    string memory keyName;
+    string memory defaultRpc;
+
     if (chainId == 1) {
-      return "https://eth.llamarpc.com";
+      keyName = "MAINNET_RPC_URL";
+      defaultRpc = "https://eth.llamarpc.com";
+    } else if (chainId == 10) {
+      keyName = "OPTIMISM_RPC_URL";
+      defaultRpc = "https://mainnet.optimism.io";
     } else if (chainId == 42161) {
-      return "https://arb1.arbitrum.io/rpc";
+      keyName = "ARBITRUM_RPC_URL";
+      defaultRpc = "https://arb1.arbitrum.io/rpc";
     }
 
-    return vm.envString("RPC_URL");
+    try vm.envString(keyName) {
+      return vm.envString(keyName);
+    } catch {
+      return defaultRpc;
+    }
   }
 }
