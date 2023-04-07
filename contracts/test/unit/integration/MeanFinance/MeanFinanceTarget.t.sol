@@ -5,8 +5,8 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IDCAHubPositionHandler, IDCAPermissionManager} from "@mean-finance/dca-v2-core/contracts/interfaces/IDCAHub.sol";
 
 import {TestHelper} from "../../../utils/TestHelper.sol";
-import {MeanFinanceTarget} from "../../../../contracts/integration/MeanFinance/MeanFinanceTarget.sol";
-import {MeanFinanceAdapter} from "../../../../contracts/integration/MeanFinance/MeanFinanceAdapter.sol";
+import {MeanFinanceTarget} from "../../../../integration/MeanFinance/MeanFinanceTarget.sol";
+import {MeanFinanceAdapter} from "../../../../integration/MeanFinance/MeanFinanceAdapter.sol";
 
 contract MeanTest is MeanFinanceTarget {
   constructor(address _connext, address _hub) MeanFinanceTarget(_connext, _hub) {}

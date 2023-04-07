@@ -6,7 +6,7 @@ import {IWeth} from "@connext/interfaces/core/IWeth.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 
-import {SwapAdapter} from "../../xreceivers/Swap/SwapAdapter.sol";
+import {SwapAdapter} from "../../shared/Swap/SwapAdapter.sol";
 
 contract MeanFinanceSource is SwapAdapter {
   // The Connext contract on this domain
@@ -48,7 +48,7 @@ contract MeanFinanceSource is SwapAdapter {
     // swap to donation asset if needed
     if (inputAsset != connextAsset) {
       require(connextApprovedAssets(connextAsset), "!connextAsset");
-    //   amountOut = swap(inputAsset, connextAsset, sourcePoolFee, amountIn, sourceAmountOutMin);
+      //   amountOut = swap(inputAsset, connextAsset, sourcePoolFee, amountIn, sourceAmountOutMin);
     }
 
     TransferHelper.safeApprove(connextAsset, address(connext), amountOut);
