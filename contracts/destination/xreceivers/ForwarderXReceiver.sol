@@ -5,6 +5,13 @@ import {IConnext} from "@connext/interfaces/core/IConnext.sol";
 import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
+/**
+ * @title ForwarderXReceiver
+ * @author Connext
+ * @notice Abstract contract to allow for forwarding a call. Handles security and error handling.
+ * @dev This is meant to be used in unauthenticated flows, so the data passed in is not guaranteed to be correct.
+ * This is meant to be used when there are funds passed into the contract that need to be forwarded to another contract.
+ */
 abstract contract ForwarderXReceiver is IXReceiver {
   // The Connext contract on this domain
   IConnext public immutable connext;
@@ -40,10 +47,10 @@ abstract contract ForwarderXReceiver is IXReceiver {
    * any router can call this function and no guarantees are made on the data passed in. This should only be used when there are
    * funds passed into the contract that need to be forwarded to another contract. This guarantees economically that there is no
    * reason to call this function maliciously, because the router would be spending their own funds.
-   * @param _transferId - The transfer ID of the transfer that triggered this call
-   * @param _amount - The amount of funds received in this transfer
-   * @param _asset - The asset of the funds received in this transfer
-   * @param _callData - The data to be prepared and forwarded
+   * @param _transferId - The transfer ID of the transfer that triggered this call.
+   * @param _amount - The amount of funds received in this transfer.
+   * @param _asset - The asset of the funds received in this transfer.
+   * @param _callData - The data to be prepared and forwarded. Fallback address needs to be encoded in the data to be used in case the forward fails.
    */
   function xReceive(
     bytes32 _transferId,
@@ -83,6 +90,8 @@ abstract contract ForwarderXReceiver is IXReceiver {
     if (!successfulForward) {
       IERC20(_asset).transfer(_fallbackAddress, _amount);
     }
+    // Return the success status of the forwardFunctionCall
+    return abi.encode(successfulForward);
   }
 
   /// INTERNAL
@@ -132,7 +141,7 @@ abstract contract ForwarderXReceiver is IXReceiver {
     uint256 _amount,
     address _asset
   ) internal virtual returns (bytes memory) {
-    return _data;
+    return abi.encode(_data, _transferId, _amount, _asset);
   }
 
   /**

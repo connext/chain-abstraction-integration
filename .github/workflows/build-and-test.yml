@@ -38,4 +38,7 @@ jobs:
         run: yarn forge:build
 
       - name: Run Forge tests
+        env:
+          OPTIMISM_RPC_URL: ${{ secrets.OPTIMISM_RPC_URL }}
+          ARBITRUM_RPC_URL: ${{ secrets.ARBITRUM_RPC_URL }}
         run: yarn forge:test

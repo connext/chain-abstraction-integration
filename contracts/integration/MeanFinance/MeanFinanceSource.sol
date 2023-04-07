@@ -6,7 +6,7 @@ import {IWeth} from "@connext/interfaces/core/IWeth.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 
-import {SwapAdapter} from "../../xreceivers/Swap/SwapAdapter.sol";
+import {SwapAdapter} from "../../shared/Swap/SwapAdapter.sol";
 
 contract MeanFinanceSource is SwapAdapter {
   // The Connext contract on this domain

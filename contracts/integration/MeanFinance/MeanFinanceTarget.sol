@@ -7,7 +7,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IDCAHubPositionHandler, IDCAPermissionManager} from "@mean-finance/dca-v2-core/contracts/interfaces/IDCAHub.sol";
 
 import {MeanFinanceAdapter} from "./MeanFinanceAdapter.sol";
-import {SwapForwarderXReceiver} from "../../xreceivers/Swap/SwapForwarderXReceiver.sol";
+import {SwapForwarderXReceiver} from "../../destination/xreceivers/Swap/SwapForwarderXReceiver.sol";
 
 contract MeanFinanceTarget is SwapForwarderXReceiver {
   IDCAHubPositionHandler public immutable hub;

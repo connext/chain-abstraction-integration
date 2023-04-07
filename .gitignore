@@ -34,3 +34,5 @@ typechain-types
 cache
 artifacts
 deployments/*/solcInputs
+artifacts_forge
+cache_forge/
