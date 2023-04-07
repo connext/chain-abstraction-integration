@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.19;
 
-import {IGreeter} from "../../example/XSwapAndGreet.sol";
+import {IGreeter} from "../../example/XSwapAndGreet/XSwapAndGreetTarget.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract Greeter is IGreeter {

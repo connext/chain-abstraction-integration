@@ -16,6 +16,24 @@ contract TestHelper is Test {
   uint32 public ARBITRUM_GOERLI_CHAIN_ID = 421613;
   uint32 public POLYGON_MUMBAI_CHAIN_ID = 80001;
 
+  /// Mainnet Domain IDs
+  uint32 public ARBITRUM_DOMAIN_ID = 1634886255;
+  uint32 public OPTIMISM_DOMAIN_ID = 1869640809;
+
+  /// Mainnet Chain IDs
+  uint32 public ARBITRUM_CHAIN_ID = 42161;
+  uint32 public OPTIMISM_CHAIN_ID = 10;
+
+  // Live Addresses
+  address public CONNEXT_ARBITRUM = 0xEE9deC2712cCE65174B561151701Bf54b99C24C8;
+  address public CONNEXT_OPTIMISM = 0x8f7492DE823025b4CfaAB1D34c58963F2af5DEDA;
+
+  // Forks
+  uint256 public arbitrumForkUrl;
+  string ARBITRUM_DEFAULT_RPC = "https://arb1.arbitrum.io/rpc";
+  uint256 public optimismForkUrl;
+  string OPTIMISM_DEFAULT_RPC = "https://mainnet.optimism.io";
+
   /// Mock Addresses
   address public USER_CHAIN_A = address(bytes20(keccak256("USER_CHAIN_A")));
   address public USER_CHAIN_B = address(bytes20(keccak256("USER_CHAIN_B")));
@@ -31,5 +49,15 @@ contract TestHelper is Test {
     vm.label(TokenB_ERC20, "TokenB_ERC20");
     vm.label(USER_CHAIN_A, "User Chain A");
     vm.label(USER_CHAIN_B, "User Chain B");
+  }
+
+  function setUpArbitrum(uint256 blockNumber) public {
+    arbitrumForkUrl = vm.createSelectFork(vm.envOr("ARBITRUM_RPC_URL", ARBITRUM_DEFAULT_RPC), blockNumber);
+    vm.label(CONNEXT_ARBITRUM, "Connext Arbitrum");
+  }
+
+  function setUpOptimism(uint256 blockNumber) public {
+    optimismForkUrl = vm.createSelectFork(vm.envOr("OPTIMISM_RPC_URL", OPTIMISM_DEFAULT_RPC), blockNumber);
+    vm.label(CONNEXT_OPTIMISM, "Connext Optimism");
   }
 }

@@ -3,13 +3,13 @@ pragma solidity ^0.8.13;
 
 import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 
-import {SwapForwarderXReceiver} from "../destination/xreceivers/Swap/SwapForwarderXReceiver.sol";
+import {SwapForwarderXReceiver} from "../../destination/xreceivers/Swap/SwapForwarderXReceiver.sol";
 
 interface IGreeter {
   function greetWithTokens(address _token, uint256 _amount, string calldata _greeting) external;
 }
 
-contract XSwapAndGreet is SwapForwarderXReceiver {
+contract XSwapAndGreetTarget is SwapForwarderXReceiver {
   IGreeter public immutable greeter;
 
   constructor(address _greeter, address _connext) SwapForwarderXReceiver(_connext) {
