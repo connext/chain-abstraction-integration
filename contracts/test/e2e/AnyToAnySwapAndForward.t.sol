@@ -109,6 +109,6 @@ contract AnyToAnySwapAndForwardTest is TestHelper {
       callData
     );
     assertEq(greeter.greeting(), "Hello, Connext!");
-    assertEq(IERC20(ARB_USDC).balanceOf(address(greeter)), 83059436227592757201);
+    assertEq(IERC20(ARB_ARB).balanceOf(address(greeter)), 83059436227592757201);
   }
 }
