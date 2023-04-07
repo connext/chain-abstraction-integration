@@ -95,7 +95,7 @@ contract AnyToAnySwapAndForwardTest is TestHelper {
       123 // fake relayer fee, will be in USDC
     );
 
-    vm.selectFork(arbitrumForkUrl);
+    vm.selectFork(arbitrumForkId);
     vm.prank(CONNEXT_ARBITRUM);
     xSwapAndGreetTarget.xReceive(
       bytes32(""),
