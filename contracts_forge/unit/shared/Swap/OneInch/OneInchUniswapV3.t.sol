@@ -5,7 +5,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IDCAHubPositionHandler, IDCAPermissionManager} from "@mean-finance/dca-v2-core/contracts/interfaces/IDCAHub.sol";
 
 import {TestHelper} from "../../../../utils/TestHelper.sol";
-import {OneInchUniswapV3, IUniswapV3Router} from "../../../../../contracts/xreceivers/Swap/OneInch/OneInchUniswapV3.sol";
+import {OneInchUniswapV3, IUniswapV3Router} from "../../../../../contracts/shared/Swap/OneInch/OneInchUniswapV3.sol";
 
 // data from 1inch API: 0xe449022e000000000000000000000000000000000000000000000000002386f26fc10000000000000000000000000000000000000000000000000000000000000120fd1200000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000e0554a476a092703abdb3ef35c80e0d76d32939fcfee7c08
 
