@@ -1,37 +1,15 @@
 import "@nomicfoundation/hardhat-toolbox";
 import "hardhat-deploy";
 import "@nomiclabs/hardhat-ethers";
+import "@nomicfoundation/hardhat-foundry";
 import { config as envConfig } from "dotenv";
 import { HardhatUserConfig } from "hardhat/config";
-import { BigNumber } from "ethers";
 
 envConfig();
 
-const chainIds = {
-  ganache: 1337,
-  hardhat: 31337,
-  mainnet: 1,
-  avalanche: 43114,
-  polygon: 137,
-  arbitrum: 42161,
-  optimism: 10,
-  fantom: 250,
-};
-
 const alchemyApiKey = process.env.ALCHEMY_API_KEY;
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
-const MNEMONIC =
-  process.env.MNEMONIC ??
-  "test test test test test test test test test test test junk";
-
-const networkGasPriceConfig: Record<string, number> = {
-  mainnet: 100,
-  polygon: 50,
-  avalanche: 40,
-  arbitrum: 1,
-  optimism: 0.001,
-  fantom: 210,
-};
+const MNEMONIC = process.env.MNEMONIC ?? "test test test test test test test test test test test junk";
 
 function createConfig(network: string) {
   return {
@@ -44,22 +22,13 @@ function createConfig(network: string) {
 
 function getNetworkUrl(networkType: string) {
   if (networkType === "polygon")
-    return alchemyApiKey
-      ? `https://polygon-mainnet.g.alchemy.com/v2/${alchemyApiKey}`
-      : "https://rpc.ankr.com/polygon";
+    return alchemyApiKey ? `https://polygon-mainnet.g.alchemy.com/v2/${alchemyApiKey}` : "https://rpc.ankr.com/polygon";
   else if (networkType === "arbitrum")
-    return alchemyApiKey
-      ? `https://arb-mainnet.g.alchemy.com/v2/${alchemyApiKey}`
-      : "https://arb1.arbitrum.io/rpc";
+    return alchemyApiKey ? `https://arb-mainnet.g.alchemy.com/v2/${alchemyApiKey}` : "https://arb1.arbitrum.io/rpc";
   else if (networkType === "optimism")
-    return alchemyApiKey
-      ? `https://opt-mainnet.g.alchemy.com/v2/${alchemyApiKey}`
-      : "https://mainnet.optimism.io";
+    return alchemyApiKey ? `https://opt-mainnet.g.alchemy.com/v2/${alchemyApiKey}` : "https://mainnet.optimism.io";
   else if (networkType === "fantom") return `https://rpc.ftm.tools/`;
-  else
-    return alchemyApiKey
-      ? `https://eth-mainnet.alchemyapi.io/v2/${alchemyApiKey}`
-      : "https://cloudflare-eth.com";
+  else return alchemyApiKey ? `https://eth-mainnet.alchemyapi.io/v2/${alchemyApiKey}` : "https://cloudflare-eth.com";
 }
 
 const config: HardhatUserConfig = {

@@ -1,6 +1,6 @@
 [profile.default]
-src = 'contracts_forge'
-out = 'artifacts_forge'
+src = 'contracts'
+out = 'artifacts'
 libs = ["node_modules", "lib"]
 remappings = [
     '@connext/=node_modules/@connext/',
