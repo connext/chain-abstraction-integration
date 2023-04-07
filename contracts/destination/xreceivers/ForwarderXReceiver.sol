@@ -132,7 +132,7 @@ abstract contract ForwarderXReceiver {
     uint256 _amount,
     address _asset
   ) internal virtual returns (bytes memory) {
-    return _data;
+    return abi.encode(_data, _transferId, _amount, _asset);
   }
 
   /**
