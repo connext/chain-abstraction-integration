@@ -17,6 +17,10 @@ interface IUniswapV3Router {
   ) external payable returns (uint256 returnAmount);
 }
 
+/**
+ * @title OneInchUniswapV3
+ * @notice Swapper contract for 1inch UniswapV3 swaps.
+ */
 contract OneInchUniswapV3 is ISwapper {
   using Address for address;
 
@@ -26,12 +30,21 @@ contract OneInchUniswapV3 is ISwapper {
     oneInchUniRouter = IUniswapV3Router(_oneInchUniRouter);
   }
 
+  /**
+   * @notice Swap the given amount of tokens using 1inch.
+   * @dev Decode the passed in data and re-encode it with the correct amountIn. This is because the amountIn is not known
+   * until the funds are transferred to this contract.
+   * @param _amountIn Amount of tokens to swap.
+   * @param _fromAsset Address of the token to swap from.
+   * @param _toAsset Address of the token to swap to.
+   * @param _swapData Data to pass to the 1inch aggregator router.
+   */
   function swap(
     uint256 _amountIn,
     address _fromAsset,
     address _toAsset,
     bytes calldata _swapData // from 1inch API
-  ) public payable returns (uint256 amountOut) {
+  ) public payable override returns (uint256 amountOut) {
     // transfer the funds to be swapped from the sender into this contract
     TransferHelper.safeTransferFrom(_fromAsset, msg.sender, address(this), _amountIn);
 

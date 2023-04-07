@@ -8,6 +8,14 @@ import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/Transfer
 
 import {ISwapper} from "./interfaces/ISwapper.sol";
 
+/**
+ * @title SwapAdapter
+ * @author Connext
+ * @notice This contract is used to provide a generic interface to swap tokens through
+ * a variety of different swap routers. It is used by the xReceiver to swap tokens
+ * before proceeding with other actions. Swap router implementations can be added by owner.
+ * This is designed to be owned by the Connext DAO and swappers can be added by the DAO.
+ */
 contract SwapAdapter is Ownable2Step {
   using Address for address;
   using Address for address payable;
@@ -22,18 +30,36 @@ contract SwapAdapter is Ownable2Step {
   }
 
   /// Payable
+  // @dev On the origin side, we can accept native assets for a swap.
   receive() external payable virtual {}
 
   /// ADMIN
+  /**
+   * @notice Add a swapper to the list of allowed swappers.
+   * @param _swapper Address of the swapper to add.
+   */
   function addSwapper(address _swapper) external onlyOwner {
     allowedSwappers[_swapper] = true;
   }
 
+  /**
+   * @notice Remove a swapper from the list of allowed swappers.
+   * @param _swapper Address of the swapper to remove.
+   */
   function removeSwapper(address _swapper) external onlyOwner {
     allowedSwappers[_swapper] = false;
   }
 
   /// EXTERNAL
+  /**
+   * @notice Swap an exact amount of tokens for another token.
+   * @param _swapper Address of the swapper to use.
+   * @param _amountIn Amount of tokens to swap.
+   * @param _fromAsset Address of the token to swap from.
+   * @param _toAsset Address of the token to swap to.
+   * @param _swapData Data to pass to the swapper. This data is encoded for a particular swap router, usually given
+   * by an API. The swapper will decode the data and re-encode it with the new amountIn.
+   */
   function exactSwap(
     address _swapper,
     uint256 _amountIn,
@@ -48,12 +74,14 @@ contract SwapAdapter is Ownable2Step {
     amountOut = ISwapper(_swapper).swap(_amountIn, _fromAsset, _toAsset, _swapData);
   }
 
-  function directSwapperCall(
-    address _swapper,
-    bytes calldata swapData,
-    uint256 value
-  ) public payable returns (uint256) {
-    bytes memory ret = _swapper.functionCallWithValue(swapData, value, "!directSwapperCallFailed");
+  /**
+   * @notice Swap an exact amount of tokens for another token. Uses a direct call to the swapper to allow
+   * easy swaps on the source side where the amount does not need to be changed.
+   * @param _swapper Address of the swapper to use.
+   * @param swapData Data to pass to the swapper. This data is encoded for a particular swap router.
+   */
+  function directSwapperCall(address _swapper, bytes calldata swapData) public payable returns (uint256) {
+    bytes memory ret = _swapper.functionCallWithValue(swapData, msg.value, "!directSwapperCallFailed");
     return abi.decode(ret, (uint256));
   }
 }

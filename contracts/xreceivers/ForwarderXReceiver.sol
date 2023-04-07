@@ -5,6 +5,13 @@ import {IConnext} from "@connext/interfaces/core/IConnext.sol";
 import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
+/**
+ * @title ForwarderXReceiver
+ * @author Connext
+ * @notice Abstract contract to allow for forwarding a call. Handles security and error handling.
+ * @dev This is meant to be used in unauthenticated flows, so the data passed in is not guaranteed to be correct.
+ * This is meant to be used when there are funds passed into the contract that need to be forwarded to another contract.
+ */
 abstract contract ForwarderXReceiver {
   // The Connext contract on this domain
   IConnext public immutable connext;
