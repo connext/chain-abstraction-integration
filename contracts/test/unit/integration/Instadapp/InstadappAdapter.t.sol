@@ -4,12 +4,11 @@ pragma solidity ^0.8.13;
 import {IDSA} from "../../../../integration/Instadapp/interfaces/IDSA.sol";
 import {TestHelper} from "../../../utils/TestHelper.sol";
 import {InstadappAdapter} from "../../../../integration/Instadapp/InstadappAdapter.sol";
-import "forge-std/console.sol";
 
 contract MockInstadappReceiver is InstadappAdapter {
   constructor() {}
 
-  function testAuthCast(
+  function tryAuthCast(
     address dsaAddress,
     address auth,
     bytes memory signature,
@@ -19,7 +18,7 @@ contract MockInstadappReceiver is InstadappAdapter {
     authCast(dsaAddress, auth, signature, castData, salt);
   }
 
-  function testVerify(
+  function tryVerify(
     address auth,
     bytes memory signature,
     CastData memory castData,
@@ -67,7 +66,7 @@ contract InstadappAdapterTest is TestHelper {
     bytes32 salt = bytes32(abi.encode(1));
 
     vm.expectRevert(bytes("Invalid Auth"));
-    instadappReceiver.testAuthCast(dsa, auth, signature, castData, salt);
+    instadappReceiver.tryAuthCast(dsa, auth, signature, castData, salt);
   }
 
   function test_InstadappAdapter__authCast_shouldRevertIfInvalidSignature() public {
@@ -91,7 +90,7 @@ contract InstadappAdapterTest is TestHelper {
     address auth = originSender;
     bytes32 salt = bytes32(abi.encode(1));
     vm.expectRevert(bytes("Invalid signature"));
-    instadappReceiver.testAuthCast(dsa, auth, signature, castData, salt);
+    instadappReceiver.tryAuthCast(dsa, auth, signature, castData, salt);
   }
 
   function test_InstadappAdapter__authCast_shouldWork() public {
@@ -117,7 +116,7 @@ contract InstadappAdapterTest is TestHelper {
 
     address auth = originSender;
     vm.expectRevert(bytes("Invalid signature"));
-    instadappReceiver.testAuthCast(dsa, auth, signature, castData, salt);
+    instadappReceiver.tryAuthCast(dsa, auth, signature, castData, salt);
   }
 
   // ============ InstadappAdapter.verify ============
