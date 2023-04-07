@@ -1,20 +1,25 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
+import "@openzeppelin/contracts/access/Ownable.sol";
 import {IConnext} from "@connext/interfaces/core/IConnext.sol";
 import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-/**
- * @title ForwarderXReceiver
- * @author Connext
- * @notice Abstract contract to allow for forwarding a call. Handles security and error handling.
- * @dev This is meant to be used in unauthenticated flows, so the data passed in is not guaranteed to be correct.
- * This is meant to be used when there are funds passed into the contract that need to be forwarded to another contract.
- */
-abstract contract ForwarderXReceiver is IXReceiver {
-  // The Connext contract on this domain
+abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
+  struct OriginInfo {
+    address originConnext;
+    address originSender;
+  }
+
+  /// The Connext contract on this domain
   IConnext public immutable connext;
+
+  /// Allowed origin domains
+  uint32[] public originDomains;
+
+  /// Registry of senders and Connext contracts of allowed origin domains
+  mapping(uint32 => OriginInfo) public originRegistry;
 
   /// EVENTS
   event ForwardedFunctionCallFailed(bytes32 _transferId);
@@ -23,43 +28,103 @@ abstract contract ForwarderXReceiver is IXReceiver {
   event ForwardedFunctionCallFailed(bytes32 _transferId, bytes _lowLevelData);
 
   /// ERRORS
-  error ForwarderXReceiver__onlyConnext(address sender);
+  error ForwarderXReceiver__onlyOrigin(address originSender, uint32 origin, address sender);
   error ForwarderXReceiver__prepareAndForward_notThis(address sender);
 
   /// MODIFIERS
-  modifier onlyConnext() {
-    if (msg.sender != address(connext)) {
-      revert ForwarderXReceiver__onlyConnext(msg.sender);
+  /** @notice A modifier for authenticated calls.
+   * This is an important security consideration. If the target contract
+   * function should be authenticated, it must check three things:
+   *    1) The originating call comes from the expected origin domain.
+   *    2) The originating call comes from the expected origin contract.
+   *    3) The call to this contract comes from Connext.
+   */
+  modifier onlyOrigin(address _originSender, uint32 _origin) {
+    OriginInfo memory info = originRegistry[_origin];
+    if (msg.sender != address(connext) || _originSender != info.originSender || msg.sender != info.originConnext) {
+      revert ForwarderXReceiver__onlyOrigin(_originSender, _origin, msg.sender);
     }
     _;
   }
 
   /**
+   * @dev The elements in the _origin* array params must be passed in the same relative positions.
    * @param _connext - The address of the Connext contract on this domain
+   * @param _originDomains - Array of origin domains to be registered in the OriginRegistry
+   * @param _originConnexts - Array of Connext contracts on origin domains
+   * @param _originSenders - Array of senders on origin domains that are expected to call this contract
    */
-  constructor(address _connext) {
+  constructor(
+    address _connext,
+    uint32[] memory _originDomains,
+    address[] memory _originConnexts,
+    address[] memory _originSenders
+  ) {
+    require(
+      _originDomains.length == _originConnexts.length && _originDomains.length == _originSenders.length,
+      "Lengths of origin params must match"
+    );
+
     connext = IConnext(_connext);
+
+    for (uint32 i = 0; i < _originConnexts.length; i++) {
+      originDomains.push(_originDomains[i]);
+      originRegistry[_originDomains[i]] = OriginInfo(_originConnexts[i], _originSenders[i]);
+    }
+  }
+
+  /**
+   * @dev Add an origin domain to the originRegistry.
+   * @param _originDomain - Origin domain to be registered in the OriginRegistry
+   * @param _originConnext - Connext contract on origin domain
+   * @param _originSender - Sender on origin domain that is expected to call this contract
+   */
+  function addOrigin(uint32 _originDomain, address _originConnext, address _originSender) public onlyOwner {
+    originDomains.push(_originDomain);
+    originRegistry[_originDomain] = OriginInfo(_originConnext, _originSender);
+  }
+
+  /**
+   * @dev Remove an origin domain from the originRegistry.
+   * @param _originDomain - Origin domain to be removed from the OriginRegistry
+   */
+  function removeOrigin(uint32 _originDomain) public onlyOwner {
+    // Assign an out-of-bounds index by default
+    uint32 indexToRemove = uint32(originDomains.length);
+    for (uint32 i = 0; i < originDomains.length; i++) {
+      if (originDomains[i] == _originDomain) {
+        indexToRemove = i;
+        break;
+      }
+    }
+
+    require(indexToRemove < originDomains.length, "Origin domain not found");
+
+    // Constant operation to remove origin since we don't need to preserve order
+    originDomains[indexToRemove] = originDomains[originDomains.length - 1];
+    originDomains.pop();
+
+    delete originRegistry[_originDomain];
   }
 
   /**
    * @notice Receives funds from Connext and forwards them to a contract, using a two step process which is defined by the developer.
-   * @dev _originSender and _origin are not used in this implementation because this is meant for an "unauthenticated" call. This means
-   * any router can call this function and no guarantees are made on the data passed in. This should only be used when there are
-   * funds passed into the contract that need to be forwarded to another contract. This guarantees economically that there is no
-   * reason to call this function maliciously, because the router would be spending their own funds.
-   * @param _transferId - The transfer ID of the transfer that triggered this call.
-   * @param _amount - The amount of funds received in this transfer.
-   * @param _asset - The asset of the funds received in this transfer.
-   * @param _callData - The data to be prepared and forwarded. Fallback address needs to be encoded in the data to be used in case the forward fails.
+   * @dev _originSender and _origin are passed into the onlyOrigin modifier to turn this into an "authenticated" call. This function
+   * will fail until the AMB's validation window has elapsed, at which point _orginSender changes from the zero address to the correct
+   * sender address from the origin domain.
+   * @param _transferId - The transfer ID of the transfer that triggered this call
+   * @param _amount - The amount of funds received in this transfer
+   * @param _asset - The asset of the funds received in this transfer
+   * @param _callData - The data to be prepared and forwarded
    */
   function xReceive(
     bytes32 _transferId,
     uint256 _amount, // Final Amount receive via Connext(After AMM calculation)
     address _asset,
-    address /*_originSender*/,
-    uint32 /*_origin*/,
-    bytes calldata _callData
-  ) external onlyConnext returns (bytes memory) {
+    address _originSender,
+    uint32 _origin,
+    bytes memory _callData
+  ) external onlyOrigin(_originSender, _origin) returns (bytes memory) {
     // Decode calldata
     (address _fallbackAddress, bytes memory _data) = abi.decode(_callData, (address, bytes));
 
