@@ -80,8 +80,8 @@ contract SwapAdapter is Ownable2Step {
    * @param _swapper Address of the swapper to use.
    * @param swapData Data to pass to the swapper. This data is encoded for a particular swap router.
    */
-  function directSwapperCall(address _swapper, bytes calldata swapData) public payable returns (uint256) {
+  function directSwapperCall(address _swapper, bytes calldata swapData) public payable returns (uint256 amountOut) {
     bytes memory ret = _swapper.functionCallWithValue(swapData, msg.value, "!directSwapperCallFailed");
-    return abi.decode(ret, (uint256));
+    amountOut = abi.decode(ret, (uint256));
   }
 }
