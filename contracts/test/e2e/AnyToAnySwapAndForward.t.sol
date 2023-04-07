@@ -18,10 +18,13 @@ contract AnyToAnySwapAndForwardTest is TestHelper {
 
   address public immutable OP_OP = 0x4200000000000000000000000000000000000042;
   address public immutable OP_USDC = 0x7F5c764cBc14f9669B88837ca1490cCa17c31607;
+  address public immutable ARB_USDC = 0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8;
   address public immutable ARB_ARB = 0x912CE59144191C1204E64559FE8253a0e49E6548;
 
   address public immutable OP_OP_WHALE = 0x2501c477D0A35545a387Aa4A3EEe4292A9a8B3F0;
   address public immutable ONEINCH_SWAPPER = 0x1111111254EEB25477B68fb85Ed929f73A960582;
+
+  address public immutable FALLBACK_ADDRESS = address(1);
 
   function utils_setUpOrigin() public {
     setUpOptimism(87307161);
@@ -47,6 +50,7 @@ contract AnyToAnySwapAndForwardTest is TestHelper {
     vm.label(address(xSwapAndGreetTarget), "XSwapAndGreetTarget");
     vm.label(address(oneInchUniswapV3), "OneInchUniswapV3");
     vm.label(ARB_ARB, "ARB_ARB");
+    vm.label(ARB_USDC, "ARB_USDC");
   }
 
   function test_AnyToAnySwapAndForwardTest__works() public {
@@ -64,7 +68,7 @@ contract AnyToAnySwapAndForwardTest is TestHelper {
     // destination
     // set up destination swap params
     bytes
-      memory oneInchApiDataUsdcToArb = hex"e449022e000000000000000000000000000000000000000000000000002386f26fc1000000000000000000000000000000000000000000000004aa05425d2de542d5e37c0000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000000180000000000000000000000081c48d31365e6b526f6bbadc5c9aafd822134863cfee7c08";
+      memory oneInchApiDataUsdcToArb = hex"e449022e0000000000000000000000000000000000000000000000000000000005f5e100000000000000000000000000000000000000000000000004188a80f4c2e52ccf00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000001800000000000000000000000cda53b1f66614552f834ceef361a8d12a0b8dad8cfee7c08";
     bytes memory _forwardCallData = abi.encode("Hello, Connext!");
     bytes memory _swapperData = abi.encode(
       address(oneInchUniswapV3),
@@ -74,7 +78,7 @@ contract AnyToAnySwapAndForwardTest is TestHelper {
     );
 
     // final calldata includes both origin and destination swaps
-    bytes memory callData = abi.encode(address(1), _swapperData);
+    bytes memory callData = abi.encode(FALLBACK_ADDRESS, _swapperData);
     // set up swap calldata
     swapAndXCall.swapAndXCall(
       OP_OP,
@@ -88,6 +92,17 @@ contract AnyToAnySwapAndForwardTest is TestHelper {
       300,
       callData,
       123 // fake relayer fee, will be in USDC
+    );
+
+    vm.selectFork(arbitrumForkUrl);
+    vm.prank(CONNEXT_ARBITRUM);
+    xSwapAndGreetTarget.xReceive(
+      bytes32(""),
+      99800000, // Final Amount receive via Connext(After AMM calculation)
+      ARB_USDC,
+      address(0),
+      123,
+      callData
     );
   }
 }
