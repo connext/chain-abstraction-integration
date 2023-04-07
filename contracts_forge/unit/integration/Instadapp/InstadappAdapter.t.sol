@@ -9,12 +9,23 @@ import "forge-std/console.sol";
 contract MockInstadappReceiver is InstadappAdapter {
   constructor() {}
 
-  function testAuthCast(address dsaAddress, address auth, bytes memory signature, CastData memory castData) public {
-    authCast(dsaAddress, auth, signature, castData);
+  function testAuthCast(
+    address dsaAddress,
+    address auth,
+    bytes memory signature,
+    CastData memory castData,
+    bytes32 salt
+  ) public {
+    authCast(dsaAddress, auth, signature, castData, salt);
   }
 
-  function testVerify(address auth, bytes memory signature, CastData memory castData) public view returns (bool) {
-    verify(auth, signature, castData);
+  function testVerify(
+    address auth,
+    bytes memory signature,
+    CastData memory castData,
+    bytes32 salt
+  ) public view returns (bool) {
+    verify(auth, signature, castData, salt);
   }
 }
 
@@ -53,9 +64,10 @@ contract InstadappAdapterTest is TestHelper {
 
     bytes memory signature = bytes("0x111");
     address auth = originSender;
+    bytes32 salt = bytes32(abi.encode(1));
 
     vm.expectRevert(bytes("Invalid Auth"));
-    instadappReceiver.testAuthCast(dsa, auth, signature, castData);
+    instadappReceiver.testAuthCast(dsa, auth, signature, castData, salt);
   }
 
   function test_InstadappAdapter__authCast_shouldRevertIfInvalidSignature() public {
@@ -77,8 +89,9 @@ contract InstadappAdapterTest is TestHelper {
       memory signature = hex"e91f49cb8bf236eafb590ba328a6ca75f4d189fa51bfce2ac774541801c17d3f2d3df798f18c0520db5a98d33362d507f890d5904c2aea1dd059a9b0f05fb3ad1c";
 
     address auth = originSender;
+    bytes32 salt = bytes32(abi.encode(1));
     vm.expectRevert(bytes("Invalid signature"));
-    instadappReceiver.testAuthCast(dsa, auth, signature, castData);
+    instadappReceiver.testAuthCast(dsa, auth, signature, castData, salt);
   }
 
   function test_InstadappAdapter__authCast_shouldWork() public {
@@ -95,6 +108,7 @@ contract InstadappAdapterTest is TestHelper {
     _datas[1] = bytes("0x222");
     _datas[2] = bytes("0x333");
     address _origin = originSender;
+    bytes32 salt = bytes32(abi.encode(1));
 
     InstadappAdapter.CastData memory castData = InstadappAdapter.CastData(_targetNames, _datas, _origin);
 
@@ -103,7 +117,7 @@ contract InstadappAdapterTest is TestHelper {
 
     address auth = originSender;
     vm.expectRevert(bytes("Invalid signature"));
-    instadappReceiver.testAuthCast(dsa, auth, signature, castData);
+    instadappReceiver.testAuthCast(dsa, auth, signature, castData, salt);
   }
 
   // ============ InstadappAdapter.verify ============
