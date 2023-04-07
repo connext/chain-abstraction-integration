@@ -54,7 +54,7 @@ contract SwapAndXCall is SwapAdapter {
   ) external payable {
     uint256 amountOut = _setupAndSwap(_fromAsset, _toAsset, _amountIn, _swapper, _swapData);
 
-    connext.xcall(_destination, _to, _toAsset, _delegate, amountOut, _slippage, _callData, _relayerFee);
+    connext.xcall(_destination, _to, _toAsset, _delegate, amountOut - _relayerFee, _slippage, _callData, _relayerFee);
   }
 
   function _setupAndSwap(
