@@ -22,6 +22,7 @@ contract AnyToAnySwapAndForwardTest is TestHelper {
   address public immutable ARB_ARB = 0x912CE59144191C1204E64559FE8253a0e49E6548;
 
   address public immutable OP_OP_WHALE = 0x2501c477D0A35545a387Aa4A3EEe4292A9a8B3F0;
+  address public immutable ARB_USDC_WHALE = 0x489ee077994B6658eAfA855C308275EAd8097C4A;
   address public immutable ONEINCH_SWAPPER = 0x1111111254EEB25477B68fb85Ed929f73A960582;
 
   address public immutable FALLBACK_ADDRESS = address(1);
@@ -96,6 +97,8 @@ contract AnyToAnySwapAndForwardTest is TestHelper {
     );
 
     vm.selectFork(arbitrumForkId);
+    vm.prank(ARB_USDC_WHALE);
+    TransferHelper.safeTransfer(ARB_USDC, address(xSwapAndGreetTarget), 99800000);
     vm.prank(CONNEXT_ARBITRUM);
     xSwapAndGreetTarget.xReceive(
       bytes32(""),
