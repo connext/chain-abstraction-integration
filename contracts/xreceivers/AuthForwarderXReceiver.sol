@@ -28,6 +28,7 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
   event ForwardedFunctionCallFailed(bytes32 _transferId, bytes _lowLevelData);
 
   /// ERRORS
+  error ForwarderXReceiver__onlyOrigin(address originSender, uint32 origin, address sender);
   error ForwarderXReceiver__prepareAndForward_notThis(address sender);
 
   /// MODIFIERS
@@ -40,10 +41,9 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
    */
   modifier onlyOrigin(address _originSender, uint32 _origin) {
     OriginInfo memory info = originRegistry[_origin];
-    require(
-      msg.sender == address(connext) && _originSender == info.originSender && msg.sender == info.originConnext,
-      "Expected caller to be origin contract on origin domain and this to be called by Connext"
-    );
+    if (msg.sender != address(connext) || _originSender != info.originSender || msg.sender != info.originConnext) {
+      revert ForwarderXReceiver__onlyOrigin(_originSender, _origin, msg.sender);
+    }
     _;
   }
 
@@ -61,8 +61,7 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
     address[] memory _originSenders
   ) {
     require(
-      _originDomains.length == _originConnexts.length && 
-        _originDomains.length == _originSenders.length, 
+      _originDomains.length == _originConnexts.length && _originDomains.length == _originSenders.length,
       "Lengths of origin params must match"
     );
 
@@ -91,7 +90,7 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
    */
   function removeOrigin(uint32 _originDomain) public onlyOwner {
     // Assign an out-of-bounds index by default
-    uint32 indexToRemove = uint32(originDomains.length); 
+    uint32 indexToRemove = uint32(originDomains.length);
     for (uint32 i = 0; i < originDomains.length; i++) {
       if (originDomains[i] == _originDomain) {
         indexToRemove = i;
@@ -107,7 +106,6 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
 
     delete originRegistry[_originDomain];
   }
-}
 
   /**
    * @notice Receives funds from Connext and forwards them to a contract, using a two step process which is defined by the developer.

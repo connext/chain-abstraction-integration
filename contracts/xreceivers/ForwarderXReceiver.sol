@@ -16,11 +16,14 @@ abstract contract ForwarderXReceiver is IXReceiver {
   event ForwardedFunctionCallFailed(bytes32 _transferId, bytes _lowLevelData);
 
   /// ERRORS
+  error ForwarderXReceiver__onlyConnext(address sender);
   error ForwarderXReceiver__prepareAndForward_notThis(address sender);
 
   /// MODIFIERS
   modifier onlyConnext() {
-    require(msg.sender == address(connext), "Caller must be Connext");
+    if (msg.sender != address(connext)) {
+      revert ForwarderXReceiver__onlyConnext(msg.sender);
+    }
     _;
   }
 
