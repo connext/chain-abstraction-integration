@@ -51,6 +51,16 @@ contract TestHelper is Test {
     vm.label(USER_CHAIN_B, "User Chain B");
   }
 
+  function setUpArbitrum(uint256 blockNumber) public {
+    arbitrumForkUrl = vm.createSelectFork(vm.envOr("ARBITRUM_RPC_URL", ARBITRUM_DEFAULT_RPC), blockNumber);
+    vm.label(CONNEXT_ARBITRUM, "Connext Arbitrum");
+  }
+
+  function setUpOptimism(uint256 blockNumber) public {
+    optimismForkUrl = vm.createSelectFork(vm.envOr("OPTIMISM_RPC_URL", OPTIMISM_DEFAULT_RPC), blockNumber);
+    vm.label(CONNEXT_OPTIMISM, "Connext Optimism");
+  }
+
   function getRpc(uint256 chainId) internal view returns (string memory) {
     if (chainId == 1) {
       return "https://eth.llamarpc.com";
