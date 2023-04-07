@@ -57,7 +57,8 @@ contract AnyToAnySwapAndForwardTest is TestHelper {
     utils_setUpOrigin();
     utils_setUpDestination();
 
-    vm.selectFork(optimismForkUrl);
+    vm.selectFork(optimismForkId);
+    assertEq(vm.activeFork(), optimismForkId);
 
     // origin
     // start with OP and swap to USDC to bridge to destination

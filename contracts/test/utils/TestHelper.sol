@@ -29,9 +29,9 @@ contract TestHelper is Test {
   address public CONNEXT_OPTIMISM = 0x8f7492DE823025b4CfaAB1D34c58963F2af5DEDA;
 
   // Forks
-  uint256 public arbitrumForkUrl;
+  uint256 public arbitrumForkId;
   string ARBITRUM_DEFAULT_RPC = "https://arb1.arbitrum.io/rpc";
-  uint256 public optimismForkUrl;
+  uint256 public optimismForkId;
   string OPTIMISM_DEFAULT_RPC = "https://mainnet.optimism.io";
 
   /// Mock Addresses
@@ -52,12 +52,12 @@ contract TestHelper is Test {
   }
 
   function setUpArbitrum(uint256 blockNumber) public {
-    arbitrumForkUrl = vm.createSelectFork(getRpc(42161), blockNumber);
+    arbitrumForkId = vm.createSelectFork(getRpc(42161), blockNumber);
     vm.label(CONNEXT_ARBITRUM, "Connext Arbitrum");
   }
 
   function setUpOptimism(uint256 blockNumber) public {
-    optimismForkUrl = vm.createSelectFork(getRpc(10), blockNumber);
+    optimismForkId = vm.createSelectFork(getRpc(10), blockNumber);
     vm.label(CONNEXT_OPTIMISM, "Connext Optimism");
   }
 
