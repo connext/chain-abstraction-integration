@@ -155,6 +155,8 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
     if (!successfulForward) {
       IERC20(_asset).transfer(_fallbackAddress, _amount);
     }
+    // Return the success status of the forwardFunctionCall
+    return abi.encode(successfulForward);
   }
 
   /// INTERNAL
@@ -204,7 +206,7 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
     uint256 _amount,
     address _asset
   ) internal virtual returns (bytes memory) {
-    return _data;
+    return abi.encode(_data, _transferId, _amount, _asset);
   }
 
   /**
