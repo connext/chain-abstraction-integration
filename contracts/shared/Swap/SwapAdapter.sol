@@ -12,7 +12,7 @@ import {ISwapper} from "./interfaces/ISwapper.sol";
  * @title SwapAdapter
  * @author Connext
  * @notice This contract is used to provide a generic interface to swap tokens through
- * a variety of different swap routers. It is used by the xReceiver to swap tokens
+ * a variety of different swap routers. It is used to swap tokens
  * before proceeding with other actions. Swap router implementations can be added by owner.
  * This is designed to be owned by the Connext DAO and swappers can be added by the DAO.
  */

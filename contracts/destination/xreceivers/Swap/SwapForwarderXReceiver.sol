@@ -6,7 +6,7 @@ import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/Transfer
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
 import {ForwarderXReceiver} from "../ForwarderXReceiver.sol";
-import {SwapAdapter} from "./SwapAdapter.sol";
+import {SwapAdapter} from "../../../shared/Swap/SwapAdapter.sol";
 
 /**
  * @title SwapForwarderXReceiver
