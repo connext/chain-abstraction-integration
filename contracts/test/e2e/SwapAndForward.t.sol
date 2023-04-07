@@ -6,8 +6,8 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import {TestHelper} from "../utils/TestHelper.sol";
 import {Greeter} from "../utils/Greeter.sol";
-import {XSwapAndGreet} from "../../contracts/example/XSwapAndGreet.sol";
-import {OneInchUniswapV3} from "../../contracts/shared/Swap/OneInch/OneInchUniswapV3.sol";
+import {XSwapAndGreet} from "../../example/XSwapAndGreet.sol";
+import {OneInchUniswapV3} from "../../shared/Swap/OneInch/OneInchUniswapV3.sol";
 
 // data from 1inch API: 0xe449022e0000000000000000000000000000000000000000000000000de0b6b3a76400000000000000000000000000000000000000000000000000000000000070015a0d00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000001000000000000000000000000641c00a822e8b671738d32a431a4fb6074e5c79dcfee7c08
 // WETH whale: 0xee9dec2712cce65174b561151701bf54b99c24c8
