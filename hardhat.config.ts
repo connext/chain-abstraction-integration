@@ -2,10 +2,7 @@ import "@nomicfoundation/hardhat-toolbox";
 import "hardhat-deploy";
 import "@nomiclabs/hardhat-ethers";
 import "@nomicfoundation/hardhat-foundry";
-import { config as envConfig } from "dotenv";
 import { HardhatUserConfig } from "hardhat/config";
-
-envConfig();
 
 const alchemyApiKey = process.env.ALCHEMY_API_KEY;
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
@@ -33,7 +30,7 @@ function getNetworkUrl(networkType: string) {
 
 const config: HardhatUserConfig = {
   solidity: {
-    version: "0.8.17",
+    version: "0.8.19",
   },
   defaultNetwork: "hardhat",
   namedAccounts: {
