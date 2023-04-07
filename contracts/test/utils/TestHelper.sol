@@ -32,4 +32,14 @@ contract TestHelper is Test {
     vm.label(USER_CHAIN_A, "User Chain A");
     vm.label(USER_CHAIN_B, "User Chain B");
   }
+
+  function getRpc(uint256 chainId) internal view returns (string memory) {
+    if (chainId == 1) {
+      return "https://eth.llamarpc.com";
+    } else if (chainId == 42161) {
+      return "https://arb1.arbitrum.io/rpc";
+    }
+
+    return vm.envString("RPC_URL");
+  }
 }
