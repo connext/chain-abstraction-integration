@@ -7,5 +7,5 @@ remappings = [
     'eth-gas-reporter/=node_modules/eth-gas-reporter/',
     'hardhat/=node_modules/hardhat/',
 ]
-
+solc = "0.8.19"
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
