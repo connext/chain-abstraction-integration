@@ -42,7 +42,7 @@ contract AnyToAnySwapAndForwardTest is TestHelper {
   function utils_setUpDestination() public {
     setUpArbitrum(78000226);
     greeter = new Greeter();
-    xSwapAndGreetTarget = new XSwapAndGreetTarget(address(greeter), MOCK_CONNEXT);
+    xSwapAndGreetTarget = new XSwapAndGreetTarget(address(greeter), CONNEXT_ARBITRUM);
     oneInchUniswapV3 = new OneInchUniswapV3(ONEINCH_SWAPPER);
     xSwapAndGreetTarget.addSwapper(address(oneInchUniswapV3)); // 1inch address on arbitrum
 
