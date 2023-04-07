@@ -32,7 +32,7 @@ contract SwapAndForwardTest is TestHelper {
     xSwapAndGreetTarget.addSwapper(address(oneInchUniswapV3)); // 1inch address on arbitrum
 
     // transfer funds to xreceiver
-    vm.prank(0xEE9deC2712cCE65174B561151701Bf54b99C24C8);
+    vm.prank(MOCK_CONNEXT);
     TransferHelper.safeTransfer(WETH, address(xSwapAndGreetTarget), 1 ether);
 
     vm.label(address(this), "TestContract");
