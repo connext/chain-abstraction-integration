@@ -31,6 +31,9 @@ function getNetworkUrl(networkType: string) {
 const config: HardhatUserConfig = {
   solidity: {
     version: "0.8.19",
+    settings: {
+      viaIR: true,
+    },
   },
   defaultNetwork: "hardhat",
   namedAccounts: {
