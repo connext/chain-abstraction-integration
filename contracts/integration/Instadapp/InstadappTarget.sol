@@ -35,8 +35,6 @@ contract InstadappTarget is IXReceiver, InstadappAdapter {
    * funds passed into the contract that need to be forwarded to another contract. This guarantees economically that there is no
    * reason to call this function maliciously, because the router would be spending their own funds.
    * @param _transferId - The transfer ID of the transfer that triggered this call
-   * @param _amount - The amount of funds received in this transfer
-   * @param _asset - The asset of the funds received in this transfer
    * @param _callData - The data to be prepared and forwarded
    */
   function xReceive(
