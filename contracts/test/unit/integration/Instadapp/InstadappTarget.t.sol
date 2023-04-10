@@ -6,9 +6,9 @@ import {TestHelper} from "../../../utils/TestHelper.sol";
 contract InstadappTargetTest is TestHelper {
   function setUp() public override {}
 
-  function test_InstadappAdapter__xReceive_shouldRevertIfCallerNotConnext() public {}
+  function test_InstadappTarget__xReceive_shouldRevertIfCallerNotConnext() public {}
 
-  function test_InstadappAdapter__xReceive_shouldRevertIfFallbackAddressInvalid() public {}
+  function test_InstadappTarget__xReceive_shouldRevertIfFallbackAddressInvalid() public {}
 
-  function test_InstadappAdapter__xReceive_shouldWork() public {}
+  function test_InstadappTarget__xReceive_shouldWork() public {}
 }
