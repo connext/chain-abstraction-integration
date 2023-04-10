@@ -54,7 +54,6 @@ contract InstadappTarget is IXReceiver, InstadappAdapter {
     );
 
     require(dsaAddress != address(0), "!invalidFallback");
-    IERC20(_asset).transferFrom(msg.sender, dsaAddress, _amount);
 
     (bool success, bytes memory returnedData) = address(this).call(
       abi.encodeWithSignature("authCast(address,address,bytes,CastData)", dsaAddress, auth, signature, _castData)
