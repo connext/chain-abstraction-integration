@@ -41,8 +41,8 @@ contract InstadappTarget is IXReceiver, InstadappAdapter {
    */
   function xReceive(
     bytes32 _transferId,
-    uint256 _amount, // must be amount in bridge asset less fees
-    address _asset,
+    uint256, // must be amount in bridge asset less fees
+    address,
     address,
     uint32,
     bytes memory _callData
