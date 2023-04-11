@@ -60,7 +60,7 @@ contract MeanFinanceTargetTest is TestHelper {
 
   function setUp() public override {
     super.setUp();
-    target = new MeanTest(MOCK_CONNEXT, UNISWAP);
+    target = new MeanTest(MOCK_CONNEXT, hub);
 
     vm.label(address(this), "TestContract");
     vm.label(address(target), "MeanFinanceTarget");
@@ -81,9 +81,9 @@ contract MeanFinanceTargetTest is TestHelper {
     permissions[0] = IDCAPermissionManager.PermissionSet(address(10), permission);
     bytes memory forwardCallData = abi.encode(from, to, amountOfSwaps, swapInterval, owner, permissions);
     bytes memory _preparedData = abi.encode(amountOut, forwardCallData);
-    vm.mockCall(address(from), abi.encodeWithSelector(IERC20.approve.selector), abi.encode(10));
+    vm.mockCall(from, abi.encodeWithSelector(IERC20.approve.selector), abi.encode(true));
     vm.mockCall(
-      address(hub),
+      hub,
       abi.encodeWithSignature(
         "deposit(address,address,uint256,uint32,uint32,address,IDCAPermissionManager.PermissionSet[])"
       ),
