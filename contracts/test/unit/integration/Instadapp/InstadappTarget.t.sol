@@ -3,7 +3,7 @@ pragma solidity ^0.8.13;
 
 import {TestHelper} from "../../../utils/TestHelper.sol";
 import {InstadappAdapter} from "../../../../integration/Instadapp/InstadappAdapter.sol";
-import {InstadappTarget} from "../../../../integration/instadapp/InstadappTarget.sol";
+import {InstadappTarget} from "../../../../integration/Instadapp/InstadappTarget.sol";
 
 contract InstadappTargetTest is TestHelper {
   // ============ Storage ============
