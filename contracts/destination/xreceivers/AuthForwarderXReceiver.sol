@@ -135,7 +135,7 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
    * @notice Receives funds from Connext and forwards them to a contract, using a two step process which is defined by the developer.
    * @dev _originSender and _origin are passed into the onlyOrigin modifier to turn this into an "authenticated" call. This function
    * will fail until the AMB's validation window has elapsed, at which point _orginSender changes from the zero address to the correct
-   * sender address from the origin domain.
+   * sender address from the origin domain. Note that transfers through this authenticated path cannot be boosted by routers.
    * @param _transferId - The transfer ID of the transfer that triggered this call
    * @param _amount - The amount of funds received in this transfer
    * @param _asset - The asset of the funds received in this transfer
@@ -211,7 +211,7 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
     return _forwardFunctionCall(_prepared, _transferId, _amount, _asset);
   }
 
-  /// INTERNAL ABSTRACT
+  /// INTERNAL VIRTUAL
   /**
    * @notice Prepares the data for the function call. This can execute any arbitrary function call in a two step process.
    * For example, _prepare can be used to swap funds on a DEX, or do any other type of preparation, and pass on the

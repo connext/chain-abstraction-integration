@@ -122,7 +122,7 @@ abstract contract ForwarderXReceiver is IXReceiver {
     return _forwardFunctionCall(_prepared, _transferId, _amount, _asset);
   }
 
-  /// INTERNAL ABSTRACT
+  /// INTERNAL VIRTUAL
   /**
    * @notice Prepares the data for the function call. This can execute any arbitrary function call in a two step process.
    * For example, _prepare can be used to swap funds on a DEX, or do any other type of preparation, and pass on the
