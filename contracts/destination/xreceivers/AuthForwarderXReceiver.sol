@@ -43,6 +43,7 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
   event ForwardedFunctionCallFailed(bytes32 _transferId, string _errorMessage);
   event ForwardedFunctionCallFailed(bytes32 _transferId, uint _errorCode);
   event ForwardedFunctionCallFailed(bytes32 _transferId, bytes _lowLevelData);
+  event originAdded(uint32 _originDomain, address _originConnext, address _originSender);
 
   /// ERRORS
   error ForwarderXReceiver__onlyOrigin(address originSender, uint32 origin, address sender);
@@ -99,6 +100,7 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
   function addOrigin(uint32 _originDomain, address _originConnext, address _originSender) public onlyOwner {
     originDomains.push(_originDomain);
     originRegistry[_originDomain] = OriginInfo(_originConnext, _originSender);
+    emit originAdded(_originDomain, _originConnext, _originSender);
   }
 
   /**
