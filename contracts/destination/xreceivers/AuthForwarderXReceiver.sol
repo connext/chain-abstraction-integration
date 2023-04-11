@@ -7,6 +7,16 @@ import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
+ * @notice Defines the fields checked during authentication for registered origins
+ * @param originConnext - The Connext contract address on origin
+ * @param originSender - The sender address on origin that will call xcall
+ */
+struct OriginInfo {
+  address originConnext;
+  address originSender;
+}
+
+/**
  * @title AuthForwarderXReceiver
  * @author Connext
  * @notice Abstract contract to allow for forwarding a call with authentication. Handles security and error handling.
@@ -18,11 +28,6 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * For more details, see the implementation: https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol
  */
 abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
-  struct OriginInfo {
-    address originConnext;
-    address originSender;
-  }
-
   /// The Connext contract on this domain
   IConnext public immutable connext;
 
@@ -63,7 +68,7 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
    * @param _connext - The address of the Connext contract on this domain
    * @param _originDomains - Array of origin domains to be registered in the OriginRegistry
    * @param _originConnexts - Array of Connext contracts on origin domains
-   * @param _originSenders - Array of senders on origin domains that are expected to call this contract
+   * @param _originSenders - Array of senders on origin domains that are expected to call xcall
    */
   constructor(
     address _connext,
