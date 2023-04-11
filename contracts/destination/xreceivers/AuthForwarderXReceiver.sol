@@ -6,6 +6,17 @@ import {IConnext} from "@connext/interfaces/core/IConnext.sol";
 import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
+/**
+ * @title AuthForwarderXReceiver
+ * @author Connext
+ * @notice Abstract contract to allow for forwarding a call with authentication. Handles security and error handling.
+ * @dev This is meant to be used in authenticated flows, so the data passed in is guaranteed to be correct with the
+ * caveat that xReceive will fail until the AMB's validation window has elapsed. This is meant to be used when there
+ * are funds passed into the contract that need to be forwarded to another contract.
+ *
+ * This contract inherits OpenZeppelin's Ownable module which allows ownership to be changed with `transferOwnership`.
+ * For more details, see the implementation: https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol
+ */
 abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
   struct OriginInfo {
     address originConnext;
