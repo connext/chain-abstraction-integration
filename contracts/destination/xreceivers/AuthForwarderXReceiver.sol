@@ -49,6 +49,7 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
   error ForwarderXReceiver__onlyOrigin(address originSender, uint32 origin, address sender);
   error ForwarderXReceiver__prepareAndForward_notThis(address sender);
   error ForwarderXReceiver__constructor_mismatchingOriginArrayLengths(address sender);
+  error ForwarderXReceiver__removeOrigin_invalidOrigin(address sender);
 
   /// MODIFIERS
   /** @notice A modifier for authenticated calls.
@@ -117,7 +118,9 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
       }
     }
 
-    require(indexToRemove < originDomains.length, "Origin domain not found");
+    if (indexToRemove >= uint32(originDomains.length)) {
+      revert ForwarderXReceiver__removeOrigin_invalidOrigin(msg.sender);
+    }
 
     // Constant operation to remove origin since we don't need to preserve order
     originDomains[indexToRemove] = originDomains[originDomains.length - 1];
