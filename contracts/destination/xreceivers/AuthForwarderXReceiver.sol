@@ -35,6 +35,7 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
   uint32[] public originDomains;
 
   /// Registry of senders and Connext contracts of allowed origin domains
+  /// @dev This contract will fail if the registry is not up to date with supported chains
   mapping(uint32 => OriginInfo) public originRegistry;
 
   /// EVENTS
@@ -46,6 +47,7 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
   /// ERRORS
   error ForwarderXReceiver__onlyOrigin(address originSender, uint32 origin, address sender);
   error ForwarderXReceiver__prepareAndForward_notThis(address sender);
+  error ForwarderXReceiver__constructor_mismatchingOriginArrayLengths(address sender);
 
   /// MODIFIERS
   /** @notice A modifier for authenticated calls.
@@ -76,10 +78,9 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
     address[] memory _originConnexts,
     address[] memory _originSenders
   ) {
-    require(
-      _originDomains.length == _originConnexts.length && _originDomains.length == _originSenders.length,
-      "Lengths of origin params must match"
-    );
+    if (_originDomains.length != _originConnexts.length || _originDomains.length != _originSenders.length) {
+      revert ForwarderXReceiver__constructor_mismatchingOriginArrayLengths(msg.sender);
+    }
 
     connext = IConnext(_connext);
 
@@ -90,7 +91,7 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
   }
 
   /**
-   * @dev Add an origin domain to the originRegistry.
+   * @notice Add an origin domain to the originRegistry.
    * @param _originDomain - Origin domain to be registered in the OriginRegistry
    * @param _originConnext - Connext contract on origin domain
    * @param _originSender - Sender on origin domain that is expected to call this contract
