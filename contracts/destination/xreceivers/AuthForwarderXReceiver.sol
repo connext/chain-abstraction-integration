@@ -43,8 +43,9 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
   event ForwardedFunctionCallFailed(bytes32 _transferId, string _errorMessage);
   event ForwardedFunctionCallFailed(bytes32 _transferId, uint _errorCode);
   event ForwardedFunctionCallFailed(bytes32 _transferId, bytes _lowLevelData);
-  event originAdded(uint32 _originDomain, address _originConnext, address _originSender);
-  event originRemoved(uint32 _originDomain);
+  event OriginAdded(uint32 _originDomain, address _originConnext, address _originSender);
+  event OriginRemoved(uint32 _originDomain);
+  event Prepared(bytes32 _transferId, bytes _data, uint256 _amount, address _asset);
 
   /// ERRORS
   error ForwarderXReceiver__onlyOrigin(address originSender, uint32 origin, address sender);
@@ -102,7 +103,7 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
   function addOrigin(uint32 _originDomain, address _originConnext, address _originSender) public onlyOwner {
     originDomains.push(_originDomain);
     originRegistry[_originDomain] = OriginInfo(_originConnext, _originSender);
-    emit originAdded(_originDomain, _originConnext, _originSender);
+    emit OriginAdded(_originDomain, _originConnext, _originSender);
   }
 
   /**
@@ -128,7 +129,7 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
     originDomains.pop();
 
     delete originRegistry[_originDomain];
-    emit originRemoved(_originDomain);
+    emit OriginRemoved(_originDomain);
   }
 
   /**
@@ -207,6 +208,8 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
     }
     // Prepare for forwarding
     bytes memory _prepared = _prepare(_transferId, _data, _amount, _asset);
+    emit Prepared(_transferId, _data, _amount, _asset);
+
     // Forward the function call
     return _forwardFunctionCall(_prepared, _transferId, _amount, _asset);
   }
