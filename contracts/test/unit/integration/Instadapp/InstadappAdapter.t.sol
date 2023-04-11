@@ -112,7 +112,7 @@ contract InstadappAdapterTest is TestHelper {
     InstadappAdapter.CastData memory castData = InstadappAdapter.CastData(_targetNames, _datas, _origin);
 
     bytes
-      memory signature = hex"d75642b5e0cfceac682011943f3586fefc3709594a89bf8087acc58d2009d85412aca8b1f9b63989de45da85f5ffcea52cc5077a61a2128fa7322a97523afe0e1b";
+      memory signature = hex"e06eb18ed5fa1258094a9af413275fc057cb5139b4e48c979a7ef9d028e8748e39bfa2ea23722f296a07ae7a2d2fee26c7de3ad067a2c569819bec0fc3c9f0f51b";
 
     address auth = originSender;
     instadappReceiver.tryAuthCast{value: 1}(dsa, auth, signature, castData, salt);
@@ -138,7 +138,7 @@ contract InstadappAdapterTest is TestHelper {
     InstadappAdapter.CastData memory castData = InstadappAdapter.CastData(_targetNames, _datas, _origin);
 
     bytes
-      memory signature = hex"d75642b5e0cfceac682011943f3586fefc3709594a89bf8087acc58d2009d85412aca8b1f9b63989de45da85f5ffcea52cc5077a61a2128fa7322a97523afe0e1b";
+      memory signature = hex"e06eb18ed5fa1258094a9af413275fc057cb5139b4e48c979a7ef9d028e8748e39bfa2ea23722f296a07ae7a2d2fee26c7de3ad067a2c569819bec0fc3c9f0f51b";
 
     address auth = originSender;
     assertEq(instadappReceiver.tryVerify(auth, signature, castData, salt), true);

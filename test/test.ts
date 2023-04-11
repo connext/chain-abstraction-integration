@@ -32,7 +32,7 @@ const generateSignature = async (
   );
   console.log({ digest });
   const signingKey = sender._signingKey();
-  const signature = signingKey.signDigest("0xa60ff7fc3235c58170f0269e3a92cb35d9202b00117db5c747b4a989d30ddf2b");
+  const signature = signingKey.signDigest("0x9efcb83cd0436c2c507075a156b9c17e7d701b8c240308e42db8b9cb2e5d5fc2");
   const joinedSig = joinSignature(signature);
   return joinedSig;
 };

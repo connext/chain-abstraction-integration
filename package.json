@@ -13,7 +13,7 @@
     "forge": "forge",
     "forge:install": "forge install",
     "forge:build": "forge build --via-ir",
-    "forge:test": "forge test --via-ir -vvv",
+    "forge:test": "forge test --via-ir",
     "lint": "yarn lint:sol && yarn prettier:check",
     "lint:sol": "forge fmt --check && yarn solhint \"{script,src,test}/**/*.sol\"",
     "prettier:check": "prettier --check './contracts/**/*.sol' && prettier --check './contracts_forge/**/*.sol'",
