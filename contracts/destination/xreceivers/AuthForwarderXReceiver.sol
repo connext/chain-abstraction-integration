@@ -144,7 +144,7 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
    */
   function xReceive(
     bytes32 _transferId,
-    uint256 _amount, // Final Amount receive via Connext(After AMM calculation)
+    uint256 _amount, // Final amount received via Connext (after AMM swaps, if applicable)
     address _asset,
     address _originSender,
     uint32 _origin,
