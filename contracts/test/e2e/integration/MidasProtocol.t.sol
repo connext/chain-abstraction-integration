@@ -7,19 +7,25 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SwapAndXCall} from "../../../origin/Swap/SwapAndXCall.sol";
 import {TestHelper} from "../../utils/TestHelper.sol";
 import {OneInchUniswapV3} from "../../../shared/Swap/OneInch/OneInchUniswapV3.sol";
+import {MidasProtocolTarget} from "../../../integration/Midas/MidasProtocolTarget.sol";
+
+import "forge-std/console.sol";
 
 contract MidasProtocolTest is TestHelper {
   SwapAndXCall swapAndXCall;
   OneInchUniswapV3 oneInchUniswapV3;
+  MidasProtocolTarget midasProtocolTarget;
 
   address public immutable OP_OP = 0x4200000000000000000000000000000000000042;
   address public immutable OP_USDC = 0x7F5c764cBc14f9669B88837ca1490cCa17c31607;
-  address public immutable ARB_USDC = 0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8;
-  address public immutable ARB_ARB = 0x912CE59144191C1204E64559FE8253a0e49E6548;
+  address public immutable BNB_USDC = 0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d;
+  address public immutable BNB_WBNB = 0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c;
 
   address public immutable OP_OP_WHALE = 0x2501c477D0A35545a387Aa4A3EEe4292A9a8B3F0;
-  address public immutable ARB_USDC_WHALE = 0x489ee077994B6658eAfA855C308275EAd8097C4A;
-  address public immutable ONEINCH_SWAPPER = 0x1111111254EEB25477B68fb85Ed929f73A960582;
+  address public immutable OP_ONEINCH_SWAPPER = 0x1111111254EEB25477B68fb85Ed929f73A960582;
+  address public immutable BNB_USDC_WHALE = 0xF977814e90dA44bFA03b6295A0616a897441aceC;
+  address public immutable BNB_COMPTROLLER = 0xCB2841d6d300b9245EB7745Db89A0A50D8468501;
+  address public immutable BNB_ONEINCH_SWAPPER = 0x1111111254EEB25477B68fb85Ed929f73A960582;
 
   address public immutable FALLBACK_ADDRESS = address(1);
 
@@ -37,12 +43,14 @@ contract MidasProtocolTest is TestHelper {
   }
 
   function utils_setUpDestination() public {
-    setUpArbitrum(78000226);
-    oneInchUniswapV3 = new OneInchUniswapV3(ONEINCH_SWAPPER);
+    setUpBNB(27284448);
+    oneInchUniswapV3 = new OneInchUniswapV3(BNB_ONEINCH_SWAPPER);
+    midasProtocolTarget = new MidasProtocolTarget(CONNEXT_BNB, BNB_COMPTROLLER);
+    midasProtocolTarget.addSwapper(address(oneInchUniswapV3));
 
     vm.label(address(oneInchUniswapV3), "OneInchUniswapV3");
-    vm.label(ARB_ARB, "ARB_ARB");
-    vm.label(ARB_USDC, "ARB_USDC");
+    vm.label(BNB_WBNB, "BNB_WBNB");
+    vm.label(BNB_USDC, "BNB_USDC");
   }
 
   function test_MidasProtocolTest__works() public {
@@ -61,14 +69,14 @@ contract MidasProtocolTest is TestHelper {
     // destination
     // set up destination swap params
     bytes
-      memory oneInchApiDataUsdcToArb = hex"e449022e0000000000000000000000000000000000000000000000000000000005f5e100000000000000000000000000000000000000000000000004188a80f4c2e52ccf00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000001800000000000000000000000cda53b1f66614552f834ceef361a8d12a0b8dad8cfee7c08";
-    bytes memory _forwardCallData = abi.encode("Hello, Connext!");
-    bytes memory _swapperData = abi.encode(
-      address(oneInchUniswapV3),
-      ARB_ARB,
-      oneInchApiDataUsdcToArb,
-      _forwardCallData
-    );
+      memory oneInchApiDataUsdcToWBNB = hex"12aa3caf00000000000000000000000014831f12fccc86c4f3dae41c769593df766e43530000000000000000000000008ac76a51cc950d9822d68b83fe1ad97b32cd580d000000000000000000000000bb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c00000000000000000000000014831f12fccc86c4f3dae41c769593df766e4353000000000000000000000000f62849f9a0b5bf2913b396098f7c7019b51a820a0000000000000000000000000000000000000000000000056bc75e2d6310000000000000000000000000000000000000000000000000000004455de5f20821950000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000014000000000000000000000000000000000000000000000000000000000000001600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008100000000000000000000000000000000000000000000000000000000006302a000000000000000000000000000000000000000000000000004455de5f2082195ee63c1e5816bcb0ba386e9de0c29006e46b2f01f047ca1806e8ac76a51cc950d9822d68b83fe1ad97b32cd580d1111111254eeb25477b68fb85ed929f73a96058200000000000000000000000000000000000000000000000000000000000000cfee7c08";
+
+    address cTokenForWBNB = 0x57a64a77f8E4cFbFDcd22D5551F52D675cc5A956;
+    address WBNB = 0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c;
+    address minter = address(0x1234567890);
+
+    bytes memory _forwardCallData = abi.encode(cTokenForWBNB, WBNB, minter);
+    bytes memory _swapperData = abi.encode(address(oneInchUniswapV3), WBNB, oneInchApiDataUsdcToWBNB, _forwardCallData);
 
     // final calldata includes both origin and destination swaps
     bytes memory callData = abi.encode(FALLBACK_ADDRESS, _swapperData);
@@ -77,7 +85,7 @@ contract MidasProtocolTest is TestHelper {
       OP_OP,
       OP_USDC,
       1000 ether,
-      ONEINCH_SWAPPER,
+      OP_ONEINCH_SWAPPER,
       oneInchApiDataOpToUsdc,
       ARBITRUM_DOMAIN_ID,
       address(0x1),
@@ -87,18 +95,20 @@ contract MidasProtocolTest is TestHelper {
       123 // fake relayer fee, will be in USDC
     );
 
-    // vm.selectFork(arbitrumForkId);
-    // vm.prank(ARB_USDC_WHALE);
-    // TransferHelper.safeTransfer(ARB_USDC, address(xSwapAndGreetTarget), 99800000);
-    // vm.prank(CONNEXT_ARBITRUM);
-    // xSwapAndGreetTarget.xReceive(
-    //   bytes32(""),
-    //   99800000, // Final Amount receive via Connext(After AMM calculation)
-    //   ARB_USDC,
-    //   address(0),
-    //   123,
-    //   callData
-    // );
+    console.log("> MidasProtocolTarget: %s", address(midasProtocolTarget));
+
+    vm.selectFork(bnbForkId);
+    vm.prank(BNB_USDC_WHALE);
+    TransferHelper.safeTransfer(BNB_USDC, address(midasProtocolTarget), 100 ether);
+    vm.prank(CONNEXT_BNB);
+    midasProtocolTarget.xReceive(
+      bytes32(""),
+      100 ether, // Final Amount receive via Connext(After AMM calculation)
+      BNB_USDC,
+      address(0),
+      123,
+      callData
+    );
     // assertEq(greeter.greeting(), "Hello, Connext!");
     // assertEq(IERC20(ARB_ARB).balanceOf(address(greeter)), 83059436227592757201);
   }

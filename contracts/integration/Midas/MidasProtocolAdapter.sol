@@ -40,8 +40,6 @@ contract MidasProtocolAdapter {
       if (IERC20(asset).allowance(address(this), cTokenAddress) < amount) {
         IERC20(asset).approve(cTokenAddress, type(uint256).max);
       }
-    } else {
-      require(asset == ICErc20(cTokenAddress).underlying(), "!underlying");
     }
 
     // Mint to this contract
