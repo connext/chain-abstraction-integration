@@ -27,6 +27,9 @@ abstract contract ForwarderXReceiver is IXReceiver {
   error ForwarderXReceiver__prepareAndForward_notThis(address sender);
 
   /// MODIFIERS
+  /** @notice A modifier to ensure that only the Connext contract on this domain can be the caller.
+   * If this is not enforced, then funds on this contract may potentially be claimed by any EOA.
+   */
   modifier onlyConnext() {
     if (msg.sender != address(connext)) {
       revert ForwarderXReceiver__onlyConnext(msg.sender);
