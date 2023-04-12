@@ -2,14 +2,12 @@
 pragma solidity ^0.8.13;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 import {CTokenInterface} from "./interfaces/CTokenInterface.sol";
 import {ICToken, ICErc20} from "./interfaces/ICErc20.sol";
 import {IComptroller} from "./interfaces/IComptroller.sol";
 
 contract MidasProtocolAdapter {
-  using SafeERC20 for IERC20;
-
   IComptroller public immutable comptroller;
 
   constructor(address _comptroller) {
@@ -39,7 +37,9 @@ contract MidasProtocolAdapter {
 
     // Approve underlying
     if (!cToken.isCEther()) {
-      _safeApprove(IERC20(asset), cTokenAddress, amount);
+      if (IERC20(asset).allowance(address(this), cTokenAddress) < amount) {
+        IERC20(asset).approve(cTokenAddress, type(uint256).max);
+      }
     } else {
       require(asset == ICErc20(cTokenAddress).underlying(), "!underlying");
     }
@@ -49,17 +49,5 @@ contract MidasProtocolAdapter {
 
     // Transfer all the cTokens to the minter
     CTokenInterface(cTokenAddress).asCTokenExtensionInterface().transfer(minter, cToken.balanceOf(address(this)));
-  }
-
-  /**
-   * @dev Internal function to approve unlimited tokens of `erc20Contract` to `to`.
-   */
-  function _safeApprove(IERC20 token, address to, uint256 minAmount) private {
-    uint256 allowance = token.allowance(address(this), to);
-
-    if (allowance < minAmount) {
-      if (allowance > 0) token.safeApprove(to, 0);
-      token.safeApprove(to, type(uint256).max);
-    }
   }
 }
