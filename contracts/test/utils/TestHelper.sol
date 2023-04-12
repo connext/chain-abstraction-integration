@@ -27,12 +27,12 @@ contract TestHelper is Test {
   // Live Addresses
   address public CONNEXT_ARBITRUM = 0xEE9deC2712cCE65174B561151701Bf54b99C24C8;
   address public CONNEXT_OPTIMISM = 0x8f7492DE823025b4CfaAB1D34c58963F2af5DEDA;
+  address public CONNEXT_BNB = 0xCd401c10afa37d641d2F594852DA94C700e4F2CE;
 
   // Forks
   uint256 public arbitrumForkId;
-  string ARBITRUM_DEFAULT_RPC = "https://arb1.arbitrum.io/rpc";
   uint256 public optimismForkId;
-  string OPTIMISM_DEFAULT_RPC = "https://mainnet.optimism.io";
+  uint256 public bnbForkId;
 
   /// Mock Addresses
   address public USER_CHAIN_A = address(bytes20(keccak256("USER_CHAIN_A")));
@@ -61,6 +61,11 @@ contract TestHelper is Test {
     vm.label(CONNEXT_OPTIMISM, "Connext Optimism");
   }
 
+  function setUpBNB(uint256 blockNumber) public {
+    bnbForkId = vm.createSelectFork(getRpc(56), blockNumber);
+    vm.label(CONNEXT_BNB, "Connext BNB");
+  }
+
   function getRpc(uint256 chainId) internal view returns (string memory) {
     string memory keyName;
     string memory defaultRpc;
@@ -74,6 +79,9 @@ contract TestHelper is Test {
     } else if (chainId == 42161) {
       keyName = "ARBITRUM_RPC_URL";
       defaultRpc = "https://arb1.arbitrum.io/rpc";
+    } else if (chainId == 56) {
+      keyName = "BNB_RPC_URL";
+      defaultRpc = "https://bsc-dataseed.binance.org";
     }
 
     try vm.envString(keyName) {
