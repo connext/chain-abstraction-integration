@@ -12,9 +12,6 @@ contract MidasProtocolAdapter {
 
   IComptroller public immutable comptroller;
 
-  /// Payable
-  receive() external payable virtual {}
-
   constructor(address _comptroller) {
     comptroller = IComptroller(_comptroller);
   }
