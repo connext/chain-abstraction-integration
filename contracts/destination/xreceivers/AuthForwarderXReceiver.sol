@@ -7,7 +7,7 @@ import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
- * @notice Defines the fields checked during authentication for registered origins
+ * @notice Defines the fields checked during authentication for registered origins.
  * @param originConnext - The Connext contract address on origin
  * @param originSender - The sender address on origin that will call xcall
  */
