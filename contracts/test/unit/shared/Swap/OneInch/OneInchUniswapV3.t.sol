@@ -23,13 +23,14 @@ contract OneInchUniswapV3Test is TestHelper {
     uint256 _amountIn = 1;
     address _tokenIn = address(2);
     address _toAsset = address(3);
-    bytes
-      memory _swapData = hex"e449022e000000000000000000000000000000000000000000000000002386f26fc10000000000000000000000000000000000000000000000000000000000000120fd1200000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000e0554a476a092703abdb3ef35c80e0d76d32939fcfee7c08";
 
-    // remove 4 byte selector, not possible with memory bytes to use array indexing???
-    bytes
-      memory _s = hex"000000000000000000000000000000000000000000000000002386f26fc10000000000000000000000000000000000000000000000000000000000000120fd1200000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000e0554a476a092703abdb3ef35c80e0d76d32939fcfee7c08";
-    (, uint256 _minReturn, uint256[] memory _pools) = abi.decode(_s, (uint256, uint256, uint256[]));
+    uint256 amount = 100000000;
+    uint256 minReturn = 75555343887264722127;
+    uint256[] memory pools = new uint256[](1);
+    pools[0] = ONE_FOR_ZERO_MASK + uint256(uint160(0xcDa53B1F66614552F834cEeF361A8D12a0B8DaD8));
+
+    bytes memory _swapData = abi.encode(amount, minReturn, pools);
+
     vm.mockCall(_tokenIn, abi.encodeWithSelector(IERC20.transferFrom.selector), abi.encode(true));
     vm.mockCall(_tokenIn, abi.encodeWithSelector(IERC20.allowance.selector), abi.encode(0));
     vm.mockCall(_tokenIn, abi.encodeWithSelector(IERC20.approve.selector), abi.encode(true));
