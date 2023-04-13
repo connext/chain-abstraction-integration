@@ -96,11 +96,10 @@ contract MidasProtocolTest is TestHelper {
       123 // fake relayer fee, will be in USDC
     );
 
-    console.log("> MidasProtocolTarget: %s", address(midasProtocolTarget));
-
     vm.selectFork(bnbForkId);
     vm.prank(BNB_USDC_WHALE);
     TransferHelper.safeTransfer(BNB_USDC, address(midasProtocolTarget), 100 ether);
+    assertEq(IERC20(cTokenForWBNB).balanceOf(minter), 0);
     vm.prank(CONNEXT_BNB);
     midasProtocolTarget.xReceive(
       bytes32(""),
@@ -110,7 +109,8 @@ contract MidasProtocolTest is TestHelper {
       123,
       callData
     );
-    // assertEq(greeter.greeting(), "Hello, Connext!");
-    // assertEq(IERC20(ARB_ARB).balanceOf(address(greeter)), 83059436227592757201);
+    assertEq(IERC20(cTokenForWBNB).balanceOf(address(midasProtocolTarget)), 0);
+    assertEq(IERC20(BNB_USDC).balanceOf(address(midasProtocolTarget)), 0);
+    assertGt(IERC20(cTokenForWBNB).balanceOf(minter), 0);
   }
 }
