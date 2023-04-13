@@ -36,7 +36,8 @@ contract MidasProtocolTest is TestHelper {
   address public immutable POLYGON_WETH = 0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619;
   address public immutable POLYGON_USDC_WHALE = 0x1205f31718499dBf1fCa446663B532Ef87481fe1;
   address public immutable POLYGON_COMPTROLLER = 0xDb984f8cbc1cF893a18c2DA50282a1492234602c;
-  address public immutable POLYGON_UNIV3_ROUTER = 0xE592427A0AEce92De3Edee1F18E0157C05861564;
+  address public immutable POLYGON_UNIV2_ROUTER = 0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff; // Quickswap Router
+  address public immutable POLYGON_UNIV3_ROUTER = 0xE592427A0AEce92De3Edee1F18E0157C05861564; // UniswapV3 Router
 
   address public immutable FALLBACK_ADDRESS = address(1);
 
@@ -68,11 +69,15 @@ contract MidasProtocolTest is TestHelper {
   function utils_setUpPolygonForDestination() public {
     setUpPolygon(41491942);
     uniV3Swapper = new UniV3Swapper(POLYGON_UNIV3_ROUTER);
+    uniV2Swapper = new UniV2Swapper(POLYGON_UNIV2_ROUTER);
     midasProtocolTarget = new MidasProtocolTarget(CONNEXT_POLYGON, POLYGON_COMPTROLLER);
     midasProtocolTarget.addSwapper(address(uniV3Swapper));
+    midasProtocolTarget.addSwapper(address(uniV2Swapper));
 
     vm.label(address(uniV3Swapper), "Polygon_UniV3Swapper");
+    vm.label(address(uniV2Swapper), "Polygon_UniV2Swapper");
     vm.label(POLYGON_UNIV3_ROUTER, "Polygon_UniV3Router");
+    vm.label(POLYGON_UNIV2_ROUTER, "Polygon_UniV2Router");
     vm.label(POLYGON_USDC, "POLYGON_USDC");
     vm.label(POLYGON_WETH, "POLYGON_WETH");
   }
@@ -181,6 +186,8 @@ contract MidasProtocolTest is TestHelper {
     );
 
     vm.selectFork(polygonForkId);
+
+    // Trying with univ3swapper
     vm.prank(POLYGON_USDC_WHALE);
     TransferHelper.safeTransfer(POLYGON_USDC, address(midasProtocolTarget), 100000000); // 100 USDC transfer
     assertEq(IERC20(cTokenForWETH).balanceOf(minter), 0);
@@ -189,5 +196,50 @@ contract MidasProtocolTest is TestHelper {
     assertEq(IERC20(cTokenForWETH).balanceOf(address(midasProtocolTarget)), 0);
     assertEq(IERC20(POLYGON_USDC).balanceOf(address(midasProtocolTarget)), 0);
     assertGt(IERC20(cTokenForWETH).balanceOf(minter), 0);
+  }
+
+  function test_MidasProtocolTest__worksWithSwappersOnPolygon() public {
+    utils_setUpPolygonForDestination();
+
+    // destination
+    // set up destination swap params
+    uint24 poolFee = 500;
+    uint256 amountOutMin = 0;
+    bytes memory encodedSwapDataForV3 = abi.encode(poolFee, amountOutMin);
+    bytes memory encodedSwapDataForV2 = abi.encode(amountOutMin);
+
+    address cTokenForWETH = 0xD809c769A04246855fee98423B180C7CCa6bF07c;
+    address WETH = POLYGON_WETH;
+    address minter = address(0x1234567890);
+
+    bytes memory _forwardCallData = abi.encode(cTokenForWETH, WETH, minter);
+    bytes memory _swapperDataForV3 = abi.encode(address(uniV3Swapper), WETH, encodedSwapDataForV3, _forwardCallData);
+    bytes memory _swapperDataForV2 = abi.encode(address(uniV2Swapper), WETH, encodedSwapDataForV2, _forwardCallData);
+
+    // final calldata includes both origin and destination swaps
+    bytes memory callDataForV3 = abi.encode(FALLBACK_ADDRESS, _swapperDataForV3);
+    bytes memory callDataForV2 = abi.encode(FALLBACK_ADDRESS, _swapperDataForV2);
+
+    // Trying with univ3swapper
+    vm.prank(POLYGON_USDC_WHALE);
+    TransferHelper.safeTransfer(POLYGON_USDC, address(midasProtocolTarget), 100000000); // 100 USDC transfer
+    assertEq(IERC20(cTokenForWETH).balanceOf(minter), 0);
+    vm.prank(CONNEXT_POLYGON);
+    midasProtocolTarget.xReceive(bytes32(""), 100000000, POLYGON_USDC, address(0), 123, callDataForV3);
+    assertEq(IERC20(cTokenForWETH).balanceOf(address(midasProtocolTarget)), 0);
+    assertEq(IERC20(POLYGON_USDC).balanceOf(address(midasProtocolTarget)), 0);
+    assertGt(IERC20(cTokenForWETH).balanceOf(minter), 0);
+
+    uint256 cTokenBalanceAfterFirstSwap = IERC20(cTokenForWETH).balanceOf(minter);
+    assertGt(cTokenBalanceAfterFirstSwap, 0);
+
+    // Trying with univ2swapper
+    vm.prank(POLYGON_USDC_WHALE);
+    TransferHelper.safeTransfer(POLYGON_USDC, address(midasProtocolTarget), 100000000); // 100 USDC transfer
+    vm.prank(CONNEXT_POLYGON);
+    midasProtocolTarget.xReceive(bytes32(""), 100000000, POLYGON_USDC, address(0), 123, callDataForV2);
+    assertEq(IERC20(cTokenForWETH).balanceOf(address(midasProtocolTarget)), 0);
+    assertEq(IERC20(POLYGON_USDC).balanceOf(address(midasProtocolTarget)), 0);
+    assertGt(IERC20(cTokenForWETH).balanceOf(minter), cTokenBalanceAfterFirstSwap);
   }
 }
