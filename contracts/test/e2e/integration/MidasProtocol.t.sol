@@ -6,14 +6,14 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import {SwapAndXCall} from "../../../origin/Swap/SwapAndXCall.sol";
 import {TestHelper} from "../../utils/TestHelper.sol";
-import {OneInchUniswapV3} from "../../../shared/Swap/OneInch/OneInchUniswapV3.sol";
+import {UniV2Swapper} from "../../../shared/Swap/Uniswap/UniV2Swapper.sol";
 import {MidasProtocolTarget} from "../../../integration/Midas/MidasProtocolTarget.sol";
 
 import "forge-std/console.sol";
 
 contract MidasProtocolTest is TestHelper {
   SwapAndXCall swapAndXCall;
-  OneInchUniswapV3 oneInchUniswapV3;
+  UniV2Swapper uniV2Swapper;
   MidasProtocolTarget midasProtocolTarget;
 
   address public immutable OP_OP = 0x4200000000000000000000000000000000000042;
@@ -25,7 +25,7 @@ contract MidasProtocolTest is TestHelper {
   address public immutable OP_ONEINCH_SWAPPER = 0x1111111254EEB25477B68fb85Ed929f73A960582;
   address public immutable BNB_USDC_WHALE = 0xF977814e90dA44bFA03b6295A0616a897441aceC;
   address public immutable BNB_COMPTROLLER = 0xCB2841d6d300b9245EB7745Db89A0A50D8468501;
-  address public immutable BNB_ONEINCH_SWAPPER = 0x1111111254EEB25477B68fb85Ed929f73A960582;
+  address public immutable BNB_UNIV2_ROUTER = 0x10ED43C718714eb63d5aA57B78B54704E256024E;
 
   address public immutable FALLBACK_ADDRESS = address(1);
 
@@ -44,11 +44,12 @@ contract MidasProtocolTest is TestHelper {
 
   function utils_setUpDestination() public {
     setUpBNB(27284448);
-    oneInchUniswapV3 = new OneInchUniswapV3(BNB_ONEINCH_SWAPPER);
+    uniV2Swapper = new UniV2Swapper(BNB_UNIV2_ROUTER);
     midasProtocolTarget = new MidasProtocolTarget(CONNEXT_BNB, BNB_COMPTROLLER);
-    midasProtocolTarget.addSwapper(address(oneInchUniswapV3));
+    midasProtocolTarget.addSwapper(address(uniV2Swapper));
 
-    vm.label(address(oneInchUniswapV3), "OneInchUniswapV3");
+    vm.label(address(uniV2Swapper), "UniV2Swapper");
+    vm.label(BNB_UNIV2_ROUTER, "UniV2Router");
     vm.label(BNB_WBNB, "BNB_WBNB");
     vm.label(BNB_USDC, "BNB_USDC");
   }
@@ -68,15 +69,15 @@ contract MidasProtocolTest is TestHelper {
 
     // destination
     // set up destination swap params
-    bytes
-      memory oneInchApiDataUsdcToWBNB = hex"12aa3caf00000000000000000000000014831f12fccc86c4f3dae41c769593df766e43530000000000000000000000008ac76a51cc950d9822d68b83fe1ad97b32cd580d000000000000000000000000bb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c00000000000000000000000014831f12fccc86c4f3dae41c769593df766e4353000000000000000000000000f62849f9a0b5bf2913b396098f7c7019b51a820a0000000000000000000000000000000000000000000000056bc75e2d6310000000000000000000000000000000000000000000000000000004455de5f20821950000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000014000000000000000000000000000000000000000000000000000000000000001600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008100000000000000000000000000000000000000000000000000000000006302a000000000000000000000000000000000000000000000000004455de5f2082195ee63c1e5816bcb0ba386e9de0c29006e46b2f01f047ca1806e8ac76a51cc950d9822d68b83fe1ad97b32cd580d1111111254eeb25477b68fb85ed929f73a96058200000000000000000000000000000000000000000000000000000000000000cfee7c08";
+    uint256 amountOutMin = 0;
+    bytes memory encodedSwapData = abi.encode(amountOutMin);
 
     address cTokenForWBNB = 0x57a64a77f8E4cFbFDcd22D5551F52D675cc5A956;
     address WBNB = 0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c;
     address minter = address(0x1234567890);
 
     bytes memory _forwardCallData = abi.encode(cTokenForWBNB, WBNB, minter);
-    bytes memory _swapperData = abi.encode(address(oneInchUniswapV3), WBNB, oneInchApiDataUsdcToWBNB, _forwardCallData);
+    bytes memory _swapperData = abi.encode(address(uniV2Swapper), WBNB, encodedSwapData, _forwardCallData);
 
     // final calldata includes both origin and destination swaps
     bytes memory callData = abi.encode(FALLBACK_ADDRESS, _swapperData);

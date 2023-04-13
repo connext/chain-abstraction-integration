@@ -42,6 +42,9 @@ contract TestHelper is Test {
   address public TokenA_ERC20 = address(bytes20(keccak256("TokenA_ERC20")));
   address public TokenB_ERC20 = address(bytes20(keccak256("TokenB_ERC20")));
 
+  // OneInch Aggregator constants
+  uint256 public constant ONE_FOR_ZERO_MASK = 1 << 255;
+
   function setUp() public virtual {
     vm.label(MOCK_CONNEXT, "Mock Connext");
     vm.label(MOCK_MEAN_FINANCE, "Mock Mean Finance");

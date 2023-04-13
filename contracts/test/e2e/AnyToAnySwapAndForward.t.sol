@@ -69,8 +69,14 @@ contract AnyToAnySwapAndForwardTest is TestHelper {
 
     // destination
     // set up destination swap params
-    bytes
-      memory oneInchApiDataUsdcToArb = hex"e449022e0000000000000000000000000000000000000000000000000000000005f5e100000000000000000000000000000000000000000000000004188a80f4c2e52ccf00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000001800000000000000000000000cda53b1f66614552f834ceef361a8d12a0b8dad8cfee7c08";
+    uint256 usdcAmount = 100000000;
+    uint256 minReturn = 75555343887264722127;
+    address USDC_ARB_POOL = 0xcDa53B1F66614552F834cEeF361A8D12a0B8DaD8;
+    uint256[] memory pools = new uint256[](1);
+    pools[0] = ONE_FOR_ZERO_MASK + uint256(uint160(USDC_ARB_POOL));
+
+    bytes memory oneInchApiDataUsdcToArb = abi.encode(usdcAmount, minReturn, pools);
+
     bytes memory _forwardCallData = abi.encode("Hello, Connext!");
     bytes memory _swapperData = abi.encode(
       address(oneInchUniswapV3),

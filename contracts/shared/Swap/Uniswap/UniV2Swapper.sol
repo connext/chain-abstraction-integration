@@ -2,32 +2,23 @@
 pragma solidity ^0.8.17;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
-import {ISwapRouter} from "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
+import {IUniswapV2Router02} from "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
 import {ISwapper} from "../interfaces/ISwapper.sol";
 
-interface IUniswapV3Router {
-  function uniswapV3Swap(
-    uint256 amount,
-    uint256 minReturn,
-    uint256[] calldata pools
-  ) external payable returns (uint256 returnAmount);
-}
-
 /**
- * @title OneInchUniswapV3
- * @notice Swapper contract for 1inch UniswapV3 swaps.
+ * @title UniV2Swapper
+ * @notice Swapper contract for UniswapV2 swaps.
  */
-contract OneInchUniswapV3 is ISwapper {
+contract UniV2Swapper is ISwapper {
   using Address for address;
 
-  IUniswapV3Router public immutable oneInchUniRouter;
+  IUniswapV2Router02 public immutable uniswapV2Router;
 
-  constructor(address _oneInchUniRouter) {
-    oneInchUniRouter = IUniswapV3Router(_oneInchUniRouter);
+  constructor(address _uniV2Router) {
+    uniswapV2Router = IUniswapV2Router02(_uniV2Router);
   }
 
   /**
@@ -43,23 +34,28 @@ contract OneInchUniswapV3 is ISwapper {
     uint256 _amountIn,
     address _fromAsset,
     address _toAsset,
-    bytes calldata _swapData // from 1inch API
+    bytes calldata _swapData
   ) public payable override returns (uint256 amountOut) {
     // transfer the funds to be swapped from the sender into this contract
     TransferHelper.safeTransferFrom(_fromAsset, msg.sender, address(this), _amountIn);
-    // decode the swap data
-    // https://docs.1inch.io/docs/aggregation-protocol/smart-contract/UnoswapV3Router#uniswapv3swap
-    (, uint256 _minReturn, uint256[] memory _pools) = abi.decode(_swapData, (uint256, uint256, uint256[]));
+
+    uint256 amountOutMin = abi.decode(_swapData, (uint256));
 
     // Set up swap params
     // Approve the swapper if needed
-    if (IERC20(_fromAsset).allowance(address(this), address(oneInchUniRouter)) < _amountIn) {
-      TransferHelper.safeApprove(_fromAsset, address(oneInchUniRouter), type(uint256).max);
+    if (IERC20(_fromAsset).allowance(address(this), address(uniswapV2Router)) < _amountIn) {
+      TransferHelper.safeApprove(_fromAsset, address(uniswapV2Router), type(uint256).max);
     }
 
-    // The call to `uniswapV3Swap` executes the swap.
-    // use actual amountIn that was sent to the xReceiver
-    amountOut = oneInchUniRouter.uniswapV3Swap(_amountIn, _minReturn, _pools);
+    if (_fromAsset != _toAsset) {
+      address[] memory path = new address[](2);
+      path[0] = _fromAsset;
+      path[1] = _toAsset;
+      TransferHelper.safeApprove(_fromAsset, address(uniswapV2Router), _amountIn);
+      uniswapV2Router.swapExactTokensForTokens(_amountIn, amountOutMin, path, address(this), block.timestamp);
+    }
+
+    amountOut = IERC20(_toAsset).balanceOf(address(this));
 
     // transfer the swapped funds back to the sender
     TransferHelper.safeTransfer(_toAsset, msg.sender, amountOut);
