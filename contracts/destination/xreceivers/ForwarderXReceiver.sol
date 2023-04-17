@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.0;
 
 import {IConnext} from "@connext/interfaces/core/IConnext.sol";
 import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
@@ -27,6 +27,9 @@ abstract contract ForwarderXReceiver is IXReceiver {
   error ForwarderXReceiver__prepareAndForward_notThis(address sender);
 
   /// MODIFIERS
+  /** @notice A modifier to ensure that only the Connext contract on this domain can be the caller.
+   * If this is not enforced, then funds on this contract may potentially be claimed by any EOA.
+   */
   modifier onlyConnext() {
     if (msg.sender != address(connext)) {
       revert ForwarderXReceiver__onlyConnext(msg.sender);
@@ -54,7 +57,7 @@ abstract contract ForwarderXReceiver is IXReceiver {
    */
   function xReceive(
     bytes32 _transferId,
-    uint256 _amount, // Final Amount receive via Connext(After AMM calculation)
+    uint256 _amount, // Final amount received via Connext (after AMM swaps, if applicable)
     address _asset,
     address /*_originSender*/,
     uint32 /*_origin*/,
@@ -122,7 +125,7 @@ abstract contract ForwarderXReceiver is IXReceiver {
     return _forwardFunctionCall(_prepared, _transferId, _amount, _asset);
   }
 
-  /// INTERNAL ABSTRACT
+  /// INTERNAL VIRTUAL
   /**
    * @notice Prepares the data for the function call. This can execute any arbitrary function call in a two step process.
    * For example, _prepare can be used to swap funds on a DEX, or do any other type of preparation, and pass on the

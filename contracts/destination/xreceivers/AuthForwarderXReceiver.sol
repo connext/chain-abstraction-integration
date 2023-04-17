@@ -1,17 +1,33 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import {IConnext} from "@connext/interfaces/core/IConnext.sol";
 import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
-  struct OriginInfo {
-    address originConnext;
-    address originSender;
-  }
+/**
+ * @notice Defines the fields checked during authentication for registered origins.
+ * @param originConnext - The Connext contract address on origin
+ * @param originSender - The sender address on origin that will call xcall
+ */
+struct OriginInfo {
+  address originConnext;
+  address originSender;
+}
 
+/**
+ * @title AuthForwarderXReceiver
+ * @author Connext
+ * @notice Abstract contract to allow for forwarding a call with authentication. Handles security and error handling.
+ * @dev This is meant to be used in authenticated flows, so the data passed in is guaranteed to be correct with the
+ * caveat that xReceive will fail until the AMB's validation window has elapsed. This is meant to be used when there
+ * are funds passed into the contract that need to be forwarded to another contract.
+ *
+ * This contract inherits OpenZeppelin's Ownable module which allows ownership to be changed with `transferOwnership`.
+ * For more details, see the implementation: https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol
+ */
+abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
   /// The Connext contract on this domain
   IConnext public immutable connext;
 
@@ -19,6 +35,7 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
   uint32[] public originDomains;
 
   /// Registry of senders and Connext contracts of allowed origin domains
+  /// @dev This contract will fail if the registry is not up to date with supported chains
   mapping(uint32 => OriginInfo) public originRegistry;
 
   /// EVENTS
@@ -26,10 +43,15 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
   event ForwardedFunctionCallFailed(bytes32 _transferId, string _errorMessage);
   event ForwardedFunctionCallFailed(bytes32 _transferId, uint _errorCode);
   event ForwardedFunctionCallFailed(bytes32 _transferId, bytes _lowLevelData);
+  event OriginAdded(uint32 _originDomain, address _originConnext, address _originSender);
+  event OriginRemoved(uint32 _originDomain);
+  event Prepared(bytes32 _transferId, bytes _data, uint256 _amount, address _asset);
 
   /// ERRORS
   error ForwarderXReceiver__onlyOrigin(address originSender, uint32 origin, address sender);
   error ForwarderXReceiver__prepareAndForward_notThis(address sender);
+  error ForwarderXReceiver__constructor_mismatchingOriginArrayLengths(address sender);
+  error ForwarderXReceiver__removeOrigin_invalidOrigin(address sender);
 
   /// MODIFIERS
   /** @notice A modifier for authenticated calls.
@@ -52,7 +74,7 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
    * @param _connext - The address of the Connext contract on this domain
    * @param _originDomains - Array of origin domains to be registered in the OriginRegistry
    * @param _originConnexts - Array of Connext contracts on origin domains
-   * @param _originSenders - Array of senders on origin domains that are expected to call this contract
+   * @param _originSenders - Array of senders on origin domains that are expected to call xcall
    */
   constructor(
     address _connext,
@@ -60,10 +82,9 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
     address[] memory _originConnexts,
     address[] memory _originSenders
   ) {
-    require(
-      _originDomains.length == _originConnexts.length && _originDomains.length == _originSenders.length,
-      "Lengths of origin params must match"
-    );
+    if (_originDomains.length != _originConnexts.length || _originDomains.length != _originSenders.length) {
+      revert ForwarderXReceiver__constructor_mismatchingOriginArrayLengths(msg.sender);
+    }
 
     connext = IConnext(_connext);
 
@@ -74,7 +95,7 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
   }
 
   /**
-   * @dev Add an origin domain to the originRegistry.
+   * @notice Add an origin domain to the originRegistry.
    * @param _originDomain - Origin domain to be registered in the OriginRegistry
    * @param _originConnext - Connext contract on origin domain
    * @param _originSender - Sender on origin domain that is expected to call this contract
@@ -82,6 +103,7 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
   function addOrigin(uint32 _originDomain, address _originConnext, address _originSender) public onlyOwner {
     originDomains.push(_originDomain);
     originRegistry[_originDomain] = OriginInfo(_originConnext, _originSender);
+    emit OriginAdded(_originDomain, _originConnext, _originSender);
   }
 
   /**
@@ -98,20 +120,23 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
       }
     }
 
-    require(indexToRemove < originDomains.length, "Origin domain not found");
+    if (indexToRemove >= uint32(originDomains.length)) {
+      revert ForwarderXReceiver__removeOrigin_invalidOrigin(msg.sender);
+    }
 
     // Constant operation to remove origin since we don't need to preserve order
     originDomains[indexToRemove] = originDomains[originDomains.length - 1];
     originDomains.pop();
 
     delete originRegistry[_originDomain];
+    emit OriginRemoved(_originDomain);
   }
 
   /**
    * @notice Receives funds from Connext and forwards them to a contract, using a two step process which is defined by the developer.
    * @dev _originSender and _origin are passed into the onlyOrigin modifier to turn this into an "authenticated" call. This function
    * will fail until the AMB's validation window has elapsed, at which point _orginSender changes from the zero address to the correct
-   * sender address from the origin domain.
+   * sender address from the origin domain. Note that transfers through this authenticated path cannot be boosted by routers.
    * @param _transferId - The transfer ID of the transfer that triggered this call
    * @param _amount - The amount of funds received in this transfer
    * @param _asset - The asset of the funds received in this transfer
@@ -119,7 +144,7 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
    */
   function xReceive(
     bytes32 _transferId,
-    uint256 _amount, // Final Amount receive via Connext(After AMM calculation)
+    uint256 _amount, // Final amount received via Connext (after AMM swaps, if applicable)
     address _asset,
     address _originSender,
     uint32 _origin,
@@ -183,11 +208,13 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
     }
     // Prepare for forwarding
     bytes memory _prepared = _prepare(_transferId, _data, _amount, _asset);
+    emit Prepared(_transferId, _data, _amount, _asset);
+
     // Forward the function call
     return _forwardFunctionCall(_prepared, _transferId, _amount, _asset);
   }
 
-  /// INTERNAL ABSTRACT
+  /// INTERNAL VIRTUAL
   /**
    * @notice Prepares the data for the function call. This can execute any arbitrary function call in a two step process.
    * For example, _prepare can be used to swap funds on a DEX, or do any other type of preparation, and pass on the
