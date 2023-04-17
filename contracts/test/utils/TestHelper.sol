@@ -19,6 +19,8 @@ contract TestHelper is Test {
   /// Mainnet Domain IDs
   uint32 public ARBITRUM_DOMAIN_ID = 1634886255;
   uint32 public OPTIMISM_DOMAIN_ID = 1869640809;
+  uint32 public BNB_DOMAIN_ID = 6450786;
+  uint32 public POLYGON_DOMAIN_ID = 1886350457;
 
   /// Mainnet Chain IDs
   uint32 public ARBITRUM_CHAIN_ID = 42161;
@@ -27,12 +29,14 @@ contract TestHelper is Test {
   // Live Addresses
   address public CONNEXT_ARBITRUM = 0xEE9deC2712cCE65174B561151701Bf54b99C24C8;
   address public CONNEXT_OPTIMISM = 0x8f7492DE823025b4CfaAB1D34c58963F2af5DEDA;
+  address public CONNEXT_BNB = 0xCd401c10afa37d641d2F594852DA94C700e4F2CE;
+  address public CONNEXT_POLYGON = 0x11984dc4465481512eb5b777E44061C158CF2259;
 
   // Forks
   uint256 public arbitrumForkId;
-  string ARBITRUM_DEFAULT_RPC = "https://arb1.arbitrum.io/rpc";
   uint256 public optimismForkId;
-  string OPTIMISM_DEFAULT_RPC = "https://mainnet.optimism.io";
+  uint256 public bnbForkId;
+  uint256 public polygonForkId;
 
   /// Mock Addresses
   address public USER_CHAIN_A = address(bytes20(keccak256("USER_CHAIN_A")));
@@ -41,6 +45,9 @@ contract TestHelper is Test {
   address public MOCK_MEAN_FINANCE = address(bytes20(keccak256("MOCK_MEAN_FINANCE")));
   address public TokenA_ERC20 = address(bytes20(keccak256("TokenA_ERC20")));
   address public TokenB_ERC20 = address(bytes20(keccak256("TokenB_ERC20")));
+
+  // OneInch Aggregator constants
+  uint256 public constant ONE_FOR_ZERO_MASK = 1 << 255;
 
   function setUp() public virtual {
     vm.label(MOCK_CONNEXT, "Mock Connext");
@@ -61,6 +68,16 @@ contract TestHelper is Test {
     vm.label(CONNEXT_OPTIMISM, "Connext Optimism");
   }
 
+  function setUpBNB(uint256 blockNumber) public {
+    bnbForkId = vm.createSelectFork(getRpc(56), blockNumber);
+    vm.label(CONNEXT_BNB, "Connext BNB");
+  }
+
+  function setUpPolygon(uint256 blockNumber) public {
+    polygonForkId = vm.createSelectFork(getRpc(137), blockNumber);
+    vm.label(CONNEXT_POLYGON, "Connext Polygon");
+  }
+
   function getRpc(uint256 chainId) internal view returns (string memory) {
     string memory keyName;
     string memory defaultRpc;
@@ -74,6 +91,12 @@ contract TestHelper is Test {
     } else if (chainId == 42161) {
       keyName = "ARBITRUM_RPC_URL";
       defaultRpc = "https://arb1.arbitrum.io/rpc";
+    } else if (chainId == 56) {
+      keyName = "BNB_RPC_URL";
+      defaultRpc = "https://bsc-dataseed.binance.org";
+    } else if (chainId == 137) {
+      keyName = "POLYGON_RPC_URL";
+      defaultRpc = "https://polygon.llamarpc.com";
     }
 
     try vm.envString(keyName) {
