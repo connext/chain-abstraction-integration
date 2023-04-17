@@ -80,7 +80,7 @@ contract MeanFinanceTargetTest is TestHelper {
     permission[0] = IDCAPermissionManager.Permission.INCREASE;
     permissions[0] = IDCAPermissionManager.PermissionSet(address(10), permission);
     bytes memory forwardCallData = abi.encode(from, to, amountOfSwaps, swapInterval, owner, permissions);
-    bytes memory _preparedData = abi.encode(amountOut, forwardCallData);
+    bytes memory _preparedData = abi.encode(forwardCallData, amountOut, address(0), address(0));
     vm.mockCall(from, abi.encodeWithSelector(IERC20.approve.selector), abi.encode(true));
     vm.mockCall(
       hub,

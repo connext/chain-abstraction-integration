@@ -4,12 +4,6 @@ pragma solidity ^0.8.15;
 import "forge-std/Test.sol";
 
 contract TestHelper is Test {
-  /// Testnet Domain IDs
-  uint32 public GOERLI_DOMAIN_ID = 1735353714;
-  uint32 public OPTIMISM_GOERLI_DOMAIN_ID = 1735356532;
-  uint32 public ARBITRUM_GOERLI_DOMAIN_ID = 1734439522;
-  uint32 public POLYGON_MUMBAI_DOMAIN_ID = 9991;
-
   /// Testnet Chain IDs
   uint32 public GOERLI_CHAIN_ID = 5;
   uint32 public OPTIMISM_GOERLI_CHAIN_ID = 420;
@@ -20,10 +14,14 @@ contract TestHelper is Test {
   uint32 public MAINNET_CHAIN_ID = 1;
   uint32 public ARBITRUM_CHAIN_ID = 42161;
   uint32 public OPTIMISM_CHAIN_ID = 10;
+  uint32 public BNB_CHAIN_ID = 56;
+  uint32 public POLYGON_CHAIN_ID = 137;
 
   // Live Addresses
   address public CONNEXT_ARBITRUM = 0xEE9deC2712cCE65174B561151701Bf54b99C24C8;
   address public CONNEXT_OPTIMISM = 0x8f7492DE823025b4CfaAB1D34c58963F2af5DEDA;
+  address public CONNEXT_BNB = 0xCd401c10afa37d641d2F594852DA94C700e4F2CE;
+  address public CONNEXT_POLYGON = 0x11984dc4465481512eb5b777E44061C158CF2259;
 
   struct ChainConfig {
     uint32 chainId;
@@ -38,7 +36,8 @@ contract TestHelper is Test {
   // Forks
   uint256 public arbitrumForkId;
   uint256 public optimismForkId;
-  string OPTIMISM_DEFAULT_RPC = "https://mainnet.optimism.io";
+  uint256 public bnbForkId;
+  uint256 public polygonForkId;
 
   /// Mock Addresses
   address public USER_CHAIN_A = address(bytes20(keccak256("USER_CHAIN_A")));
@@ -47,6 +46,9 @@ contract TestHelper is Test {
   address public MOCK_MEAN_FINANCE = address(bytes20(keccak256("MOCK_MEAN_FINANCE")));
   address public TokenA_ERC20 = address(bytes20(keccak256("TokenA_ERC20")));
   address public TokenB_ERC20 = address(bytes20(keccak256("TokenB_ERC20")));
+
+  // OneInch Aggregator constants
+  uint256 public constant ONE_FOR_ZERO_MASK = 1 << 255;
 
   function setUp() public virtual {
     vm.label(MOCK_CONNEXT, "Mock Connext");
@@ -77,6 +79,54 @@ contract TestHelper is Test {
       domainId: 6648936,
       defaultRpc: "https://eth.llamarpc.com",
       rpcKeyName: "MAINNET_RPC_URL",
+      forkId: 0
+    });
+
+    chainConfigs[BNB_CHAIN_ID] = ChainConfig({
+      chainId: BNB_CHAIN_ID,
+      domainId: 6450786,
+      defaultRpc: "https://bsc-dataseed.binance.org",
+      rpcKeyName: "BNB_RPC_URL",
+      forkId: 0
+    });
+
+    chainConfigs[POLYGON_CHAIN_ID] = ChainConfig({
+      chainId: POLYGON_CHAIN_ID,
+      domainId: 1886350457,
+      defaultRpc: "https://rpc-mainnet.maticvigil.com",
+      rpcKeyName: "POLYGON_RPC_URL",
+      forkId: 0
+    });
+
+    chainConfigs[GOERLI_CHAIN_ID] = ChainConfig({
+      chainId: GOERLI_CHAIN_ID,
+      domainId: 1735353714,
+      defaultRpc: "",
+      rpcKeyName: "GOERLI_RPC_URL",
+      forkId: 0
+    });
+
+    chainConfigs[OPTIMISM_GOERLI_CHAIN_ID] = ChainConfig({
+      chainId: OPTIMISM_GOERLI_CHAIN_ID,
+      domainId: 1735356532,
+      defaultRpc: "",
+      rpcKeyName: "OPTIMISM_GOERLI_RPC_URL",
+      forkId: 0
+    });
+
+    chainConfigs[ARBITRUM_GOERLI_CHAIN_ID] = ChainConfig({
+      chainId: ARBITRUM_GOERLI_CHAIN_ID,
+      domainId: 1734439522,
+      defaultRpc: "",
+      rpcKeyName: "ARBITRUM_GOERLI_RPC_URL",
+      forkId: 0
+    });
+
+    chainConfigs[POLYGON_MUMBAI_CHAIN_ID] = ChainConfig({
+      chainId: POLYGON_MUMBAI_CHAIN_ID,
+      domainId: 1734439522,
+      defaultRpc: "",
+      rpcKeyName: "POLYGON_MUMBAI_RPC_URL",
       forkId: 0
     });
   }

@@ -22,7 +22,10 @@ contract MeanFinanceTarget is SwapForwarderXReceiver {
     uint256 /*_amount*/,
     address /*_asset*/
   ) internal override returns (bool) {
-    (uint256 _amountOut, bytes memory _forwardCallData) = abi.decode(_preparedData, (uint256, bytes));
+    (bytes memory _forwardCallData, uint256 _amountOut, , ) = abi.decode(
+      _preparedData,
+      (bytes, uint256, address, address)
+    );
     (
       address _from,
       address _to,
