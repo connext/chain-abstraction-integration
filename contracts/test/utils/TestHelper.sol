@@ -16,11 +16,8 @@ contract TestHelper is Test {
   uint32 public ARBITRUM_GOERLI_CHAIN_ID = 421613;
   uint32 public POLYGON_MUMBAI_CHAIN_ID = 80001;
 
-  /// Mainnet Domain IDs
-  uint32 public ARBITRUM_DOMAIN_ID = 1634886255;
-  uint32 public OPTIMISM_DOMAIN_ID = 1869640809;
-
   /// Mainnet Chain IDs
+  uint32 public MAINNET_CHAIN_ID = 1;
   uint32 public ARBITRUM_CHAIN_ID = 42161;
   uint32 public OPTIMISM_CHAIN_ID = 10;
 
@@ -28,9 +25,18 @@ contract TestHelper is Test {
   address public CONNEXT_ARBITRUM = 0xEE9deC2712cCE65174B561151701Bf54b99C24C8;
   address public CONNEXT_OPTIMISM = 0x8f7492DE823025b4CfaAB1D34c58963F2af5DEDA;
 
+  struct ChainConfig {
+    uint32 chainId;
+    uint32 domainId;
+    string defaultRpc;
+    string rpcKeyName;
+    uint256 forkId;
+  }
+
+  mapping(uint32 => ChainConfig) public chainConfigs;
+
   // Forks
   uint256 public arbitrumForkId;
-  string ARBITRUM_DEFAULT_RPC = "https://arb1.arbitrum.io/rpc";
   uint256 public optimismForkId;
   string OPTIMISM_DEFAULT_RPC = "https://mainnet.optimism.io";
 
@@ -49,37 +55,53 @@ contract TestHelper is Test {
     vm.label(TokenB_ERC20, "TokenB_ERC20");
     vm.label(USER_CHAIN_A, "User Chain A");
     vm.label(USER_CHAIN_B, "User Chain B");
+
+    chainConfigs[ARBITRUM_CHAIN_ID] = ChainConfig({
+      chainId: ARBITRUM_CHAIN_ID,
+      domainId: 1634886255,
+      defaultRpc: "https://arb1.arbitrum.io/rpc",
+      rpcKeyName: "ARBITRUM_RPC_URL",
+      forkId: 0
+    });
+
+    chainConfigs[OPTIMISM_CHAIN_ID] = ChainConfig({
+      chainId: OPTIMISM_CHAIN_ID,
+      domainId: 1869640809,
+      defaultRpc: "https://mainnet.optimism.io",
+      rpcKeyName: "OPTIMISM_RPC_URL",
+      forkId: 0
+    });
+
+    chainConfigs[MAINNET_CHAIN_ID] = ChainConfig({
+      chainId: MAINNET_CHAIN_ID,
+      domainId: 6648936,
+      defaultRpc: "https://eth.llamarpc.com",
+      rpcKeyName: "MAINNET_RPC_URL",
+      forkId: 0
+    });
   }
 
-  function setUpArbitrum(uint256 blockNumber) public {
-    arbitrumForkId = vm.createSelectFork(getRpc(42161), blockNumber);
-    vm.label(CONNEXT_ARBITRUM, "Connext Arbitrum");
+  function setUpFork(uint32 chainId, uint256 blockNumber) public {
+    uint256 forkId = vm.createSelectFork(getRpc(chainId), blockNumber);
+    chainConfigs[chainId].forkId = forkId;
+    vm.label(MOCK_CONNEXT, "Connext");
   }
 
-  function setUpOptimism(uint256 blockNumber) public {
-    optimismForkId = vm.createSelectFork(getRpc(10), blockNumber);
-    vm.label(CONNEXT_OPTIMISM, "Connext Optimism");
+  function setUpCrossChainE2E(
+    uint32 originChainId,
+    uint32 destinationChainId,
+    uint256 originChainBlockNumber,
+    uint256 destinationChainBlockNumber
+  ) public {
+    setUpFork(originChainId, originChainBlockNumber);
+    setUpFork(destinationChainId, destinationChainBlockNumber);
   }
 
-  function getRpc(uint256 chainId) internal view returns (string memory) {
-    string memory keyName;
-    string memory defaultRpc;
-
-    if (chainId == 1) {
-      keyName = "MAINNET_RPC_URL";
-      defaultRpc = "https://eth.llamarpc.com";
-    } else if (chainId == 10) {
-      keyName = "OPTIMISM_RPC_URL";
-      defaultRpc = "https://mainnet.optimism.io";
-    } else if (chainId == 42161) {
-      keyName = "ARBITRUM_RPC_URL";
-      defaultRpc = "https://arb1.arbitrum.io/rpc";
-    }
-
-    try vm.envString(keyName) {
-      return vm.envString(keyName);
+  function getRpc(uint32 chainId) internal view returns (string memory) {
+    try vm.envString(chainConfigs[chainId].rpcKeyName) {
+      return vm.envString(chainConfigs[chainId].rpcKeyName);
     } catch {
-      return defaultRpc;
+      return chainConfigs[chainId].defaultRpc;
     }
   }
 }
