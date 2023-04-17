@@ -48,6 +48,7 @@ contract OneInchUniswapV3 is ISwapper {
     // transfer the funds to be swapped from the sender into this contract
     TransferHelper.safeTransferFrom(_fromAsset, msg.sender, address(this), _amountIn);
     // decode the swap data
+    // the data included with the swap encodes with the selector so we need to remove it
     // https://docs.1inch.io/docs/aggregation-protocol/smart-contract/UnoswapV3Router#uniswapv3swap
     (, uint256 _minReturn, uint256[] memory _pools) = abi.decode(_swapData[4:], (uint256, uint256, uint256[]));
 
