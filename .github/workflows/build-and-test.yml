@@ -41,4 +41,5 @@ jobs:
         env:
           OPTIMISM_RPC_URL: ${{ secrets.OPTIMISM_RPC_URL }}
           ARBITRUM_RPC_URL: ${{ secrets.ARBITRUM_RPC_URL }}
+          POLYGON_RPC_URL: ${{ secrets.ARBITRUM_RPC_URL }}
         run: yarn forge:test

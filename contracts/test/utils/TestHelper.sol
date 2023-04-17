@@ -96,7 +96,7 @@ contract TestHelper is Test {
       defaultRpc = "https://bsc-dataseed.binance.org";
     } else if (chainId == 137) {
       keyName = "POLYGON_RPC_URL";
-      defaultRpc = "https://rpc-mainnet.matic.quiknode.pro";
+      defaultRpc = "https://polygon.llamarpc.com";
     }
 
     try vm.envString(keyName) {
