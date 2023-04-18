@@ -7,6 +7,7 @@ import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import {IDSA} from "./interfaces/IDSA.sol";
 
 /// @title InstadappAdapter
+/// @author Connext
 /// @notice This contract is inherited by InstadappTarget, it includes the logic to verify signatures
 /// and execute the calls.
 /// @dev This contract is not meant to be used directly, it is meant to be inherited by other contracts.
@@ -32,7 +33,7 @@ contract InstadappAdapter is EIP712 {
 
   /// Storage
   /// @dev This mapping is used to prevent replay attacks.
-  mapping(address => bytes32) private sigRelayProtection;
+  mapping(bytes32 => bool) private sigRelayProtection;
 
   /// Constants
   /// @dev This is the typehash for the CastData struct.
@@ -65,11 +66,14 @@ contract InstadappAdapter is EIP712 {
     // check if Auth is valid, and included in the DSA
     require(dsa.isAuth(auth), "Invalid Auth");
 
+    // check if signature is not replayed
+    require(sigRelayProtection[salt], "Replay Attack");
+
     // check if signature is valid, and not replayed
     require(verify(auth, signature, castData, salt), "Invalid signature");
 
     // Signature Replay Protection
-    sigRelayProtection[auth] = salt;
+    sigRelayProtection[salt] = true;
 
     // Cast the call
     dsa.cast{value: msg.value}(castData._targetNames, castData._datas, castData._origin);
