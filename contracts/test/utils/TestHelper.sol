@@ -58,6 +58,7 @@ contract TestHelper is Test {
     vm.label(USER_CHAIN_A, "User Chain A");
     vm.label(USER_CHAIN_B, "User Chain B");
 
+    // MAINNET
     chainConfigs[ARBITRUM_CHAIN_ID] = ChainConfig({
       chainId: ARBITRUM_CHAIN_ID,
       domainId: 1634886255,
@@ -98,6 +99,7 @@ contract TestHelper is Test {
       forkId: 0
     });
 
+    // TESTNET
     chainConfigs[GOERLI_CHAIN_ID] = ChainConfig({
       chainId: GOERLI_CHAIN_ID,
       domainId: 1735353714,
@@ -134,7 +136,6 @@ contract TestHelper is Test {
   function setUpFork(uint32 chainId, uint256 blockNumber) public {
     uint256 forkId = vm.createSelectFork(getRpc(chainId), blockNumber);
     chainConfigs[chainId].forkId = forkId;
-    vm.label(MOCK_CONNEXT, "Connext");
   }
 
   function setUpCrossChainE2E(
