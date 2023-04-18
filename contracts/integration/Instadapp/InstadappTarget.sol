@@ -46,15 +46,20 @@ contract InstadappTarget is IXReceiver, InstadappAdapter {
     bytes memory _callData
   ) external onlyConnext returns (bytes memory) {
     // Decode signed calldata
-    (address dsaAddress, address auth, bytes memory signature, CastData memory _castData) = abi.decode(
-      _callData,
-      (address, address, bytes, CastData)
-    );
+    (address dsaAddress, address auth, bytes memory signature, CastData memory _castData, bytes memory salt) = abi
+      .decode(_callData, (address, address, bytes, CastData, bytes));
 
     require(dsaAddress != address(0), "!invalidFallback");
 
     (bool success, bytes memory returnedData) = address(this).call(
-      abi.encodeWithSignature("authCast(address,address,bytes,CastData)", dsaAddress, auth, signature, _castData)
+      abi.encodeWithSignature(
+        "authCast(address,address,bytes,CastData,bytes32)",
+        dsaAddress,
+        auth,
+        signature,
+        _castData,
+        salt
+      )
     );
 
     emit AuthCast(_transferId, dsaAddress, auth, success, returnedData);
