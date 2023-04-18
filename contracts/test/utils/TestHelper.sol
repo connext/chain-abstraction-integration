@@ -2,6 +2,7 @@
 pragma solidity ^0.8.15;
 
 import "forge-std/Test.sol";
+import {MockConnext} from "./MockConnext.sol";
 
 contract TestHelper is Test {
   /// Testnet Chain IDs
@@ -29,6 +30,7 @@ contract TestHelper is Test {
     string defaultRpc;
     string rpcKeyName;
     uint256 forkId;
+    address connext;
   }
 
   mapping(uint32 => ChainConfig) public chainConfigs;
@@ -64,7 +66,8 @@ contract TestHelper is Test {
       domainId: 1634886255,
       defaultRpc: "https://arb1.arbitrum.io/rpc",
       rpcKeyName: "ARBITRUM_RPC_URL",
-      forkId: 0
+      forkId: 0,
+      connext: address(0)
     });
 
     chainConfigs[OPTIMISM_CHAIN_ID] = ChainConfig({
@@ -72,7 +75,8 @@ contract TestHelper is Test {
       domainId: 1869640809,
       defaultRpc: "https://mainnet.optimism.io",
       rpcKeyName: "OPTIMISM_RPC_URL",
-      forkId: 0
+      forkId: 0,
+      connext: address(0)
     });
 
     chainConfigs[MAINNET_CHAIN_ID] = ChainConfig({
@@ -80,7 +84,8 @@ contract TestHelper is Test {
       domainId: 6648936,
       defaultRpc: "https://eth.llamarpc.com",
       rpcKeyName: "MAINNET_RPC_URL",
-      forkId: 0
+      forkId: 0,
+      connext: address(0)
     });
 
     chainConfigs[BNB_CHAIN_ID] = ChainConfig({
@@ -88,7 +93,8 @@ contract TestHelper is Test {
       domainId: 6450786,
       defaultRpc: "https://bsc-dataseed.binance.org",
       rpcKeyName: "BNB_RPC_URL",
-      forkId: 0
+      forkId: 0,
+      connext: address(0)
     });
 
     chainConfigs[POLYGON_CHAIN_ID] = ChainConfig({
@@ -96,7 +102,8 @@ contract TestHelper is Test {
       domainId: 1886350457,
       defaultRpc: "https://rpc-mainnet.maticvigil.com",
       rpcKeyName: "POLYGON_RPC_URL",
-      forkId: 0
+      forkId: 0,
+      connext: address(0)
     });
 
     // TESTNET
@@ -105,7 +112,8 @@ contract TestHelper is Test {
       domainId: 1735353714,
       defaultRpc: "",
       rpcKeyName: "GOERLI_RPC_URL",
-      forkId: 0
+      forkId: 0,
+      connext: address(0)
     });
 
     chainConfigs[OPTIMISM_GOERLI_CHAIN_ID] = ChainConfig({
@@ -113,7 +121,8 @@ contract TestHelper is Test {
       domainId: 1735356532,
       defaultRpc: "",
       rpcKeyName: "OPTIMISM_GOERLI_RPC_URL",
-      forkId: 0
+      forkId: 0,
+      connext: address(0)
     });
 
     chainConfigs[ARBITRUM_GOERLI_CHAIN_ID] = ChainConfig({
@@ -121,7 +130,8 @@ contract TestHelper is Test {
       domainId: 1734439522,
       defaultRpc: "",
       rpcKeyName: "ARBITRUM_GOERLI_RPC_URL",
-      forkId: 0
+      forkId: 0,
+      connext: address(0)
     });
 
     chainConfigs[POLYGON_MUMBAI_CHAIN_ID] = ChainConfig({
@@ -129,12 +139,13 @@ contract TestHelper is Test {
       domainId: 1734439522,
       defaultRpc: "",
       rpcKeyName: "POLYGON_MUMBAI_RPC_URL",
-      forkId: 0
+      forkId: 0,
+      connext: address(0)
     });
   }
 
-  function setUpFork(uint32 chainId, uint256 blockNumber) public {
-    uint256 forkId = vm.createSelectFork(getRpc(chainId), blockNumber);
+  function setUpFork(uint32 chainId, uint256 blockNumber) public returns (uint256 forkId) {
+    forkId = vm.createSelectFork(getRpc(chainId), blockNumber);
     chainConfigs[chainId].forkId = forkId;
   }
 
@@ -142,10 +153,21 @@ contract TestHelper is Test {
     uint32 originChainId,
     uint32 destinationChainId,
     uint256 originChainBlockNumber,
-    uint256 destinationChainBlockNumber
+    uint256 destinationChainBlockNumber,
+    address destinationAsset // i.e. USDC or WETH
   ) public {
     setUpFork(originChainId, originChainBlockNumber);
     setUpFork(destinationChainId, destinationChainBlockNumber);
+    vm.selectFork(chainConfigs[originChainId].forkId);
+    MockConnext connext = new MockConnext(
+      chainConfigs[originChainId].domainId,
+      chainConfigs[destinationChainId].domainId,
+      chainConfigs[originChainId].forkId,
+      chainConfigs[destinationChainId].forkId,
+      destinationAsset
+    );
+    vm.label(address(connext), "Mock Connext");
+    chainConfigs[originChainId].connext = address(connext);
   }
 
   function getRpc(uint32 chainId) internal view returns (string memory) {
