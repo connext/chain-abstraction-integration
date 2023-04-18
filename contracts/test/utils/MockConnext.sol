@@ -3,6 +3,7 @@ pragma solidity ^0.8.19;
 import "forge-std/Test.sol";
 import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 import {TransferInfo} from "connext-interfaces/core/IConnext.sol";
+import {IXReceiver} from "connext-interfaces/core/IXReceiver.sol";
 import "ExcessivelySafeCall/ExcessivelySafeCall.sol";
 
 contract MockConnext is Test {
@@ -14,6 +15,10 @@ contract MockConnext is Test {
   address public constant SUGAR_DADDY = address(1);
 
   bytes32 internal constant EMPTY_HASH = keccak256("");
+  uint256 public constant EXECUTE_CALLDATA_RESERVE_GAS = 10_000;
+  uint16 public constant DEFAULT_COPY_BYTES = 256;
+
+  error BridgeFacet__execute_externalCallFailed();
 
   constructor(
     uint32 _originDomain,
@@ -40,6 +45,7 @@ contract MockConnext is Test {
   ) external payable returns (bytes32) {
     bytes32 _transferId = bytes32(originChainForkId);
     TransferHelper.safeTransferFrom(_asset, msg.sender, address(this), _amount);
+    _executeDestination(_callData, _amount, _to, _transferId);
 
     return bytes32(originChainForkId);
   }
@@ -53,7 +59,13 @@ contract MockConnext is Test {
     uint256 _slippage,
     bytes calldata _callData,
     uint256 _relayerFee
-  ) external returns (bytes32) {}
+  ) external returns (bytes32) {
+    bytes32 _transferId = bytes32(originChainForkId);
+    TransferHelper.safeTransferFrom(_asset, msg.sender, address(this), _amount + _relayerFee);
+    _executeDestination(_callData, _amount, _to, _transferId);
+
+    return bytes32(originChainForkId);
+  }
 
   function xcallIntoLocal(
     uint32 _destination,
@@ -65,7 +77,7 @@ contract MockConnext is Test {
     bytes calldata _callData
   ) external payable returns (bytes32) {}
 
-  function _executeDestination() internal {
+  function _executeDestination(bytes calldata _callData, uint256 _amount, address _to, bytes32 _transferId) internal {
     if (keccak256(_callData) == EMPTY_HASH) {
       // no call data, return amount out
       return;
@@ -76,23 +88,27 @@ contract MockConnext is Test {
 
     // transfer to destination
     uint256 _destinationAmount = (_amount * (10000 - 5)) / 10000; // simulate router fee
-    vm.deal(destinationAsset, address(this), _destinationAmount);
+    deal(destinationAsset, address(this), _destinationAmount);
 
-    (bool success, bytes memory returnData) = ExcessivelySafeCall.excessivelySafeCall(
+    (bool success, ) = ExcessivelySafeCall.excessivelySafeCall(
       _to,
-      gasleft() - Constants.EXECUTE_CALLDATA_RESERVE_GAS,
+      gasleft() - EXECUTE_CALLDATA_RESERVE_GAS,
       0, // native asset value (always 0)
-      Constants.DEFAULT_COPY_BYTES, // only copy 256 bytes back as calldata
+      DEFAULT_COPY_BYTES, // only copy 256 bytes back as calldata
       abi.encodeWithSelector(
         IXReceiver.xReceive.selector,
         _transferId,
         _destinationAmount,
         destinationAsset,
         address(0), // fast path only, TODO: figure out slow path
-        _originDomain,
+        originDomain,
         _callData
       )
     );
-    
+
+    if (!success) {
+      // reverts if unsuccessful on fast path
+      revert BridgeFacet__execute_externalCallFailed();
+    }
   }
 }

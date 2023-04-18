@@ -28,7 +28,7 @@ contract AnyToAnySwapAndForwardTest is TestHelper {
   address public immutable FALLBACK_ADDRESS = address(1);
 
   function utils_setUpOrigin() public {
-    setUpOptimism(87307161);
+    setUpFork(OPTIMISM_CHAIN_ID, 87307161);
     swapAndXCall = new SwapAndXCall(CONNEXT_OPTIMISM);
     vm.prank(OP_OP_WHALE);
     TransferHelper.safeTransfer(OP_OP, address(this), 1000 ether);
@@ -41,7 +41,7 @@ contract AnyToAnySwapAndForwardTest is TestHelper {
   }
 
   function utils_setUpDestination() public {
-    setUpArbitrum(78000226);
+    setUpFork(ARBITRUM_CHAIN_ID, 78000226);
     greeter = new Greeter();
     xSwapAndGreetTarget = new XSwapAndGreetTarget(address(greeter), CONNEXT_ARBITRUM);
     oneInchUniswapV3 = new OneInchUniswapV3(ONEINCH_SWAPPER);
@@ -96,7 +96,7 @@ contract AnyToAnySwapAndForwardTest is TestHelper {
       1000 ether,
       ONEINCH_SWAPPER,
       oneInchApiDataOpToUsdc,
-      ARBITRUM_DOMAIN_ID,
+      chainConfigs[ARBITRUM_CHAIN_ID].domainId,
       address(greeter),
       address(this),
       300,

@@ -42,7 +42,7 @@ contract MidasProtocolTest is TestHelper {
   address public immutable FALLBACK_ADDRESS = address(1);
 
   function utils_setUpOptimismForOrigin() public {
-    setUpOptimism(87307161);
+    setUpFork(OPTIMISM_CHAIN_ID, 87307161);
     swapAndXCall = new SwapAndXCall(CONNEXT_OPTIMISM);
     vm.prank(OP_OP_WHALE);
     TransferHelper.safeTransfer(OP_OP, address(this), 1000 ether);
@@ -55,7 +55,7 @@ contract MidasProtocolTest is TestHelper {
   }
 
   function utils_setUpBNBForDestination() public {
-    setUpBNB(27284448);
+    setUpFork(BNB_CHAIN_ID, 27284448);
     uniV2Swapper = new UniV2Swapper(BNB_UNIV2_ROUTER);
     midasProtocolTarget = new MidasProtocolTarget(CONNEXT_BNB, BNB_COMPTROLLER);
     midasProtocolTarget.addSwapper(address(uniV2Swapper));
@@ -67,7 +67,7 @@ contract MidasProtocolTest is TestHelper {
   }
 
   function utils_setUpPolygonForDestination() public {
-    setUpPolygon(41491942);
+    setUpFork(POLYGON_CHAIN_ID, 41491942);
     uniV3Swapper = new UniV3Swapper(POLYGON_UNIV3_ROUTER);
     uniV2Swapper = new UniV2Swapper(POLYGON_UNIV2_ROUTER);
     midasProtocolTarget = new MidasProtocolTarget(CONNEXT_POLYGON, POLYGON_COMPTROLLER);
@@ -116,7 +116,7 @@ contract MidasProtocolTest is TestHelper {
       1000 ether,
       OP_ONEINCH_SWAPPER,
       oneInchApiDataOpToUsdc,
-      BNB_DOMAIN_ID,
+      chainConfigs[BNB_CHAIN_ID].domainId,
       address(0x1),
       address(this),
       300,
@@ -177,7 +177,7 @@ contract MidasProtocolTest is TestHelper {
       1000 ether,
       OP_ONEINCH_SWAPPER,
       oneInchApiDataOpToUsdc,
-      POLYGON_DOMAIN_ID,
+      chainConfigs[POLYGON_CHAIN_ID].domainId,
       address(0x1),
       address(this),
       300,
