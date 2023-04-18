@@ -92,7 +92,7 @@ contract InstadappAdapter is EIP712 {
     require(dsa.isAuth(auth), "Invalid Auth");
 
     // check if signature is not replayed
-    require(sigRelayProtection[salt], "Replay Attack");
+    require(!sigRelayProtection[salt], "Replay Attack");
 
     // check if signature is valid, and not replayed
     require(verify(auth, signature, castData, salt), "Invalid signature");
