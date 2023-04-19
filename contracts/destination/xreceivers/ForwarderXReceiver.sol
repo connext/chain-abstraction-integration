@@ -21,6 +21,7 @@ abstract contract ForwarderXReceiver is IXReceiver {
   event ForwardedFunctionCallFailed(bytes32 _transferId, string _errorMessage);
   event ForwardedFunctionCallFailed(bytes32 _transferId, uint _errorCode);
   event ForwardedFunctionCallFailed(bytes32 _transferId, bytes _lowLevelData);
+  event Prepared(bytes32 _transferId, bytes _data, uint256 _amount, address _asset);
 
   /// ERRORS
   error ForwarderXReceiver__onlyConnext(address sender);
@@ -121,6 +122,8 @@ abstract contract ForwarderXReceiver is IXReceiver {
     }
     // Prepare for forwarding
     bytes memory _prepared = _prepare(_transferId, _data, _amount, _asset);
+    emit Prepared(_transferId, _data, _amount, _asset);
+
     // Forward the function call
     return _forwardFunctionCall(_prepared, _transferId, _amount, _asset);
   }
