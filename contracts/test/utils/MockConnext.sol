@@ -88,8 +88,7 @@ contract MockConnext is Test {
 
     // transfer to destination
     uint256 _destinationAmount = (_amount * (10000 - 5)) / 10000; // simulate router fee
-    deal(destinationAsset, address(this), _destinationAmount);
-
+    deal(destinationAsset, _to, _destinationAmount);
     (bool success, ) = ExcessivelySafeCall.excessivelySafeCall(
       _to,
       gasleft() - EXECUTE_CALLDATA_RESERVE_GAS,
