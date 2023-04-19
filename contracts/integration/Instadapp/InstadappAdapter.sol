@@ -33,7 +33,7 @@ contract InstadappAdapter is EIP712 {
 
   /// Storage
   /// @dev This mapping is used to prevent replay attacks.
-  mapping(bytes32 => bool) private sigRelayProtection;
+  mapping(bytes32 => bool) private sigReplayProtection;
 
   /// Constants
   /// @dev This is the typehash for the CastData struct.
@@ -74,7 +74,7 @@ contract InstadappAdapter is EIP712 {
 
   /// Internal functions
   /// @dev This function is used to forward the call to dsa.cast function.
-  /// Cast the call is forwarded, the signature is verified and the salt is stored in the sigRelayProtection mapping.
+  /// Cast the call is forwarded, the signature is verified and the salt is stored in the sigReplayProtection mapping.
   /// @param dsaAddress The address of the DSA.
   /// @param auth The address of the auth.
   /// @param signature The signature by the auth. This signature is used to verify the SIG data.
@@ -92,13 +92,13 @@ contract InstadappAdapter is EIP712 {
     require(dsa.isAuth(auth), "Invalid Auth");
 
     // check if signature is not replayed
-    require(!sigRelayProtection[salt], "Replay Attack");
+    require(!sigReplayProtection[salt], "Replay Attack");
 
     // check if signature is valid, and not replayed
     require(verify(auth, signature, castData, salt), "Invalid signature");
 
     // Signature Replay Protection
-    sigRelayProtection[salt] = true;
+    sigReplayProtection[salt] = true;
 
     // Cast the call
     dsa.cast{value: msg.value}(castData._targetNames, castData._datas, castData._origin);
