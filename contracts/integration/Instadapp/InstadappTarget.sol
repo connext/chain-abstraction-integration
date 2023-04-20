@@ -51,9 +51,9 @@ contract InstadappTarget is IXReceiver, InstadappAdapter {
     bytes memory _callData
   ) external onlyConnext returns (bytes memory) {
     // Decode signed calldata
-    (address dsaAddress, address auth, bytes memory signature, CastData memory _castData) = abi.decode(
+    (address dsaAddress, address auth, bytes memory signature, CastData memory _castData, bytes32 _salt) = abi.decode(
       _callData,
-      (address, address, bytes, CastData)
+      (address, address, bytes, CastData, bytes32)
     );
 
     // verify the dsaAddress
@@ -63,8 +63,16 @@ contract InstadappTarget is IXReceiver, InstadappAdapter {
     IERC20(_asset).transfer(dsaAddress, _amount);
 
     // forward call to AuthCast
+    // calling via encodeWithSignature as alternative to try/catch
     (bool success, bytes memory returnedData) = address(this).call(
-      abi.encodeWithSignature("authCast(address,address,bytes,CastData)", dsaAddress, auth, signature, _castData)
+      abi.encodeWithSignature(
+        "authCast(address,address,bytes,CastData,bytes32)",
+        dsaAddress,
+        auth,
+        signature,
+        _castData,
+        _salt
+      )
     );
 
     emit AuthCast(_transferId, dsaAddress, auth, success, returnedData);
