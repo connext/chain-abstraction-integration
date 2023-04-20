@@ -101,6 +101,6 @@ contract InstadappAdapter is EIP712 {
     sigReplayProtection[salt] = true;
 
     // Cast the call
-    dsa.cast{value: msg.value}(castData._targetNames, castData._datas, castData._origin);
+    dsa.cast(castData._targetNames, castData._datas, castData._origin);
   }
 }
