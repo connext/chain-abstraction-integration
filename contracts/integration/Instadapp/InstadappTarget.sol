@@ -51,6 +51,11 @@ contract InstadappTarget is IXReceiver, InstadappAdapter {
     bytes memory _callData
   ) external onlyConnext returns (bytes memory) {
     // Decode signed calldata
+    // dsaAddress: address of DSA contract
+    // auth: address of Authority, which whitelisted at dsaContract.
+    // signature: signature is signed by the auth includes the castData with salt.
+    // castData: CastData required for execution at destination
+    // salt: salt for Signature Replay Protection, which is unique to each signature signed by auth.
     (address dsaAddress, address auth, bytes memory signature, CastData memory _castData, bytes32 _salt) = abi.decode(
       _callData,
       (address, address, bytes, CastData, bytes32)
