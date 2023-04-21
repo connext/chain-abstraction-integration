@@ -2,8 +2,10 @@ import "@nomicfoundation/hardhat-toolbox";
 import "hardhat-deploy";
 import "@nomiclabs/hardhat-ethers";
 import "@nomicfoundation/hardhat-foundry";
+import { config as dotenvConfig } from "dotenv";
 import { HardhatUserConfig } from "hardhat/config";
 
+dotenvConfig();
 const alchemyApiKey = process.env.ALCHEMY_API_KEY;
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const MNEMONIC = process.env.MNEMONIC ?? "test test test test test test test test test test test junk";
@@ -19,7 +21,7 @@ function createConfig(network: string) {
 
 function getNetworkUrl(networkType: string) {
   if (networkType === "polygon")
-    return alchemyApiKey ? `https://polygon-mainnet.g.alchemy.com/v2/${alchemyApiKey}` : "https://rpc.ankr.com/polygon";
+    return alchemyApiKey ? `https://polygon-mainnet.g.alchemy.com/v2/${alchemyApiKey}` : "https://polygon.llamarpc.com";
   else if (networkType === "arbitrum")
     return alchemyApiKey ? `https://arb-mainnet.g.alchemy.com/v2/${alchemyApiKey}` : "https://arb1.arbitrum.io/rpc";
   else if (networkType === "optimism")
@@ -33,6 +35,10 @@ const config: HardhatUserConfig = {
     version: "0.8.19",
     settings: {
       viaIR: true,
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
     },
   },
   defaultNetwork: "hardhat",
