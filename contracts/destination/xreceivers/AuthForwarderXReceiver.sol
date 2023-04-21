@@ -7,16 +7,6 @@ import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
- * @notice Defines the fields checked during authentication for registered origins.
- * @param originConnext - The Connext contract address on origin
- * @param originSender - The sender address on origin that will call xcall
- */
-struct OriginInfo {
-  address originConnext;
-  address originSender;
-}
-
-/**
  * @title AuthForwarderXReceiver
  * @author Connext
  * @notice Abstract contract to allow for forwarding a call with authentication. Handles security and error handling.
@@ -34,37 +24,37 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
   /// Allowed origin domains
   uint32[] public originDomains;
 
-  /// Registry of senders and Connext contracts of allowed origin domains
+  /// Registry of origin senders from allowed origin domains
   /// @dev This contract will fail if the registry is not up to date with supported chains
-  mapping(uint32 => OriginInfo) public originRegistry;
+  mapping(uint32 => address) public originRegistry;
 
   /// EVENTS
   event ForwardedFunctionCallFailed(bytes32 _transferId);
   event ForwardedFunctionCallFailed(bytes32 _transferId, string _errorMessage);
   event ForwardedFunctionCallFailed(bytes32 _transferId, uint _errorCode);
   event ForwardedFunctionCallFailed(bytes32 _transferId, bytes _lowLevelData);
-  event OriginAdded(uint32 _originDomain, address _originConnext, address _originSender);
+  event OriginAdded(uint32 _originDomain, address _originSender);
   event OriginRemoved(uint32 _originDomain);
   event Prepared(bytes32 _transferId, bytes _data, uint256 _amount, address _asset);
 
   /// ERRORS
-  error ForwarderXReceiver__onlyOrigin(address originSender, uint32 origin, address sender);
+  error ForwarderXReceiver__onlyOrigin(uint32 originDomain, address originSender, address sender);
   error ForwarderXReceiver__prepareAndForward_notThis(address sender);
   error ForwarderXReceiver__constructor_mismatchingOriginArrayLengths(address sender);
-  error ForwarderXReceiver__removeOrigin_invalidOrigin(address sender);
+  error ForwarderXReceiver__removeOrigin_invalidOrigin(uint32 originDomain);
 
   /// MODIFIERS
   /** @notice A modifier for authenticated calls.
    * This is an important security consideration. If the target contract
    * function should be authenticated, it must check three things:
-   *    1) The originating call comes from the expected origin domain.
-   *    2) The originating call comes from the expected origin contract.
+   *    1) The originating call comes from a registered origin domain.
+   *    2) The originating call comes from the expected origin contract of the origin domain.
    *    3) The call to this contract comes from Connext.
    */
   modifier onlyOrigin(address _originSender, uint32 _origin) {
-    OriginInfo memory info = originRegistry[_origin];
-    if (msg.sender != address(connext) || _originSender != info.originSender || msg.sender != info.originConnext) {
-      revert ForwarderXReceiver__onlyOrigin(_originSender, _origin, msg.sender);
+    address originSender = originRegistry[_origin];
+    if (originSender == address(0) || originSender != _originSender || msg.sender != address(connext)) {
+      revert ForwarderXReceiver__onlyOrigin(_origin, _originSender, msg.sender);
     }
     _;
   }
@@ -73,37 +63,30 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
    * @dev The elements in the _origin* array params must be passed in the same relative positions.
    * @param _connext - The address of the Connext contract on this domain
    * @param _originDomains - Array of origin domains to be registered in the OriginRegistry
-   * @param _originConnexts - Array of Connext contracts on origin domains
    * @param _originSenders - Array of senders on origin domains that are expected to call xcall
    */
-  constructor(
-    address _connext,
-    uint32[] memory _originDomains,
-    address[] memory _originConnexts,
-    address[] memory _originSenders
-  ) {
-    if (_originDomains.length != _originConnexts.length || _originDomains.length != _originSenders.length) {
+  constructor(address _connext, uint32[] memory _originDomains, address[] memory _originSenders) {
+    if (_originDomains.length != _originSenders.length) {
       revert ForwarderXReceiver__constructor_mismatchingOriginArrayLengths(msg.sender);
     }
 
     connext = IConnext(_connext);
 
-    for (uint32 i = 0; i < _originConnexts.length; i++) {
+    for (uint32 i = 0; i < _originDomains.length; i++) {
       originDomains.push(_originDomains[i]);
-      originRegistry[_originDomains[i]] = OriginInfo(_originConnexts[i], _originSenders[i]);
+      originRegistry[_originDomains[i]] = _originSenders[i];
     }
   }
 
   /**
    * @notice Add an origin domain to the originRegistry.
    * @param _originDomain - Origin domain to be registered in the OriginRegistry
-   * @param _originConnext - Connext contract on origin domain
    * @param _originSender - Sender on origin domain that is expected to call this contract
    */
-  function addOrigin(uint32 _originDomain, address _originConnext, address _originSender) public onlyOwner {
+  function addOrigin(uint32 _originDomain, address _originSender) public onlyOwner {
     originDomains.push(_originDomain);
-    originRegistry[_originDomain] = OriginInfo(_originConnext, _originSender);
-    emit OriginAdded(_originDomain, _originConnext, _originSender);
+    originRegistry[_originDomain] = _originSender;
+    emit OriginAdded(_originDomain, _originSender);
   }
 
   /**
@@ -121,7 +104,7 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
     }
 
     if (indexToRemove >= uint32(originDomains.length)) {
-      revert ForwarderXReceiver__removeOrigin_invalidOrigin(msg.sender);
+      revert ForwarderXReceiver__removeOrigin_invalidOrigin(_originDomain);
     }
 
     // Constant operation to remove origin since we don't need to preserve order
