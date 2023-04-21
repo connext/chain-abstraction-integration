@@ -33,8 +33,11 @@ contract InstadappIntegrationTest is TestHelper {
   address public immutable OP_USDC = 0x7F5c764cBc14f9669B88837ca1490cCa17c31607;
   address public immutable OP_USDC_WHALE = 0x625E7708f30cA75bfd92586e17077590C60eb4cD;
   address public immutable CONNEXT_CONNECTOR = 0x0492B77bafd78E7124b0A6d81eFB470bF9aE53fC;
-  address public immutable INSTA_CONNECTORS = 0x127d8cD0E2b2E0366D522DeA53A787bfE9002C14;
+  address public immutable INSTA_CONNECTORS_V2 = 0x127d8cD0E2b2E0366D522DeA53A787bfE9002C14;
   address public immutable INSTA_INDEX = 0x6CE3e607C808b4f4C26B7F6aDAeB619e49CAbb25;
+  address public immutable INSTA_ACCOUNT_V2 = 0x0a0a82D2F86b9E46AE60E22FCE4e8b916F858Ddc;
+  address public immutable INSTA_IMPLEMENTATIONS = 0x01fEF4d2B513C9F69E34b2f93Ef707FA9Ff60109;
+  address public immutable INSTA_IMPLEMENTATION_M1 = 0x28846f4051EB05594B3fF9dE76b7B5bf00431155;
 
   // Arbitrum as destination
   address public immutable ARB_DSA = 0xF4335D224ad8425dDE0A5671820fF6b6Ba09Fab2;
@@ -80,13 +83,18 @@ contract InstadappIntegrationTest is TestHelper {
     address[] memory CONNEXT_CONNECTOR_ARRAY = new address[](1);
     CONNEXT_CONNECTOR_NAME_ARRAY[0] = "CONNEXT-A";
     CONNEXT_CONNECTOR_ARRAY[0] = CONNEXT_CONNECTOR;
-    ConnectorInterface(INSTA_CONNECTORS).addConnectors(CONNEXT_CONNECTOR_NAME_ARRAY, CONNEXT_CONNECTOR_ARRAY);
+    ConnectorInterface(INSTA_CONNECTORS_V2).addConnectors(CONNEXT_CONNECTOR_NAME_ARRAY, CONNEXT_CONNECTOR_ARRAY);
 
     vm.label(OP_DSA, "OP_DSA");
     vm.label(OP_AUTH, "OP_AUTH");
     vm.label(OP_USDC, "OP_USDC");
     vm.label(OP_USDC_WHALE, "OP_USDC_WHALE");
     vm.label(CONNEXT_CONNECTOR, "ConnextConnector");
+    vm.label(INSTA_CONNECTORS_V2, "InstaConnectorsV2");
+    vm.label(INSTA_INDEX, "InstaIndex");
+    vm.label(INSTA_ACCOUNT_V2, "InstaAccountV2");
+    vm.label(INSTA_IMPLEMENTATIONS, "InstaImplementations");
+    vm.label(INSTA_IMPLEMENTATION_M1, "InstaImplementationM1");
   }
 
   function utils_setUpDestination() public {
