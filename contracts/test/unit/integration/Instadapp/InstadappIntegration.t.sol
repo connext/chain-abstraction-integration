@@ -14,6 +14,16 @@ interface IDSA {
   ) external payable returns (bytes32);
 }
 
+interface IndexInterface {
+  function master() external view returns (address);
+}
+
+interface ConnectorInterface {
+  function name() external view returns (string memory);
+
+  function addConnectors(string[] calldata _connectorNames, address[] calldata _connectors) external;
+}
+
 contract InstadappIntegrationTest is TestHelper {
   // ============ Storage ============
 
@@ -23,6 +33,8 @@ contract InstadappIntegrationTest is TestHelper {
   address public immutable OP_USDC = 0x7F5c764cBc14f9669B88837ca1490cCa17c31607;
   address public immutable OP_USDC_WHALE = 0x625E7708f30cA75bfd92586e17077590C60eb4cD;
   address public immutable CONNEXT_CONNECTOR = 0x0492B77bafd78E7124b0A6d81eFB470bF9aE53fC;
+  address public immutable INSTA_CONNECTORS = 0x127d8cD0E2b2E0366D522DeA53A787bfE9002C14;
+  address public immutable INSTA_INDEX = 0x6CE3e607C808b4f4C26B7F6aDAeB619e49CAbb25;
 
   // Arbitrum as destination
   address public immutable ARB_DSA = 0xF4335D224ad8425dDE0A5671820fF6b6Ba09Fab2;
@@ -61,6 +73,15 @@ contract InstadappIntegrationTest is TestHelper {
     TransferHelper.safeTransfer(OP_USDC, OP_DSA, AMOUNT); // send 1 USDC to DSA
     vm.deal(OP_DSA, RELAYER_FEE); // give DSA enough oETH for the relayer fee
 
+    // register Connext connector
+    address master = IndexInterface(INSTA_INDEX).master();
+    vm.prank(master);
+    string[] memory CONNEXT_CONNECTOR_NAME_ARRAY = new string[](1);
+    address[] memory CONNEXT_CONNECTOR_ARRAY = new address[](1);
+    CONNEXT_CONNECTOR_NAME_ARRAY[0] = "CONNEXT-A";
+    CONNEXT_CONNECTOR_ARRAY[0] = CONNEXT_CONNECTOR;
+    ConnectorInterface(INSTA_CONNECTORS).addConnectors(CONNEXT_CONNECTOR_NAME_ARRAY, CONNEXT_CONNECTOR_ARRAY);
+
     vm.label(OP_DSA, "OP_DSA");
     vm.label(OP_AUTH, "OP_AUTH");
     vm.label(OP_USDC, "OP_USDC");
@@ -96,7 +117,7 @@ contract InstadappIntegrationTest is TestHelper {
 
     bytes4 basicDeposit = bytes4(keccak256("deposit(address,uint256,uint256,uint256)"));
 
-    _destinationData[0] = abi.encodeWithSelector(basicDeposit, ARB_USDC, amount, 0, 0);
+    _destinationData[0] = abi.encodeWithSelector(basicDeposit, ARB_USDC, AMOUNT, 0, 0);
 
     CastData memory destinationCastData = CastData(_destinationTargets, _destinationData, address(0));
 
