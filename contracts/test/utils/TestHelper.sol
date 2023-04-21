@@ -156,18 +156,35 @@ contract TestHelper is Test {
     uint256 destinationChainBlockNumber,
     address destinationAsset // i.e. USDC or WETH
   ) public {
-    setUpFork(originChainId, originChainBlockNumber);
-    setUpFork(destinationChainId, destinationChainBlockNumber);
-    vm.selectFork(chainConfigs[originChainId].forkId);
-    MockConnext connext = new MockConnext(
+    // origin chain
+    uint256 originFork = setUpFork(originChainId, originChainBlockNumber);
+    uint256 destinationFork = setUpFork(destinationChainId, destinationChainBlockNumber);
+    vm.selectFork(originFork);
+    MockConnext connextOrigin = new MockConnext(
       chainConfigs[originChainId].domainId,
       chainConfigs[destinationChainId].domainId,
-      chainConfigs[originChainId].forkId,
-      chainConfigs[destinationChainId].forkId,
+      originFork,
+      destinationFork,
       destinationAsset
     );
-    vm.label(address(connext), "Mock Connext");
-    chainConfigs[originChainId].connext = address(connext);
+    chainConfigs[originChainId].connext = address(connextOrigin);
+    vm.label(address(connextOrigin), "Mock Connext Origin");
+
+    // destination chain
+    vm.selectFork(destinationFork);
+    MockConnext connextDestination = new MockConnext(
+      chainConfigs[originChainId].domainId,
+      chainConfigs[destinationChainId].domainId,
+      originFork,
+      destinationFork,
+      destinationAsset
+    );
+    chainConfigs[destinationChainId].connext = address(connextDestination);
+    connextDestination.setDestinationConnext(address(connextOrigin));
+    vm.label(address(connextDestination), "Mock Connext Destination");
+
+    vm.selectFork(originFork);
+    connextOrigin.setDestinationConnext(address(connextDestination));
   }
 
   function getRpc(uint32 chainId) internal view returns (string memory) {

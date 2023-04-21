@@ -12,7 +12,8 @@ contract MockConnext is Test {
   address public destinationAsset;
   uint32 public originDomain;
   uint32 public destinationDomain;
-  address public constant SUGAR_DADDY = address(1);
+
+  address public destinationConnext;
 
   bytes32 internal constant EMPTY_HASH = keccak256("");
   uint256 public constant EXECUTE_CALLDATA_RESERVE_GAS = 10_000;
@@ -32,6 +33,10 @@ contract MockConnext is Test {
     originChainForkId = _originChainForkId;
     destinationChainForkId = _destinationChainForkId;
     destinationAsset = _destinationAsset;
+  }
+
+  function setDestinationConnext(address _destinationConnext) external {
+    destinationConnext = _destinationConnext;
   }
 
   function xcall(
@@ -59,12 +64,10 @@ contract MockConnext is Test {
     uint256 _slippage,
     bytes calldata _callData,
     uint256 _relayerFee
-  ) external returns (bytes32) {
-    bytes32 _transferId = bytes32(originChainForkId);
+  ) external returns (bytes32 _transferId) {
+    _transferId = bytes32(originChainForkId);
     TransferHelper.safeTransferFrom(_asset, msg.sender, address(this), _amount + _relayerFee);
     _executeDestination(_callData, _amount, _to, _transferId);
-
-    return bytes32(originChainForkId);
   }
 
   function xcallIntoLocal(
@@ -84,11 +87,14 @@ contract MockConnext is Test {
     }
 
     vm.selectFork(destinationChainForkId);
-    vm.deal(SUGAR_DADDY, 1 ether);
 
     // transfer to destination
     uint256 _destinationAmount = (_amount * (10000 - 5)) / 10000; // simulate router fee
     deal(destinationAsset, _to, _destinationAmount);
+
+    // to send a tx
+    vm.deal(destinationConnext, 1 ether);
+    vm.prank(destinationConnext);
     (bool success, ) = ExcessivelySafeCall.excessivelySafeCall(
       _to,
       gasleft() - EXECUTE_CALLDATA_RESERVE_GAS,
