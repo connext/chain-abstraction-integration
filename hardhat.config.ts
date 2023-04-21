@@ -16,6 +16,11 @@ function createConfig(network: string) {
     accounts: !!PRIVATE_KEY ? [`0x${PRIVATE_KEY}`] : { mnemonic: MNEMONIC },
     // gasPrice: BigNumber.from(networkGasPriceConfig[network])
     //   .mul(1e9).toString(), // Update the mapping above
+    verify: {
+      etherscan: {
+        apiKey: process.env.ETHERSCAN_API_KEY!,
+      },
+    },
   };
 }
 

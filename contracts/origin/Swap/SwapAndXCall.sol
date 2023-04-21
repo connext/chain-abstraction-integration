@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Unlicense
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.17;
 
 import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
@@ -111,13 +111,13 @@ contract SwapAndXCall is SwapAdapter {
   ) internal returns (uint256 amountOut) {
     if (_fromAsset != address(0)) {
       TransferHelper.safeTransferFrom(_fromAsset, msg.sender, address(this), _amountIn);
+      if (IERC20(_fromAsset).allowance(address(this), _swapper) < _amountIn) {
+        IERC20(_fromAsset).approve(_swapper, type(uint256).max);
+      }
     } else {
       require(msg.value >= _amountIn, "SwapAndXCall: msg.value != _amountIn");
     }
 
-    if (IERC20(_fromAsset).allowance(address(this), _swapper) < _amountIn) {
-      IERC20(_fromAsset).approve(_swapper, type(uint256).max);
-    }
     amountOut = this.directSwapperCall{value: _fromAsset == address(0) ? _amountIn : 0}(_swapper, _swapData);
 
     if (IERC20(_toAsset).allowance(address(this), address(connext)) < _amountIn) {
