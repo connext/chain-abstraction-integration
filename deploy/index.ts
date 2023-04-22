@@ -6,6 +6,7 @@ export const DEFAULT_ARGS: Record<number, any> = {
     USDC: "0x7F5c764cBc14f9669B88837ca1490cCa17c31607", // USDC on Optimism
     DOMAIN: "6648936", // Ethereum domain ID
     ONEINCH_ROUTER: "",
+    UNIV3_ROUTER: "",
   },
   // Optimism
   10: {
@@ -14,6 +15,7 @@ export const DEFAULT_ARGS: Record<number, any> = {
     USDC: "0x7F5c764cBc14f9669B88837ca1490cCa17c31607", // USDC on Optimism
     DOMAIN: "1869640809", // Optimism domain ID
     ONEINCH_ROUTER: "",
+    UNIV3_ROUTER: "",
   },
   // Arbitrum
   42161: {
@@ -22,6 +24,7 @@ export const DEFAULT_ARGS: Record<number, any> = {
     USDC: "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8", // USDC on Arbitrum (donation asset)
     DOMAIN: "1634886255", // Arbitrum domain ID
     ONEINCH_ROUTER: "",
+    UNIV3_ROUTER: "",
   },
   // Polygon
   137: {
@@ -30,5 +33,23 @@ export const DEFAULT_ARGS: Record<number, any> = {
     USDC: "0x2791bca1f2de4661ed88a30c99a7a9449aa84174", // USDC
     DOMAIN: "1886350457", // Polygon domain ID
     ONEINCH_ROUTER: "0x1111111254EEB25477B68fb85Ed929f73A960582",
+    UNIV3_ROUTER: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
+  },
+  // Bnb
+  56: {
+    CONNEXT: "0xCd401c10afa37d641d2F594852DA94C700e4F2CE", // Connext
+    USDC: "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d", // USDC
+    DOMAIN: "6450786", // Polygon domain ID
+    ONEINCH_ROUTER: "0x1111111254EEB25477B68fb85Ed929f73A960582",
+    UNIV3_ROUTER: "0x13f4EA83D0bd40E75C8222255bc855a974568Dd4", // PancakeSwap Smart Router
+  },
+};
+
+export const MIDAS_CONFIG: Record<number, any> = {
+  137: {
+    COMPTROLLER: "0xDb984f8cbc1cF893a18c2DA50282a1492234602c",
+  },
+  56: {
+    COMPTROLLER: "0x31d76A64Bc8BbEffb601fac5884372DEF910F044",
   },
 };
