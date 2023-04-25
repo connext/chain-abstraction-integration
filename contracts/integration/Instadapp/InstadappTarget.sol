@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import {IConnext} from "@connext/interfaces/core/IConnext.sol";
 import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {InstadappAdapter} from "./InstadappAdapter.sol";
 
@@ -14,6 +15,7 @@ import {InstadappAdapter} from "./InstadappAdapter.sol";
 /// funds are forwarded to fallback address defined by the user under callData.
 /// @custom:experimental This is an experimental contract.
 contract InstadappTarget is IXReceiver, InstadappAdapter {
+  using SafeERC20 for IERC20;
   /// Storage
   /// @dev This is the address of the Connext contract.
   IConnext public connext;
@@ -65,7 +67,7 @@ contract InstadappTarget is IXReceiver, InstadappAdapter {
     require(dsaAddress != address(0), "!invalidFallback");
 
     // transfer funds to this dsaAddress
-    IERC20(_asset).transfer(dsaAddress, _amount);
+    SafeERC20.safeTransfer(IERC20(_asset), dsaAddress, _amount);
 
     // forward call to AuthCast
     // calling via encodeWithSignature as alternative to try/catch
