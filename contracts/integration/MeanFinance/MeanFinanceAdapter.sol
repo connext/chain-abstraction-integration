@@ -9,9 +9,6 @@ contract MeanFinanceAdapter {
   /// @dev see https://docs.mean.finance/guides/smart-contract-registry
   IDCAHub public immutable hub = IDCAHub(0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345);
 
-  /// Payable
-  receive() external payable virtual {}
-
   /// @notice Creates a new position
   /// @param _from The address of the "from" token
   /// @param _to The address of the "to" token
@@ -28,7 +25,7 @@ contract MeanFinanceAdapter {
     uint32 _swapInterval,
     address _owner,
     IDCAPermissionManager.PermissionSet[] memory _permissions
-  ) public returns (uint256 _positionId) {
+  ) internal returns (uint256 _positionId) {
     // We need to increase the allowance for the hub before calling deposit
     IERC20(_from).approve(address(hub), _amount);
     _positionId = hub.deposit(_from, _to, _amount, _amountOfSwaps, _swapInterval, _owner, _permissions);
