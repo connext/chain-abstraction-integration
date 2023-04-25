@@ -7,7 +7,12 @@ import "@mean-finance/dca-v2-core/contracts/interfaces/IDCAHub.sol";
 contract MeanFinanceAdapter {
   /// @notice MeanFinance IDCAHub contract for deposit
   /// @dev see https://docs.mean.finance/guides/smart-contract-registry
-  IDCAHub public immutable hub = IDCAHub(0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345);
+  // IDCAHub public hub = IDCAHub(0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345);
+  IDCAHub public immutable hub;
+
+  constructor(address _hub) {
+    hub = IDCAHub(_hub);
+  }
 
   /// @notice Creates a new position
   /// @param _from The address of the "from" token

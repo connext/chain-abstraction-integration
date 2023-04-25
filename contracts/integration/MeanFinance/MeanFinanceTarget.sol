@@ -10,7 +10,7 @@ import {MeanFinanceAdapter} from "./MeanFinanceAdapter.sol";
 import {SwapForwarderXReceiver} from "../../destination/xreceivers/Swap/SwapForwarderXReceiver.sol";
 
 contract MeanFinanceTarget is SwapForwarderXReceiver, MeanFinanceAdapter {
-  constructor(address _connext) SwapForwarderXReceiver(_connext) {}
+  constructor(address _connext, address _hub) SwapForwarderXReceiver(_connext) MeanFinanceAdapter(_hub) {}
 
   function _forwardFunctionCall(
     bytes memory _preparedData,

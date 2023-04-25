@@ -67,9 +67,9 @@ contract MeanFinanceTargetTest is TestHelper {
   }
 
   // ============ MeanFinanceTarget._forwardFunctionCall ============
-  function test_MeanFinanceTargetTest___forwardFunctionCall_shouldWork() public {
+  function test_MeanFinanceTargetTest___forwardFunctionCall_shouldWork(uint256 _amountOut) public {
     vm.prank(address(target));
-    uint256 amountOut = 42;
+    uint256 amountOut = _amountOut;
     address from = address(7);
     address to = address(8);
     uint32 amountOfSwaps = 1;
