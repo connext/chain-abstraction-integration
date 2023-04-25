@@ -30,7 +30,7 @@ contract UniV3Swapper is ISwapper {
    * @param _toAsset Address of the token to swap to.
    * @param _swapData Data to pass to the 1inch aggregator router.
    */
-  function swap(
+  function callSwap(
     uint256 _amountIn,
     address _fromAsset,
     address _toAsset,
