@@ -9,12 +9,8 @@ import {IDCAHubPositionHandler, IDCAPermissionManager} from "@mean-finance/dca-v
 import {MeanFinanceAdapter} from "./MeanFinanceAdapter.sol";
 import {SwapForwarderXReceiver} from "../../destination/xreceivers/Swap/SwapForwarderXReceiver.sol";
 
-contract MeanFinanceTarget is SwapForwarderXReceiver {
-  IDCAHubPositionHandler public immutable hub;
-
-  constructor(address _connext, address _hub) SwapForwarderXReceiver(_connext) {
-    hub = IDCAHubPositionHandler(_hub);
-  }
+contract MeanFinanceTarget is SwapForwarderXReceiver, MeanFinanceAdapter {
+  constructor(address _connext) SwapForwarderXReceiver(_connext) {}
 
   function _forwardFunctionCall(
     bytes memory _preparedData,
@@ -37,8 +33,8 @@ contract MeanFinanceTarget is SwapForwarderXReceiver {
         _forwardCallData,
         (address, address, uint32, uint32, address, IDCAPermissionManager.PermissionSet[])
       );
-    IERC20(_from).approve(address(hub), _amountOut);
-    hub.deposit(_from, _to, _amountOut, _amountOfSwaps, _swapInterval, _owner, _permissions);
+
+    deposit(_from, _to, _amountOut, _amountOfSwaps, _swapInterval, _owner, _permissions);
     return true;
   }
 }
