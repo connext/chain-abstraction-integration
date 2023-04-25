@@ -3,7 +3,7 @@
 pragma solidity ^0.8.17;
 
 interface ISwapper {
-  function swap(
+  function callSwap(
     uint256 _amountIn,
     address _tokenIn,
     address _tokenOut,
