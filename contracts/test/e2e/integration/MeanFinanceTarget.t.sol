@@ -172,9 +172,8 @@ contract MeanFinanceTargetTest is TestHelper {
 
     address cTokenForWETH = 0xD809c769A04246855fee98423B180C7CCa6bF07c;
     address WETH = POLYGON_WETH;
-    address minter = address(0x1234567890);
 
-    address _from = POLYGON_WETH;
+    address _from = WETH;
     address _to = cTokenForWETH;
     uint32 _amountOfSwaps = 10;
     uint32 _swapInterval = 3600 seconds;
@@ -183,6 +182,7 @@ contract MeanFinanceTargetTest is TestHelper {
     IDCAPermissionManager.Permission[] memory permission = new IDCAPermissionManager.Permission[](1);
     permission[0] = IDCAPermissionManager.Permission.INCREASE;
     permissions[0] = IDCAPermissionManager.PermissionSet(address(10), permission);
+
     bytes memory _forwardCallData = abi.encode(_from, _to, _amountOfSwaps, _swapInterval, _owner, permissions);
 
     bytes memory _swapperData = abi.encode(address(uniV3Swapper), WETH, encodedSwapData, _forwardCallData);
@@ -205,16 +205,13 @@ contract MeanFinanceTargetTest is TestHelper {
     );
 
     vm.selectFork(polygonForkId);
-
     // Trying with univ3swapper
     vm.prank(POLYGON_USDC_WHALE);
     TransferHelper.safeTransfer(POLYGON_USDC, address(meanFinanceTarget), 100000000); // 100 USDC transfer
-    assertEq(IERC20(cTokenForWETH).balanceOf(minter), 0);
     vm.prank(CONNEXT_POLYGON);
     meanFinanceTarget.xReceive(bytes32(""), 100000000, POLYGON_USDC, address(0), 123, callData);
     assertEq(IERC20(cTokenForWETH).balanceOf(address(meanFinanceTarget)), 0);
     assertEq(IERC20(POLYGON_USDC).balanceOf(address(meanFinanceTarget)), 0);
-    assertGt(IERC20(cTokenForWETH).balanceOf(minter), 0);
   }
 
   function test_MeanFinanceTargetTest__worksWithSwappersOnPolygon() public {
@@ -229,7 +226,6 @@ contract MeanFinanceTargetTest is TestHelper {
 
     address cTokenForWETH = 0xD809c769A04246855fee98423B180C7CCa6bF07c;
     address WETH = POLYGON_WETH;
-    address minter = address(0x1234567890);
 
     address _from = WETH;
     address _to = cTokenForWETH;
@@ -252,15 +248,10 @@ contract MeanFinanceTargetTest is TestHelper {
     // Trying with univ3swapper
     vm.prank(POLYGON_USDC_WHALE);
     TransferHelper.safeTransfer(POLYGON_USDC, address(meanFinanceTarget), 100000000); // 100 USDC transfer
-    assertEq(IERC20(cTokenForWETH).balanceOf(minter), 0);
     vm.prank(CONNEXT_POLYGON);
     meanFinanceTarget.xReceive(bytes32(""), 100000000, POLYGON_USDC, address(0), 123, callDataForV3);
     assertEq(IERC20(cTokenForWETH).balanceOf(address(meanFinanceTarget)), 0);
     assertEq(IERC20(POLYGON_USDC).balanceOf(address(meanFinanceTarget)), 0);
-    assertGt(IERC20(cTokenForWETH).balanceOf(minter), 0);
-
-    uint256 cTokenBalanceAfterFirstSwap = IERC20(cTokenForWETH).balanceOf(minter);
-    assertGt(cTokenBalanceAfterFirstSwap, 0);
 
     // Trying with univ2swapper
     vm.prank(POLYGON_USDC_WHALE);
@@ -269,6 +260,5 @@ contract MeanFinanceTargetTest is TestHelper {
     meanFinanceTarget.xReceive(bytes32(""), 100000000, POLYGON_USDC, address(0), 123, callDataForV2);
     assertEq(IERC20(cTokenForWETH).balanceOf(address(meanFinanceTarget)), 0);
     assertEq(IERC20(POLYGON_USDC).balanceOf(address(meanFinanceTarget)), 0);
-    assertGt(IERC20(cTokenForWETH).balanceOf(minter), cTokenBalanceAfterFirstSwap);
   }
 }
