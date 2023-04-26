@@ -10,8 +10,8 @@ import {MeanFinanceAdapter} from "./MeanFinanceAdapter.sol";
 import {SwapForwarderXReceiver} from "../../destination/xreceivers/Swap/SwapForwarderXReceiver.sol";
 
 contract MeanFinanceTarget is SwapForwarderXReceiver, MeanFinanceAdapter {
-  constructor(address _connext, address _hub) SwapForwarderXReceiver(_connext) MeanFinanceAdapter(_hub) {}
-
+  event Deposited(uint256 positionID);
+  constructor(address _connext, address _hub) SwapForwarderXReceiver(_connext) MeanFinanceAdapter(_hub)  {}
   function _forwardFunctionCall(
     bytes memory _preparedData,
     bytes32 /*_transferId*/,
@@ -33,8 +33,8 @@ contract MeanFinanceTarget is SwapForwarderXReceiver, MeanFinanceAdapter {
         _forwardCallData,
         (address, address, uint32, uint32, address, IDCAPermissionManager.PermissionSet[])
       );
-
-    deposit(_from, _to, _amountOut, _amountOfSwaps, _swapInterval, _owner, _permissions);
+    uint256 positionID = deposit(_from, _to, _amountOut, _amountOfSwaps, _swapInterval, _owner, _permissions);
+    emit Deposited(positionID);
     return true;
   }
 }

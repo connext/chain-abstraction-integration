@@ -34,5 +34,6 @@ contract MeanFinanceAdapter {
     // We need to increase the allowance for the hub before calling deposit
     IERC20(_from).approve(address(hub), _amount);
     _positionId = hub.deposit(_from, _to, _amount, _amountOfSwaps, _swapInterval, _owner, _permissions);
+    return _positionId;
   }
 }

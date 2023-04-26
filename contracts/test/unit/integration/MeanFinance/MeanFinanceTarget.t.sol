@@ -37,6 +37,8 @@ contract MeanTargetTest is TestHelper {
     uint256 _positionId
   );
 
+  event Deposited(uint256 positionID);
+
   // ============ Storage ============
   address private connext = address(1);
   address private hub = address(2);
@@ -89,6 +91,8 @@ contract MeanTargetTest is TestHelper {
       ),
       abi.encode(10)
     );
+    vm.expectEmit(true, false, false, false);
+    emit Deposited(1);
     bool ret = target.forwardFunctionCall(_preparedData, transferId, amount, notOriginSender);
     assertEq(ret, true);
   }
