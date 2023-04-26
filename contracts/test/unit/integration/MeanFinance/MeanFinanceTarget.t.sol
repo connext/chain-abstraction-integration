@@ -77,6 +77,7 @@ contract MeanTargetTest is TestHelper {
     uint32 amountOfSwaps = 1;
     uint32 swapInterval = 2;
     address owner = address(9);
+    uint256 mockPositionID = 1;
     IDCAPermissionManager.PermissionSet[] memory permissions = new IDCAPermissionManager.PermissionSet[](1);
     IDCAPermissionManager.Permission[] memory permission = new IDCAPermissionManager.Permission[](1);
     permission[0] = IDCAPermissionManager.Permission.INCREASE;
@@ -92,7 +93,7 @@ contract MeanTargetTest is TestHelper {
       abi.encode(10)
     );
     vm.expectEmit(true, false, false, false);
-    emit Deposited(1);
+    emit Deposited(mockPositionID);
     bool ret = target.forwardFunctionCall(_preparedData, transferId, amount, notOriginSender);
     assertEq(ret, true);
   }
