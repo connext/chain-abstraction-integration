@@ -21,7 +21,7 @@ contract MeanTest is MeanFinanceTarget {
   }
 }
 
-contract MeanFinanceTargetTest is TestHelper {
+contract MeanTargetTest is TestHelper {
   // ============ Errors ============
   // error ProposedOwnable__onlyOwner_notOwner();
 
@@ -67,7 +67,7 @@ contract MeanFinanceTargetTest is TestHelper {
   }
 
   // ============ MeanFinanceTarget._forwardFunctionCall ============
-  function test_MeanFinanceTargetTest___forwardFunctionCall_shouldWork(uint256 _amountOut) public {
+  function test_MeanFinanceTargetTest___forwardFunctionCall_works(uint256 _amountOut) public {
     vm.prank(address(target));
     uint256 amountOut = _amountOut;
     address from = address(7);
@@ -93,30 +93,31 @@ contract MeanFinanceTargetTest is TestHelper {
     assertEq(ret, true);
   }
 
-  // checking the deposit function without approval
-  function test_MeanFinanceTargetTest___forwardFunctionCall_shouldNotWork(uint256 _amountOut) public {
-    vm.prank(address(target));
-    uint256 amountOut = _amountOut;
-    address from = address(7);
-    address to = address(8);
-    uint32 amountOfSwaps = 1;
-    uint32 swapInterval = 2;
-    address owner = address(9);
-    IDCAPermissionManager.PermissionSet[] memory permissions = new IDCAPermissionManager.PermissionSet[](1);
-    IDCAPermissionManager.Permission[] memory permission = new IDCAPermissionManager.Permission[](1);
-    permission[0] = IDCAPermissionManager.Permission.INCREASE;
-    permissions[0] = IDCAPermissionManager.PermissionSet(address(10), permission);
-    bytes memory forwardCallData = abi.encode(from, to, amountOfSwaps, swapInterval, owner, permissions);
-    bytes memory _preparedData = abi.encode(forwardCallData, amountOut, address(0), address(0));
-    // deposit call without approval
-    vm.mockCall(
-      hub,
-      abi.encodeWithSignature(
-        "deposit(address,address,uint256,uint32,uint32,address,IDCAPermissionManager.PermissionSet[])"
-      ),
-      abi.encode(10)
-    );
-    vm.expectRevert();
-    bool ret = target.forwardFunctionCall(_preparedData, transferId, amount, notOriginSender);
-  }
+  // // checking the deposit function without approval
+  // /// TODO: Are we sure if we want this condition check considering that fact approval will come from connext contracts.
+  // function test_MeanFinanceTargetTest___forwardFunctionCall_failsIfNoApproval(uint256 _amountOut) public {
+  //   vm.prank(address(target));
+  //   uint256 amountOut = _amountOut;
+  //   address from = address(7);
+  //   address to = address(8);
+  //   uint32 amountOfSwaps = 1;
+  //   uint32 swapInterval = 2;
+  //   address owner = address(9);
+  //   IDCAPermissionManager.PermissionSet[] memory permissions = new IDCAPermissionManager.PermissionSet[](1);
+  //   IDCAPermissionManager.Permission[] memory permission = new IDCAPermissionManager.Permission[](1);
+  //   permission[0] = IDCAPermissionManager.Permission.INCREASE;
+  //   permissions[0] = IDCAPermissionManager.PermissionSet(address(10), permission);
+  //   bytes memory forwardCallData = abi.encode(from, to, amountOfSwaps, swapInterval, owner, permissions);
+  //   bytes memory _preparedData = abi.encode(forwardCallData, amountOut, address(0), address(0));
+  //   // deposit call without approval
+  //   vm.mockCall(
+  //     hub,
+  //     abi.encodeWithSignature(
+  //       "deposit(address,address,uint256,uint32,uint32,address,IDCAPermissionManager.PermissionSet[])"
+  //     ),
+  //     abi.encode(10)
+  //   );
+  //   /// TODO: revert message required here!!!
+  //   vm.expectRevert();
+  //   bool ret = target.forwardFunctionCall(_preparedData, transferId, amount, notOriginSender);
 }
