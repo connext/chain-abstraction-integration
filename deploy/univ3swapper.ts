@@ -32,7 +32,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     args: args,
     skipIfAlreadyDeployed: true,
     log: true,
-    gasPrice: "300000000000",
     // deterministicDeployment: true,
   });
   console.log(`UniV3Swapper deployed to ${adapter.address}`);
