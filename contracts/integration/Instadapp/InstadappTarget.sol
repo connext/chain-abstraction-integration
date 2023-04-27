@@ -58,10 +58,15 @@ contract InstadappTarget is IXReceiver, InstadappAdapter {
     // signature: signature is signed by the auth includes the castData with salt.
     // castData: CastData required for execution at destination
     // salt: salt for Signature Replay Protection, which is unique to each signature signed by auth.
-    (address dsaAddress, address auth, bytes memory signature, CastData memory _castData, bytes32 _salt) = abi.decode(
-      _callData,
-      (address, address, bytes, CastData, bytes32)
-    );
+    // deadline: deadline for the cast to be valid
+    (
+      address dsaAddress,
+      address auth,
+      bytes memory signature,
+      CastData memory _castData,
+      bytes32 _salt,
+      uint256 deadline
+    ) = abi.decode(_callData, (address, address, bytes, CastData, bytes32, uint256));
 
     // verify the dsaAddress
     require(dsaAddress != address(0), "!invalidFallback");
@@ -73,12 +78,13 @@ contract InstadappTarget is IXReceiver, InstadappAdapter {
     // calling via encodeWithSignature as alternative to try/catch
     (bool success, bytes memory returnedData) = address(this).call(
       abi.encodeWithSignature(
-        "authCast(address,address,bytes,CastData,bytes32)",
+        "authCast(address,address,bytes,CastData,bytes32, uint256)",
         dsaAddress,
         auth,
         signature,
         _castData,
-        _salt
+        _salt,
+        deadline
       )
     );
 
