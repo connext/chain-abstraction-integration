@@ -1,16 +1,18 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@mean-finance/dca-v2-core/contracts/interfaces/IDCAHub.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IDCAHub, IDCAPermissionManager} from "@mean-finance/dca-v2-core/contracts/interfaces/IDCAHub.sol";
 
 contract MeanFinanceAdapter {
   /// @notice MeanFinance IDCAHub contract for deposit
   /// @dev see https://docs.mean.finance/guides/smart-contract-registry
-  IDCAHub public immutable hub = IDCAHub(0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345);
+  // IDCAHub public hub = IDCAHub(0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345);
+  IDCAHub public immutable hub;
 
-  /// Payable
-  receive() external payable virtual {}
+  constructor(address _hub) {
+    hub = IDCAHub(_hub);
+  }
 
   /// @notice Creates a new position
   /// @param _from The address of the "from" token
@@ -28,9 +30,10 @@ contract MeanFinanceAdapter {
     uint32 _swapInterval,
     address _owner,
     IDCAPermissionManager.PermissionSet[] memory _permissions
-  ) public returns (uint256 _positionId) {
+  ) internal returns (uint256 _positionId) {
     // We need to increase the allowance for the hub before calling deposit
     IERC20(_from).approve(address(hub), _amount);
     _positionId = hub.deposit(_from, _to, _amount, _amountOfSwaps, _swapInterval, _owner, _permissions);
+    return _positionId;
   }
 }
