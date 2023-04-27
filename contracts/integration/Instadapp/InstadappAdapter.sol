@@ -29,6 +29,7 @@ contract InstadappAdapter is EIP712 {
   struct Sig {
     CastData castData;
     bytes32 salt;
+    uint256 deadline;
   }
 
   /// Storage
@@ -42,7 +43,9 @@ contract InstadappAdapter is EIP712 {
 
   /// @dev This is the typehash for the Sig struct.
   bytes32 public constant SIG_TYPEHASH =
-    keccak256("Sig(CastData cast,bytes32 salt)CastData(string[] _targetNames,bytes[] _datas,address _origin)");
+    keccak256(
+      "Sig(CastData cast,bytes32 salt, uint256 deadline)CastData(string[] _targetNames,bytes[] _datas,address _origin)"
+    );
 
   /// Constructor
   constructor() EIP712("InstaTargetAuth", "1") {}
@@ -53,14 +56,16 @@ contract InstadappAdapter is EIP712 {
   /// @param signature The signature of the auth.
   /// @param castData The data that will be sent to the targets.
   /// @param salt The salt that will be used to prevent replay attacks.
+  /// @param deadline The deadline that will be used to prevent replay attacks.
   /// @return boolean that indicates if the signature is valid.
   function verify(
     address auth,
     bytes memory signature,
     CastData memory castData,
-    bytes32 salt
+    bytes32 salt,
+    uint256 deadline
   ) public view returns (bool) {
-    bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(SIG_TYPEHASH, hash(castData), salt)));
+    bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(SIG_TYPEHASH, hash(castData), salt, deadline)));
     address signer = ECDSA.recover(digest, signature);
     return signer == auth;
   }
@@ -80,12 +85,14 @@ contract InstadappAdapter is EIP712 {
   /// @param signature The signature by the auth. This signature is used to verify the SIG data.
   /// @param castData The data that will be sent to the targets.
   /// @param salt The salt that will be used to prevent replay attacks.
+  /// @param deadline The deadline that will be used to prevent replay attacks.
   function authCast(
     address dsaAddress,
     address auth,
     bytes memory signature,
     CastData memory castData,
-    bytes32 salt
+    bytes32 salt,
+    uint256 deadline
   ) internal {
     IDSA dsa = IDSA(dsaAddress);
     // check if Auth is valid, and included in the DSA
@@ -94,8 +101,11 @@ contract InstadappAdapter is EIP712 {
     // check if signature is not replayed
     require(!sigReplayProtection[salt], "Replay Attack");
 
+    // check if signature is not expired
+    require(block.timestamp <= deadline, "Signature Expired");
+
     // check if signature is valid, and not replayed
-    require(verify(auth, signature, castData, salt), "Invalid signature");
+    require(verify(auth, signature, castData, salt, deadline), "Invalid signature");
 
     // Signature Replay Protection
     sigReplayProtection[salt] = true;
