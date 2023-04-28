@@ -175,7 +175,7 @@
       "chainId": "56",
       "contracts": {
         "MidasProtocolTarget": {
-          "address": "0xEF8dd349E32D1fE8691A5fCaFb7faac6DA9b4499",
+          "address": "0x5510188B296d1a13140a6cd52A83B81078f22413",
           "abi": [
             {
               "inputs": [
@@ -639,7 +639,7 @@
           ]
         },
         "SwapAndXCall": {
-          "address": "0x6840600Bc9B74fA6B3BDF1503cb31A7AdF061c1D",
+          "address": "0xB7E327b0484641Aa59b3F9ffDbEa4b4872a701fD",
           "abi": [
             {
               "inputs": [
@@ -992,7 +992,7 @@
           ]
         },
         "UniV3Swapper": {
-          "address": "0xaDd4B3FE6b083BaeCB80605Cc259309147178e24",
+          "address": "0x911b8C1b2d99c5bBB82BC1F71c85A3a54d2dFfcE",
           "abi": [
             {
               "inputs": [
@@ -1332,7 +1332,7 @@
           ]
         },
         "MidasProtocolTarget": {
-          "address": "0x5d7663c5483A46e7794b652aF8f155775E4F390C",
+          "address": "0x4E02AC4b0942E670dD0366fa504f665a2257443c",
           "abi": [
             {
               "inputs": [
@@ -1796,7 +1796,7 @@
           ]
         },
         "SwapAndXCall": {
-          "address": "0x697075f4A3Ce358d125281134e98d594D8Bb472e",
+          "address": "0x56D087121E5CC320002A4D826B08832FA9E729Bc",
           "abi": [
             {
               "inputs": [
@@ -2149,7 +2149,7 @@
           ]
         },
         "UniV3Swapper": {
-          "address": "0x9aC21E7373E64B8C60e3C1f70c6D43da3aF016d4",
+          "address": "0xd92fd008bb2a1B74C9De29B7a68d9822Cc8c9868",
           "abi": [
             {
               "inputs": [
