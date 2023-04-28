@@ -13,9 +13,10 @@ contract MockInstadappReceiver is InstadappAdapter {
     address auth,
     bytes memory signature,
     CastData memory castData,
-    bytes32 salt
+    bytes32 salt,
+    uint256 deadline
   ) external payable {
-    authCast(dsaAddress, auth, signature, castData, salt);
+    authCast(dsaAddress, auth, signature, castData, salt, deadline);
   }
 }
 
@@ -23,6 +24,7 @@ contract InstadappAdapterTest is TestHelper {
   // ============ Storage ============
   address dsa = address(1);
   MockInstadappReceiver instadappReceiver;
+  uint256 deadline = block.timestamp + 3600 seconds;
 
   // ============ Test set up ============
   function setUp() public override {
@@ -57,7 +59,7 @@ contract InstadappAdapterTest is TestHelper {
     bytes32 salt = bytes32(abi.encode(1));
 
     vm.expectRevert(bytes("Invalid Auth"));
-    instadappReceiver.tryAuthCast(dsa, auth, signature, castData, salt);
+    instadappReceiver.tryAuthCast(dsa, auth, signature, castData, salt, deadline);
   }
 
   function test_InstadappAdapter__authCast_shouldRevertIfInvalidSignature() public {
@@ -81,7 +83,7 @@ contract InstadappAdapterTest is TestHelper {
     address auth = originSender;
     bytes32 salt = bytes32(abi.encode(1));
     vm.expectRevert(bytes("Invalid signature"));
-    instadappReceiver.tryAuthCast(dsa, auth, signature, castData, salt);
+    instadappReceiver.tryAuthCast(dsa, auth, signature, castData, salt, deadline);
   }
 
   function test_InstadappAdapter__authCast_shouldWork() public {
@@ -106,7 +108,7 @@ contract InstadappAdapterTest is TestHelper {
       memory signature = hex"e06eb18ed5fa1258094a9af413275fc057cb5139b4e48c979a7ef9d028e8748e39bfa2ea23722f296a07ae7a2d2fee26c7de3ad067a2c569819bec0fc3c9f0f51b";
 
     address auth = originSender;
-    instadappReceiver.tryAuthCast{value: 1}(dsa, auth, signature, castData, salt);
+    instadappReceiver.tryAuthCast{value: 1}(dsa, auth, signature, castData, salt, deadline);
   }
 
   // ============ InstadappAdapter.verify ============
@@ -132,7 +134,7 @@ contract InstadappAdapterTest is TestHelper {
       memory signature = hex"e06eb18ed5fa1258094a9af413275fc057cb5139b4e48c979a7ef9d028e8748e39bfa2ea23722f296a07ae7a2d2fee26c7de3ad067a2c569819bec0fc3c9f0f51b";
 
     address auth = originSender;
-    assertEq(instadappReceiver.verify(auth, signature, castData, salt), true);
+    assertEq(instadappReceiver.verify(auth, signature, castData, salt, deadline), true);
   }
 
   function test_InstadappAdapter__verify_shouldReturnFalse() public {
@@ -155,6 +157,6 @@ contract InstadappAdapterTest is TestHelper {
 
     address auth = originSender;
     bytes32 salt = bytes32(abi.encode(1));
-    assertEq(instadappReceiver.verify(auth, signature, castData, salt), false);
+    assertEq(instadappReceiver.verify(auth, signature, castData, salt, deadline), false);
   }
 }
