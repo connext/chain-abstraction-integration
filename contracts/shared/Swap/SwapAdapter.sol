@@ -68,6 +68,12 @@ contract SwapAdapter is Ownable2Step {
     bytes calldata _swapData // comes directly from API with swap data encoded
   ) public payable returns (uint256 amountOut) {
     require(allowedSwappers[_swapper], "!allowedSwapper");
+
+    // If from == to, no need to swap
+    if (_fromAsset == _toAsset) {
+      return _amountIn;
+    }
+
     if (IERC20(_fromAsset).allowance(address(this), _swapper) < _amountIn) {
       TransferHelper.safeApprove(_fromAsset, _swapper, type(uint256).max);
     }

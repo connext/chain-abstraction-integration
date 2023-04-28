@@ -47,20 +47,25 @@ contract OneInchUniswapV3 is ISwapper {
   ) public payable override returns (uint256 amountOut) {
     // transfer the funds to be swapped from the sender into this contract
     TransferHelper.safeTransferFrom(_fromAsset, msg.sender, address(this), _amountIn);
-    // decode the swap data
-    // the data included with the swap encodes with the selector so we need to remove it
-    // https://docs.1inch.io/docs/aggregation-protocol/smart-contract/UnoswapV3Router#uniswapv3swap
-    (, uint256 _minReturn, uint256[] memory _pools) = abi.decode(_swapData[4:], (uint256, uint256, uint256[]));
 
-    // Set up swap params
-    // Approve the swapper if needed
-    if (IERC20(_fromAsset).allowance(address(this), address(oneInchUniRouter)) < _amountIn) {
-      TransferHelper.safeApprove(_fromAsset, address(oneInchUniRouter), type(uint256).max);
+    if(_fromAsset != _toAsset) {
+      // decode the swap data
+      // the data included with the swap encodes with the selector so we need to remove it
+      // https://docs.1inch.io/docs/aggregation-protocol/smart-contract/UnoswapV3Router#uniswapv3swap
+      (, uint256 _minReturn, uint256[] memory _pools) = abi.decode(_swapData[4:], (uint256, uint256, uint256[]));
+
+      // Set up swap params
+      // Approve the swapper if needed
+      if (IERC20(_fromAsset).allowance(address(this), address(oneInchUniRouter)) < _amountIn) {
+        TransferHelper.safeApprove(_fromAsset, address(oneInchUniRouter), type(uint256).max);
+      }
+
+      // The call to `uniswapV3Swap` executes the swap.
+      // use actual amountIn that was sent to the xReceiver
+      amountOut = oneInchUniRouter.uniswapV3Swap(_amountIn, _minReturn, _pools);
+    } else {
+      amountOut = _amountIn;
     }
-
-    // The call to `uniswapV3Swap` executes the swap.
-    // use actual amountIn that was sent to the xReceiver
-    amountOut = oneInchUniRouter.uniswapV3Swap(_amountIn, _minReturn, _pools);
 
     // transfer the swapped funds back to the sender
     TransferHelper.safeTransfer(_toAsset, msg.sender, amountOut);

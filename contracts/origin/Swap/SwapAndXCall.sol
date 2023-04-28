@@ -118,7 +118,11 @@ contract SwapAndXCall is SwapAdapter {
       require(msg.value >= _amountIn, "SwapAndXCall: msg.value != _amountIn");
     }
 
-    amountOut = this.directSwapperCall{value: _fromAsset == address(0) ? _amountIn : 0}(_swapper, _swapData);
+    if(_fromAsset != _toAsset) {
+      amountOut = this.directSwapperCall{value: _fromAsset == address(0) ? _amountIn : 0}(_swapper, _swapData);
+    } else {
+      amountOut = _amountIn;
+    }
 
     if (IERC20(_toAsset).allowance(address(this), address(connext)) < _amountIn) {
       IERC20(_toAsset).approve(address(connext), type(uint256).max);
