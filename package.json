@@ -20,7 +20,8 @@
     "prettier:write": "prettier --write './contracts/**/*.sol' && prettier --write './contracts_forge/**/*.sol'",
     "hardhat": "hardhat",
     "export": "hardhat export --export-all ./deployments.json",
-    "clean": "rimraf cache out"
+    "clean": "rimraf cache out",
+    "cli:run": "ts-node test/cli.ts"
   },
   "devDependencies": {
     "@0xgafu/common-abi": "^1.0.3",

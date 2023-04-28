@@ -4,6 +4,7 @@ pragma solidity ^0.8.13;
 import {IDSA} from "../../../../integration/Instadapp/interfaces/IDSA.sol";
 import {TestHelper} from "../../../utils/TestHelper.sol";
 import {InstadappAdapter} from "../../../../integration/Instadapp/InstadappAdapter.sol";
+import "forge-std/console.sol";
 
 contract MockInstadappReceiver is InstadappAdapter {
   constructor() {}
@@ -23,13 +24,16 @@ contract MockInstadappReceiver is InstadappAdapter {
 contract InstadappAdapterTest is TestHelper {
   // ============ Storage ============
   address dsa = address(1);
-  MockInstadappReceiver instadappReceiver;
-  uint256 deadline = block.timestamp + 3600 seconds;
+  address instadappReceiver = 0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f;
+
+  uint256 deadline = 100;
+  uint256 timestamp = 90;
 
   // ============ Test set up ============
   function setUp() public override {
     super.setUp();
-    instadappReceiver = new MockInstadappReceiver();
+    MockInstadappReceiver _instadappReceiver = new MockInstadappReceiver();
+    vm.etch(instadappReceiver, address(_instadappReceiver).code);
   }
 
   // ============ Utils ============
@@ -59,7 +63,7 @@ contract InstadappAdapterTest is TestHelper {
     bytes32 salt = bytes32(abi.encode(1));
 
     vm.expectRevert(bytes("Invalid Auth"));
-    instadappReceiver.tryAuthCast(dsa, auth, signature, castData, salt, deadline);
+    MockInstadappReceiver(instadappReceiver).tryAuthCast(dsa, auth, signature, castData, salt, deadline);
   }
 
   function test_InstadappAdapter__authCast_shouldRevertIfInvalidSignature() public {
@@ -83,7 +87,7 @@ contract InstadappAdapterTest is TestHelper {
     address auth = originSender;
     bytes32 salt = bytes32(abi.encode(1));
     vm.expectRevert(bytes("Invalid signature"));
-    instadappReceiver.tryAuthCast(dsa, auth, signature, castData, salt, deadline);
+    MockInstadappReceiver(instadappReceiver).tryAuthCast(dsa, auth, signature, castData, salt, deadline);
   }
 
   function test_InstadappAdapter__authCast_shouldWork() public {
@@ -105,10 +109,11 @@ contract InstadappAdapterTest is TestHelper {
     InstadappAdapter.CastData memory castData = InstadappAdapter.CastData(_targetNames, _datas, _origin);
 
     bytes
-      memory signature = hex"e06eb18ed5fa1258094a9af413275fc057cb5139b4e48c979a7ef9d028e8748e39bfa2ea23722f296a07ae7a2d2fee26c7de3ad067a2c569819bec0fc3c9f0f51b";
+      memory signature = hex"ac66d103e593be748af47496663fd93133970928dbfdade49bcca087d41773e95f4ead6a0897057adc61a67a6664de7730cc34055fdd500fded8c83b1e696fd61b";
 
     address auth = originSender;
-    instadappReceiver.tryAuthCast{value: 1}(dsa, auth, signature, castData, salt, deadline);
+    vm.warp(timestamp);
+    MockInstadappReceiver(instadappReceiver).tryAuthCast{value: 1}(dsa, auth, signature, castData, salt, deadline);
   }
 
   // ============ InstadappAdapter.verify ============
@@ -131,10 +136,11 @@ contract InstadappAdapterTest is TestHelper {
     InstadappAdapter.CastData memory castData = InstadappAdapter.CastData(_targetNames, _datas, _origin);
 
     bytes
-      memory signature = hex"e06eb18ed5fa1258094a9af413275fc057cb5139b4e48c979a7ef9d028e8748e39bfa2ea23722f296a07ae7a2d2fee26c7de3ad067a2c569819bec0fc3c9f0f51b";
+      memory signature = hex"ac66d103e593be748af47496663fd93133970928dbfdade49bcca087d41773e95f4ead6a0897057adc61a67a6664de7730cc34055fdd500fded8c83b1e696fd61b";
 
     address auth = originSender;
-    assertEq(instadappReceiver.verify(auth, signature, castData, salt, deadline), true);
+    vm.warp(timestamp);
+    assertEq(MockInstadappReceiver(instadappReceiver).verify(auth, signature, castData, salt, deadline), true);
   }
 
   function test_InstadappAdapter__verify_shouldReturnFalse() public {
@@ -157,6 +163,6 @@ contract InstadappAdapterTest is TestHelper {
 
     address auth = originSender;
     bytes32 salt = bytes32(abi.encode(1));
-    assertEq(instadappReceiver.verify(auth, signature, castData, salt, deadline), false);
+    assertEq(MockInstadappReceiver(instadappReceiver).verify(auth, signature, castData, salt, deadline), false);
   }
 }
