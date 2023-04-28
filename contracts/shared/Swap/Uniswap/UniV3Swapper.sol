@@ -57,6 +57,8 @@ contract UniV3Swapper is ISwapper {
 
       // The call to `exactInputSingle` executes the swap.
       amountOut = ISwapRouter(uniswapV3Router).exactInputSingle(params);
+    } else {
+      amountOut = _amountIn;
     }
 
     // transfer the swapped funds back to the sender
