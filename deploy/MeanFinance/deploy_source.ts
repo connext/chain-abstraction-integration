@@ -15,19 +15,14 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   }
 
   // Get the constructor args
-  const args = [
-    process.env.CONNEXT ?? DEFAULT_ARGS[chainId].CONNEXT,
-    process.env.WETH ?? DEFAULT_ARGS[chainId].WETH,
-  ];
+  const args = [process.env.CONNEXT ?? DEFAULT_ARGS[chainId].CONNEXT, process.env.WETH ?? DEFAULT_ARGS[chainId].WETH];
 
   // Get the deployer
   const [deployer] = await hre.ethers.getSigners();
   if (!deployer) {
     throw new Error(`Cannot find signer to deploy with`);
   }
-  console.log(
-    "\n============================= Deploying MeanFinanceSource ==============================="
-  );
+  console.log("\n============================= Deploying MeanFinanceSource ===============================");
   console.log("deployer: ", deployer.address);
   console.log("constructorArgs:", args);
 
