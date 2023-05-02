@@ -5,20 +5,20 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
-import {ISwapRouter} from "../interfaces/IPancakeV3SwapRouter.sol";
+import {IV3SwapRouter} from "../interfaces/IPancakeV3SwapRouter.sol";
 import {ISwapper} from "../interfaces/ISwapper.sol";
 
 /**
- * @title UniV3Swapper
- * @notice Swapper contract for UniswapV3 swaps.
+ * @title PancakeV3Swapper
+ * @notice Swapper contract for PancakeV3 swaps.
  */
-contract UniV3Swapper is ISwapper {
+contract PancakeV3Swapper is ISwapper {
   using Address for address;
 
-  ISwapRouter public immutable uniswapV3Router;
+  IV3SwapRouter public immutable uniswapV3Router;
 
   constructor(address _uniV3Router) {
-    uniswapV3Router = ISwapRouter(_uniV3Router);
+    uniswapV3Router = IV3SwapRouter(_uniV3Router);
   }
 
   /**
@@ -44,7 +44,7 @@ contract UniV3Swapper is ISwapper {
     if (_fromAsset != _toAsset) {
       TransferHelper.safeApprove(_fromAsset, address(uniswapV3Router), _amountIn);
       // Set up uniswap swap params.
-      ISwapRouter.ExactInputSingleParams memory params = ISwapRouter.ExactInputSingleParams({
+      IV3SwapRouter.ExactInputSingleParams memory params = IV3SwapRouter.ExactInputSingleParams({
         tokenIn: _fromAsset,
         tokenOut: _toAsset,
         fee: poolFee,
@@ -55,7 +55,7 @@ contract UniV3Swapper is ISwapper {
       });
 
       // The call to `exactInputSingle` executes the swap.
-      amountOut = ISwapRouter(uniswapV3Router).exactInputSingle(params);
+      amountOut = IV3SwapRouter(uniswapV3Router).exactInputSingle(params);
     } else {
       amountOut = _amountIn;
     }

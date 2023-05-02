@@ -19,7 +19,7 @@ interface IPancakeV3SwapCallback {
 
 /// @title Router token swapping functionality
 /// @notice Functions for swapping tokens via PancakeSwap V3
-interface ISwapRouter is IPancakeV3SwapCallback {
+interface IV3SwapRouter is IPancakeV3SwapCallback {
   struct ExactInputSingleParams {
     address tokenIn;
     address tokenOut;
