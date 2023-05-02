@@ -5,6 +5,9 @@ import "@nomicfoundation/hardhat-foundry";
 import { config as dotenvConfig } from "dotenv";
 import { HardhatUserConfig } from "hardhat/config";
 
+import "./tasks/addSwapper";
+import "./tasks/removeSwapper";
+
 dotenvConfig();
 const alchemyApiKey = process.env.ALCHEMY_API_KEY;
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
