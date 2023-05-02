@@ -638,6 +638,69 @@
             }
           ]
         },
+        "PancakeV3Swapper": {
+          "address": "0x73D53460fc1ead8Eb4A7771Bc5023159E8730E68",
+          "abi": [
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "_uniV3Router",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "constructor"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "_amountIn",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_fromAsset",
+                  "type": "address"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_toAsset",
+                  "type": "address"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "_swapData",
+                  "type": "bytes"
+                }
+              ],
+              "name": "swap",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "amountOut",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "payable",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "uniswapV3Router",
+              "outputs": [
+                {
+                  "internalType": "contract IV3SwapRouter",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            }
+          ]
+        },
         "SwapAndXCall": {
           "address": "0xB7E327b0484641Aa59b3F9ffDbEa4b4872a701fD",
           "abi": [
@@ -988,69 +1051,6 @@
             {
               "stateMutability": "payable",
               "type": "receive"
-            }
-          ]
-        },
-        "UniV3Swapper": {
-          "address": "0x911b8C1b2d99c5bBB82BC1F71c85A3a54d2dFfcE",
-          "abi": [
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "_uniV3Router",
-                  "type": "address"
-                }
-              ],
-              "stateMutability": "nonpayable",
-              "type": "constructor"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "_amountIn",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "address",
-                  "name": "_fromAsset",
-                  "type": "address"
-                },
-                {
-                  "internalType": "address",
-                  "name": "_toAsset",
-                  "type": "address"
-                },
-                {
-                  "internalType": "bytes",
-                  "name": "_swapData",
-                  "type": "bytes"
-                }
-              ],
-              "name": "swap",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "amountOut",
-                  "type": "uint256"
-                }
-              ],
-              "stateMutability": "payable",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "uniswapV3Router",
-              "outputs": [
-                {
-                  "internalType": "contract ISwapRouter",
-                  "name": "",
-                  "type": "address"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
             }
           ]
         }

@@ -27,14 +27,26 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   console.log("constructorArgs:", args);
 
   // Deploy contract
-  const adapter = await hre.deployments.deploy("UniV3Swapper", {
-    from: deployer.address,
-    args: args,
-    skipIfAlreadyDeployed: true,
-    log: true,
-    // deterministicDeployment: true,
-  });
-  console.log(`UniV3Swapper deployed to ${adapter.address}`);
+  if (chainId === 56) {
+    // deploy pancake v3 swapper
+    const adapter = await hre.deployments.deploy("PancakeV3Swapper", {
+      from: deployer.address,
+      args: args,
+      skipIfAlreadyDeployed: true,
+      log: true,
+      // deterministicDeployment: true,
+    });
+    console.log(`PancakeV3Swapper deployed to ${adapter.address}`);
+  } else {
+    const adapter = await hre.deployments.deploy("UniV3Swapper", {
+      from: deployer.address,
+      args: args,
+      skipIfAlreadyDeployed: true,
+      log: true,
+      // deterministicDeployment: true,
+    });
+    console.log(`UniV3Swapper deployed to ${adapter.address}`);
+  }
 };
 export default func;
 func.tags = ["univ3swapper", "test", "prod"];
