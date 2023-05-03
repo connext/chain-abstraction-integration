@@ -702,7 +702,7 @@
           ]
         },
         "SwapAndXCall": {
-          "address": "0xB7E327b0484641Aa59b3F9ffDbEa4b4872a701fD",
+          "address": "0xE57c141e99257426294032D8437B136A8B641C27",
           "abi": [
             {
               "inputs": [
@@ -2004,7 +2004,7 @@
           ]
         },
         "SwapAndXCall": {
-          "address": "0x56D087121E5CC320002A4D826B08832FA9E729Bc",
+          "address": "0x833cBFaf81EE07528B34cBB4c487287435113EdF",
           "abi": [
             {
               "inputs": [
