@@ -111,14 +111,17 @@ contract SwapAndXCall is SwapAdapter {
   ) internal returns (uint256 amountOut) {
     if (_fromAsset != address(0)) {
       TransferHelper.safeTransferFrom(_fromAsset, msg.sender, address(this), _amountIn);
-      if (IERC20(_fromAsset).allowance(address(this), _swapper) < _amountIn) {
-        IERC20(_fromAsset).approve(_swapper, type(uint256).max);
-      }
     } else {
       require(msg.value >= _amountIn, "SwapAndXCall: msg.value != _amountIn");
     }
 
-    if(_fromAsset != _toAsset) {
+    if (_fromAsset != _toAsset) {
+      require(_swapper != address(0), "SwapAndXCall: zero swapper!");
+
+      if (IERC20(_fromAsset).allowance(address(this), _swapper) < _amountIn) {
+        IERC20(_fromAsset).approve(_swapper, type(uint256).max);
+      }
+
       amountOut = this.directSwapperCall{value: _fromAsset == address(0) ? _amountIn : 0}(_swapper, _swapData);
     } else {
       amountOut = _amountIn;
