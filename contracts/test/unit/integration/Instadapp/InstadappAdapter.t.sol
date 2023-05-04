@@ -19,6 +19,16 @@ contract MockInstadappReceiver is InstadappAdapter {
   ) external payable {
     authCast(dsaAddress, auth, signature, castData, salt, deadline);
   }
+
+  function tryVerify(
+    address auth,
+    bytes memory signature,
+    CastData memory castData,
+    bytes32 salt,
+    uint256 deadline
+  ) external returns (bool) {
+    return verify(auth, signature, castData, salt, deadline);
+  }
 }
 
 contract InstadappAdapterTest is TestHelper {
@@ -109,7 +119,7 @@ contract InstadappAdapterTest is TestHelper {
     InstadappAdapter.CastData memory castData = InstadappAdapter.CastData(_targetNames, _datas, _origin);
 
     bytes
-      memory signature = hex"ac66d103e593be748af47496663fd93133970928dbfdade49bcca087d41773e95f4ead6a0897057adc61a67a6664de7730cc34055fdd500fded8c83b1e696fd61b";
+      memory signature = hex"ec163cca0d31ea58537dfff8377fdbd957fb0ba58088f74436af944bf1c3248148910f14a13b7d0b6d707fb7478cfd7f9ae3830b02d0a5e5584ef7648460a8d71c";
 
     address auth = originSender;
     vm.warp(timestamp);
@@ -136,11 +146,11 @@ contract InstadappAdapterTest is TestHelper {
     InstadappAdapter.CastData memory castData = InstadappAdapter.CastData(_targetNames, _datas, _origin);
 
     bytes
-      memory signature = hex"ac66d103e593be748af47496663fd93133970928dbfdade49bcca087d41773e95f4ead6a0897057adc61a67a6664de7730cc34055fdd500fded8c83b1e696fd61b";
+      memory signature = hex"ec163cca0d31ea58537dfff8377fdbd957fb0ba58088f74436af944bf1c3248148910f14a13b7d0b6d707fb7478cfd7f9ae3830b02d0a5e5584ef7648460a8d71c";
 
     address auth = originSender;
     vm.warp(timestamp);
-    assertEq(MockInstadappReceiver(instadappReceiver).verify(auth, signature, castData, salt, deadline), true);
+    assertEq(MockInstadappReceiver(instadappReceiver).tryVerify(auth, signature, castData, salt, deadline), true);
   }
 
   function test_InstadappAdapter__verify_shouldReturnFalse() public {
@@ -163,6 +173,6 @@ contract InstadappAdapterTest is TestHelper {
 
     address auth = originSender;
     bytes32 salt = bytes32(abi.encode(1));
-    assertEq(MockInstadappReceiver(instadappReceiver).verify(auth, signature, castData, salt, deadline), false);
+    assertEq(MockInstadappReceiver(instadappReceiver).tryVerify(auth, signature, castData, salt, deadline), false);
   }
 }
