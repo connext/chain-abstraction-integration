@@ -18,11 +18,17 @@ contract InstadappTarget is IXReceiver, InstadappAdapter {
   using SafeERC20 for IERC20;
   /// Storage
   /// @dev This is the address of the Connext contract.
-  IConnext public connext;
+  IConnext public immutable connext;
 
   /// Events
   /// @dev This event is emitted when the authCast function is called.
-  event AuthCast(bytes32 transferId, address dsaAddress, address auth, bool success, bytes returnedData);
+  event AuthCast(
+    bytes32 indexed transferId,
+    address indexed dsaAddress,
+    bool indexed success,
+    address auth,
+    bytes returnedData
+  );
 
   /// Modifiers
   /// @dev This modifier is used to ensure that only the Connext contract can call the function.
@@ -62,9 +68,9 @@ contract InstadappTarget is IXReceiver, InstadappAdapter {
     (
       address dsaAddress,
       address auth,
-      bytes memory signature,
+      bytes memory _signature,
       CastData memory _castData,
-      bytes32 _salt,
+      bytes32 salt,
       uint256 deadline
     ) = abi.decode(_callData, (address, address, bytes, CastData, bytes32, uint256));
 
@@ -78,17 +84,17 @@ contract InstadappTarget is IXReceiver, InstadappAdapter {
     // calling via encodeWithSignature as alternative to try/catch
     (bool success, bytes memory returnedData) = address(this).call(
       abi.encodeWithSignature(
-        "authCast(address,address,bytes,CastData,bytes32, uint256)",
+        "authCast(address,address,bytes,CastData,bytes32,uint256)",
         dsaAddress,
         auth,
-        signature,
+        _signature,
         _castData,
-        _salt,
+        salt,
         deadline
       )
     );
 
-    emit AuthCast(_transferId, dsaAddress, auth, success, returnedData);
+    emit AuthCast(_transferId, dsaAddress, success, auth, returnedData);
 
     return returnedData;
   }
