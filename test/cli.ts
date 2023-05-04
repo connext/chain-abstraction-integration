@@ -10,10 +10,10 @@ import {
   hexZeroPad,
 } from "ethers/lib/utils";
 
-const CASTDATA_TYPEHASH = keccak256(toUtf8Bytes("CastData(string[] _targetNames,bytes[] _datas,address _origin)"));
+const CASTDATA_TYPEHASH = keccak256(toUtf8Bytes("CastData(string[] targetNames,bytes[] datas,address origin)"));
 const SIG_TYPEHASH = keccak256(
   toUtf8Bytes(
-    "Sig(CastData cast,bytes32 salt,uint256 deadline)CastData(string[] _targetNames,bytes[] _datas,address _origin)",
+    "Sig(CastData cast,bytes32 salt,uint256 deadline)CastData(string[] targetNames,bytes[] datas,address origin)",
   ),
 );
 
@@ -25,9 +25,9 @@ type EIP712Domain = {
 };
 
 type CastData = {
-  _targetNames: string[];
-  _datas: Uint8Array[];
-  _origin: string;
+  targetNames: string[];
+  datas: Uint8Array[];
+  origin: string;
 };
 
 export const generateEIP712Signature = (domain: EIP712Domain, structHash: string, signer: Wallet): string => {
@@ -52,7 +52,7 @@ const generateSignature = async (
 ): Promise<string> => {
   const encodedData = defaultAbiCoder.encode(
     ["bytes32", "string[]", "bytes[]", "address"],
-    [CASTDATA_TYPEHASH, castData._targetNames, castData._datas, castData._origin],
+    [CASTDATA_TYPEHASH, castData.targetNames, castData.datas, castData.origin],
   );
   const structHash = defaultAbiCoder.encode(
     ["bytes32", "bytes32", "bytes32", "uint256"],
@@ -76,9 +76,9 @@ export const main = async () => {
   };
 
   const castData = {
-    _targetNames: ["target111", "target222", "target333"],
-    _datas: [toUtf8Bytes("0x111"), toUtf8Bytes("0x222"), toUtf8Bytes("0x333")],
-    _origin: sender.address.toLowerCase(),
+    targetNames: ["target111", "target222", "target333"],
+    datas: [toUtf8Bytes("0x111"), toUtf8Bytes("0x222"), toUtf8Bytes("0x333")],
+    origin: sender.address.toLowerCase(),
   };
 
   const salt = hexZeroPad(hexlify(1), 32);
