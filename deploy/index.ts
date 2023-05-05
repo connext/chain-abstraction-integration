@@ -53,3 +53,9 @@ export const MIDAS_CONFIG: Record<number, any> = {
     COMPTROLLER: "0x31d76A64Bc8BbEffb601fac5884372DEF910F044",
   },
 };
+
+export const MEAN_CONFIG: Record<number, any> = {
+  137: {
+    HUB: "0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345",
+  },
+};
