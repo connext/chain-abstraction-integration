@@ -175,7 +175,7 @@
       "chainId": "56",
       "contracts": {
         "MidasProtocolTarget": {
-          "address": "0x5510188B296d1a13140a6cd52A83B81078f22413",
+          "address": "0x8eb0e275f52fc7ba0B366D9b539c6EB5ea9162F1",
           "abi": [
             {
               "inputs": [
@@ -639,7 +639,7 @@
           ]
         },
         "PancakeV3Swapper": {
-          "address": "0x73D53460fc1ead8Eb4A7771Bc5023159E8730E68",
+          "address": "0x0b081b724CDC4DD9186E64F259b5fC589a4Fd7D0",
           "abi": [
             {
               "inputs": [
@@ -683,6 +683,35 @@
                   "type": "uint256"
                 }
               ],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "_amountIn",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_toAsset",
+                  "type": "address"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "_swapData",
+                  "type": "bytes"
+                }
+              ],
+              "name": "swapETH",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "amountOut",
+                  "type": "uint256"
+                }
+              ],
               "stateMutability": "payable",
               "type": "function"
             },
@@ -691,18 +720,22 @@
               "name": "uniswapV3Router",
               "outputs": [
                 {
-                  "internalType": "contract IV3SwapRouter",
+                  "internalType": "contract IPancakeSmartRouter",
                   "name": "",
                   "type": "address"
                 }
               ],
               "stateMutability": "view",
               "type": "function"
+            },
+            {
+              "stateMutability": "payable",
+              "type": "receive"
             }
           ]
         },
         "SwapAndXCall": {
-          "address": "0xE57c141e99257426294032D8437B136A8B641C27",
+          "address": "0x119dd93154780d7604D50014c4545b4906928bFF",
           "abi": [
             {
               "inputs": [
