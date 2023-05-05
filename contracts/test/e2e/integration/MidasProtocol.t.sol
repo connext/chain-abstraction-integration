@@ -27,9 +27,12 @@ contract MidasProtocolTest is TestHelper {
   // BNB ADDRESSES
   address public immutable BNB_USDC = 0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d;
   address public immutable BNB_WBNB = 0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c;
+  address public immutable BNB_BNB = 0x0000000000000000000000000000000000000000;
   address public immutable BNB_USDC_WHALE = 0xF977814e90dA44bFA03b6295A0616a897441aceC;
+  address public immutable BNB_BNB_WHALE = 0xF977814e90dA44bFA03b6295A0616a897441aceC;
   address public immutable BNB_COMPTROLLER = 0x31d76A64Bc8BbEffb601fac5884372DEF910F044;
   address public immutable BNB_UNIV2_ROUTER = 0x10ED43C718714eb63d5aA57B78B54704E256024E;
+  address public immutable BNB_ONEINCH_SWAPPER = 0x1111111254EEB25477B68fb85Ed929f73A960582;
 
   // POLYGON ADDRESSES
   address public immutable POLYGON_USDC = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
@@ -52,6 +55,19 @@ contract MidasProtocolTest is TestHelper {
     vm.label(OP_OP, "OP_OP");
     vm.label(OP_USDC, "OP_USDC");
     vm.label(OP_OP_WHALE, "OP_OP_WHALE");
+  }
+
+  function utils_setUpBnbForOrigin() public {
+    setUpBNB(27284448);
+    swapAndXCall = new SwapAndXCall(CONNEXT_BNB);
+    vm.prank(BNB_BNB_WHALE);
+    TransferHelper.safeTransferETH(address(this), 10 ether);
+
+    vm.label(address(swapAndXCall), "SwapAndXCall");
+    vm.label(address(this), "MidasProtocolTest");
+    vm.label(BNB_BNB, "BNB_BNB");
+    vm.label(BNB_USDC, "BNB_USDC");
+    vm.label(BNB_BNB_WHALE, "BNB_BNB_WHALE");
   }
 
   function utils_setUpBNBForDestination() public {
@@ -198,6 +214,65 @@ contract MidasProtocolTest is TestHelper {
     assertGt(IERC20(cTokenForWETH).balanceOf(minter), 0);
   }
 
+  function test_MidasProtocolTest__worksFromBnbToPolygon() public {
+    utils_setUpBnbForOrigin();
+    utils_setUpPolygonForDestination();
+
+    vm.selectFork(bnbForkId);
+    assertEq(vm.activeFork(), bnbForkId);
+
+    // origin
+    // start with OP and swap to USDC to bridge to destination
+    bytes
+      memory oneInchApiDataBnbToUsdc = hex"12aa3caf00000000000000000000000014831f12fccc86c4f3dae41c769593df766e4353000000000000000000000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee0000000000000000000000008ac76a51cc950d9822d68b83fe1ad97b32cd580d00000000000000000000000014831f12fccc86c4f3dae41c769593df766e43530000000000000000000000005615deb798bb3e4dfa0139dfa1b3d433cc23b72f0000000000000000000000000000000000000000000000008ac7230489e800000000000000000000000000000000000000000000000000a901214acaa652de45000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001400000000000000000000000000000000000000000000000000000000000000160000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002520000000000000000000000000000000000000000000002340002060001bc00a007e5c0d200000000000000000000000000000000000000000000019800006800001a4041bb4cdb9cbd36b01bd1cbaebf2de08d9173bc095cd0e30db0482081917eb96b397dfb1c6000d28a5bc08c0f05fc1dbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095cbd6015b400000000000000000000000014831f12fccc86c4f3dae41c769593df766e435351264ec3432d9443f05022e2ff4e54fc7514be2359e055d398326f99059ff775485246999027b3197955000438ed173900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a901214acaa652de4500000000000000000000000000000000000000000000000000000000000000a000000000000000000000000014831f12fccc86c4f3dae41c769593df766e435300000000000000000000000000000000000000000000000000000000645b63e6000000000000000000000000000000000000000000000000000000000000000200000000000000000000000055d398326f99059ff775485246999027b31979550000000000000000000000008ac76a51cc950d9822d68b83fe1ad97b32cd580d00a0f2fa6b668ac76a51cc950d9822d68b83fe1ad97b32cd580d0000000000000000000000000000000000000000000000b00bd8033dc296523300000000000000008a909bbec1c48ab980a06c4eca278ac76a51cc950d9822d68b83fe1ad97b32cd580d1111111254eeb25477b68fb85ed929f73a9605820000000000000000000000000000cfee7c08";
+
+    // destination
+    // set up destination swap params
+    uint24 poolFee = 500;
+    uint256 amountOutMin = 0;
+    bytes memory encodedSwapData = abi.encode(poolFee, amountOutMin);
+
+    address cTokenForWETH = 0xD809c769A04246855fee98423B180C7CCa6bF07c;
+    address ETH = address(0);
+    address minter = address(0x1234567890);
+
+    // check ETH swap
+    bytes memory _forwardCallData = abi.encode(cTokenForWETH, ETH, minter);
+    bytes memory _swapperData = abi.encode(address(uniV3Swapper), ETH, encodedSwapData, _forwardCallData);
+
+    // final calldata includes both origin and destination swaps
+    bytes memory callData = abi.encode(FALLBACK_ADDRESS, _swapperData);
+    // set up swap calldata
+    swapAndXCall.swapAndXCall{value: 10 ether}(
+      BNB_BNB,
+      BNB_USDC,
+      10 ether,
+      BNB_ONEINCH_SWAPPER,
+      oneInchApiDataBnbToUsdc,
+      POLYGON_DOMAIN_ID,
+      address(0x1),
+      address(this),
+      300,
+      callData,
+      123 // fake relayer fee, will be in USDC
+    );
+
+    vm.selectFork(polygonForkId);
+
+    // Trying with univ3swapper
+    vm.prank(POLYGON_USDC_WHALE);
+    TransferHelper.safeTransfer(POLYGON_USDC, address(midasProtocolTarget), 100000000); // 100 USDC transfer
+    assertEq(IERC20(cTokenForWETH).balanceOf(minter), 0);
+
+    uint256 beforeFallbackBalance = IERC20(POLYGON_USDC).balanceOf(FALLBACK_ADDRESS);
+    vm.prank(CONNEXT_POLYGON);
+    midasProtocolTarget.xReceive(bytes32(""), 100000000, POLYGON_USDC, address(0), 123, callData);
+    assertEq(IERC20(cTokenForWETH).balanceOf(address(midasProtocolTarget)), 0);
+    assertEq(IERC20(POLYGON_USDC).balanceOf(address(midasProtocolTarget)), 0);
+    assertEq(IERC20(cTokenForWETH).balanceOf(minter), 0);
+    assertEq(IERC20(POLYGON_USDC).balanceOf(FALLBACK_ADDRESS) - beforeFallbackBalance, 100000000);
+  }
+
   function test_MidasProtocolTest__worksWithSwappersOnPolygon() public {
     utils_setUpPolygonForDestination();
 
@@ -242,4 +317,6 @@ contract MidasProtocolTest is TestHelper {
     assertEq(IERC20(POLYGON_USDC).balanceOf(address(midasProtocolTarget)), 0);
     assertGt(IERC20(cTokenForWETH).balanceOf(minter), cTokenBalanceAfterFirstSwap);
   }
+
+  receive() external payable {}
 }
