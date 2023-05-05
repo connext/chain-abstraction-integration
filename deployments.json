@@ -175,7 +175,7 @@
       "chainId": "56",
       "contracts": {
         "MidasProtocolTarget": {
-          "address": "0x5510188B296d1a13140a6cd52A83B81078f22413",
+          "address": "0x8eb0e275f52fc7ba0B366D9b539c6EB5ea9162F1",
           "abi": [
             {
               "inputs": [
@@ -639,7 +639,7 @@
           ]
         },
         "PancakeV3Swapper": {
-          "address": "0x73D53460fc1ead8Eb4A7771Bc5023159E8730E68",
+          "address": "0x0b081b724CDC4DD9186E64F259b5fC589a4Fd7D0",
           "abi": [
             {
               "inputs": [
@@ -683,6 +683,35 @@
                   "type": "uint256"
                 }
               ],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "_amountIn",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_toAsset",
+                  "type": "address"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "_swapData",
+                  "type": "bytes"
+                }
+              ],
+              "name": "swapETH",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "amountOut",
+                  "type": "uint256"
+                }
+              ],
               "stateMutability": "payable",
               "type": "function"
             },
@@ -691,18 +720,22 @@
               "name": "uniswapV3Router",
               "outputs": [
                 {
-                  "internalType": "contract IV3SwapRouter",
+                  "internalType": "contract IPancakeSmartRouter",
                   "name": "",
                   "type": "address"
                 }
               ],
               "stateMutability": "view",
               "type": "function"
+            },
+            {
+              "stateMutability": "payable",
+              "type": "receive"
             }
           ]
         },
         "SwapAndXCall": {
-          "address": "0xE57c141e99257426294032D8437B136A8B641C27",
+          "address": "0x119dd93154780d7604D50014c4545b4906928bFF",
           "abi": [
             {
               "inputs": [
@@ -1063,7 +1096,7 @@
       "chainId": "137",
       "contracts": {
         "MeanFinanceTarget": {
-          "address": "0x4240FE9d4EDd8176eB28C6De66bAe9fe37B3b51A",
+          "address": "0xC825d25123Ca8d49066cf8F0AeE164660056e172",
           "abi": [
             {
               "inputs": [
@@ -1540,7 +1573,7 @@
           ]
         },
         "MidasProtocolTarget": {
-          "address": "0x4E02AC4b0942E670dD0366fa504f665a2257443c",
+          "address": "0xDF97CadbcCeE9cfdB12A3e9BB7663E6753A71a0C",
           "abi": [
             {
               "inputs": [
@@ -2004,7 +2037,7 @@
           ]
         },
         "SwapAndXCall": {
-          "address": "0x833cBFaf81EE07528B34cBB4c487287435113EdF",
+          "address": "0x6e92344d08F8443a9C704452ac66bEFB90D32E12",
           "abi": [
             {
               "inputs": [
@@ -2357,7 +2390,7 @@
           ]
         },
         "UniV3Swapper": {
-          "address": "0xd92fd008bb2a1B74C9De29B7a68d9822Cc8c9868",
+          "address": "0xeC345E9be52f0Fca8aAd6aec3254Ed86151b060d",
           "abi": [
             {
               "inputs": [
@@ -2401,6 +2434,35 @@
                   "type": "uint256"
                 }
               ],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "_amountIn",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_toAsset",
+                  "type": "address"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "_swapData",
+                  "type": "bytes"
+                }
+              ],
+              "name": "swapETH",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "amountOut",
+                  "type": "uint256"
+                }
+              ],
               "stateMutability": "payable",
               "type": "function"
             },
@@ -2409,13 +2471,17 @@
               "name": "uniswapV3Router",
               "outputs": [
                 {
-                  "internalType": "contract ISwapRouter",
+                  "internalType": "contract ISmartRouter",
                   "name": "",
                   "type": "address"
                 }
               ],
               "stateMutability": "view",
               "type": "function"
+            },
+            {
+              "stateMutability": "payable",
+              "type": "receive"
             }
           ]
         }
@@ -2519,7 +2585,7 @@
       "chainId": "42161",
       "contracts": {
         "SwapAndXCall": {
-          "address": "0x054cb759Cef515c8CA71e19367c6091a7B76D962",
+          "address": "0xa28DE94d2e6F84659c2C32dF14334Daa08DD6461",
           "abi": [
             {
               "inputs": [
@@ -2858,6 +2924,102 @@
               "outputs": [
                 {
                   "internalType": "address",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "stateMutability": "payable",
+              "type": "receive"
+            }
+          ]
+        },
+        "UniV3Swapper": {
+          "address": "0x924E679c3c23017aef214c9ea1fBC22e97ff9E2e",
+          "abi": [
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "_uniV3Router",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "constructor"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "_amountIn",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_fromAsset",
+                  "type": "address"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_toAsset",
+                  "type": "address"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "_swapData",
+                  "type": "bytes"
+                }
+              ],
+              "name": "swap",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "amountOut",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "_amountIn",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_toAsset",
+                  "type": "address"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "_swapData",
+                  "type": "bytes"
+                }
+              ],
+              "name": "swapETH",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "amountOut",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "payable",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "uniswapV3Router",
+              "outputs": [
+                {
+                  "internalType": "contract ISmartRouter",
                   "name": "",
                   "type": "address"
                 }

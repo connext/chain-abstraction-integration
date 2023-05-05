@@ -6,7 +6,7 @@ export const DEFAULT_ARGS: Record<number, any> = {
     USDC: "0x7F5c764cBc14f9669B88837ca1490cCa17c31607", // USDC on Optimism
     DOMAIN: "6648936", // Ethereum domain ID
     ONEINCH_ROUTER: "",
-    UNIV3_ROUTER: "",
+    UNIV3_ROUTER: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
   },
   // Optimism
   10: {
@@ -15,7 +15,7 @@ export const DEFAULT_ARGS: Record<number, any> = {
     USDC: "0x7F5c764cBc14f9669B88837ca1490cCa17c31607", // USDC on Optimism
     DOMAIN: "1869640809", // Optimism domain ID
     ONEINCH_ROUTER: "",
-    UNIV3_ROUTER: "",
+    UNIV3_ROUTER: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
   },
   // Arbitrum
   42161: {
@@ -24,7 +24,7 @@ export const DEFAULT_ARGS: Record<number, any> = {
     USDC: "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8", // USDC on Arbitrum (donation asset)
     DOMAIN: "1634886255", // Arbitrum domain ID
     ONEINCH_ROUTER: "",
-    UNIV3_ROUTER: "",
+    UNIV3_ROUTER: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
   },
   // Polygon
   137: {
@@ -51,5 +51,11 @@ export const MIDAS_CONFIG: Record<number, any> = {
   },
   56: {
     COMPTROLLER: "0x31d76A64Bc8BbEffb601fac5884372DEF910F044",
+  },
+};
+
+export const MEAN_CONFIG: Record<number, any> = {
+  137: {
+    HUB: "0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345",
   },
 };
