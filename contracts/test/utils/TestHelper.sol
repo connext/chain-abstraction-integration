@@ -2,35 +2,38 @@
 pragma solidity ^0.8.15;
 
 import "forge-std/Test.sol";
+import {MockConnext} from "./MockConnext.sol";
 
 contract TestHelper is Test {
-  /// Testnet Domain IDs
-  uint32 public GOERLI_DOMAIN_ID = 1735353714;
-  uint32 public OPTIMISM_GOERLI_DOMAIN_ID = 1735356532;
-  uint32 public ARBITRUM_GOERLI_DOMAIN_ID = 1734439522;
-  uint32 public POLYGON_MUMBAI_DOMAIN_ID = 9991;
-
   /// Testnet Chain IDs
   uint32 public GOERLI_CHAIN_ID = 5;
   uint32 public OPTIMISM_GOERLI_CHAIN_ID = 420;
   uint32 public ARBITRUM_GOERLI_CHAIN_ID = 421613;
   uint32 public POLYGON_MUMBAI_CHAIN_ID = 80001;
 
-  /// Mainnet Domain IDs
-  uint32 public ARBITRUM_DOMAIN_ID = 1634886255;
-  uint32 public OPTIMISM_DOMAIN_ID = 1869640809;
-  uint32 public BNB_DOMAIN_ID = 6450786;
-  uint32 public POLYGON_DOMAIN_ID = 1886350457;
-
   /// Mainnet Chain IDs
+  uint32 public MAINNET_CHAIN_ID = 1;
   uint32 public ARBITRUM_CHAIN_ID = 42161;
   uint32 public OPTIMISM_CHAIN_ID = 10;
+  uint32 public BNB_CHAIN_ID = 56;
+  uint32 public POLYGON_CHAIN_ID = 137;
 
   // Live Addresses
   address public CONNEXT_ARBITRUM = 0xEE9deC2712cCE65174B561151701Bf54b99C24C8;
   address public CONNEXT_OPTIMISM = 0x8f7492DE823025b4CfaAB1D34c58963F2af5DEDA;
   address public CONNEXT_BNB = 0xCd401c10afa37d641d2F594852DA94C700e4F2CE;
   address public CONNEXT_POLYGON = 0x11984dc4465481512eb5b777E44061C158CF2259;
+
+  struct ChainConfig {
+    uint32 chainId;
+    uint32 domainId;
+    string defaultRpc;
+    string rpcKeyName;
+    uint256 forkId;
+    address connext;
+  }
+
+  mapping(uint32 => ChainConfig) public chainConfigs;
 
   // Forks
   uint256 public arbitrumForkId;
@@ -56,53 +59,139 @@ contract TestHelper is Test {
     vm.label(TokenB_ERC20, "TokenB_ERC20");
     vm.label(USER_CHAIN_A, "User Chain A");
     vm.label(USER_CHAIN_B, "User Chain B");
+
+    // MAINNET
+    chainConfigs[ARBITRUM_CHAIN_ID] = ChainConfig({
+      chainId: ARBITRUM_CHAIN_ID,
+      domainId: 1634886255,
+      defaultRpc: "https://arb1.arbitrum.io/rpc",
+      rpcKeyName: "ARBITRUM_RPC_URL",
+      forkId: 0,
+      connext: address(0)
+    });
+
+    chainConfigs[OPTIMISM_CHAIN_ID] = ChainConfig({
+      chainId: OPTIMISM_CHAIN_ID,
+      domainId: 1869640809,
+      defaultRpc: "https://mainnet.optimism.io",
+      rpcKeyName: "OPTIMISM_RPC_URL",
+      forkId: 0,
+      connext: address(0)
+    });
+
+    chainConfigs[MAINNET_CHAIN_ID] = ChainConfig({
+      chainId: MAINNET_CHAIN_ID,
+      domainId: 6648936,
+      defaultRpc: "https://eth.llamarpc.com",
+      rpcKeyName: "MAINNET_RPC_URL",
+      forkId: 0,
+      connext: address(0)
+    });
+
+    chainConfigs[BNB_CHAIN_ID] = ChainConfig({
+      chainId: BNB_CHAIN_ID,
+      domainId: 6450786,
+      defaultRpc: "https://bsc-dataseed.binance.org",
+      rpcKeyName: "BNB_RPC_URL",
+      forkId: 0,
+      connext: address(0)
+    });
+
+    chainConfigs[POLYGON_CHAIN_ID] = ChainConfig({
+      chainId: POLYGON_CHAIN_ID,
+      domainId: 1886350457,
+      defaultRpc: "https://rpc-mainnet.maticvigil.com",
+      rpcKeyName: "POLYGON_RPC_URL",
+      forkId: 0,
+      connext: address(0)
+    });
+
+    // TESTNET
+    chainConfigs[GOERLI_CHAIN_ID] = ChainConfig({
+      chainId: GOERLI_CHAIN_ID,
+      domainId: 1735353714,
+      defaultRpc: "",
+      rpcKeyName: "GOERLI_RPC_URL",
+      forkId: 0,
+      connext: address(0)
+    });
+
+    chainConfigs[OPTIMISM_GOERLI_CHAIN_ID] = ChainConfig({
+      chainId: OPTIMISM_GOERLI_CHAIN_ID,
+      domainId: 1735356532,
+      defaultRpc: "",
+      rpcKeyName: "OPTIMISM_GOERLI_RPC_URL",
+      forkId: 0,
+      connext: address(0)
+    });
+
+    chainConfigs[ARBITRUM_GOERLI_CHAIN_ID] = ChainConfig({
+      chainId: ARBITRUM_GOERLI_CHAIN_ID,
+      domainId: 1734439522,
+      defaultRpc: "",
+      rpcKeyName: "ARBITRUM_GOERLI_RPC_URL",
+      forkId: 0,
+      connext: address(0)
+    });
+
+    chainConfigs[POLYGON_MUMBAI_CHAIN_ID] = ChainConfig({
+      chainId: POLYGON_MUMBAI_CHAIN_ID,
+      domainId: 1734439522,
+      defaultRpc: "",
+      rpcKeyName: "POLYGON_MUMBAI_RPC_URL",
+      forkId: 0,
+      connext: address(0)
+    });
   }
 
-  function setUpArbitrum(uint256 blockNumber) public {
-    arbitrumForkId = vm.createSelectFork(getRpc(42161), blockNumber);
-    vm.label(CONNEXT_ARBITRUM, "Connext Arbitrum");
+  function setUpFork(uint32 chainId, uint256 blockNumber) public returns (uint256 forkId) {
+    forkId = vm.createSelectFork(getRpc(chainId), blockNumber);
+    chainConfigs[chainId].forkId = forkId;
   }
 
-  function setUpOptimism(uint256 blockNumber) public {
-    optimismForkId = vm.createSelectFork(getRpc(10), blockNumber);
-    vm.label(CONNEXT_OPTIMISM, "Connext Optimism");
+  function setUpCrossChainE2E(
+    uint32 originChainId,
+    uint32 destinationChainId,
+    uint256 originChainBlockNumber,
+    uint256 destinationChainBlockNumber,
+    address destinationAsset // i.e. USDC or WETH
+  ) public {
+    // origin chain
+    uint256 originFork = setUpFork(originChainId, originChainBlockNumber);
+    uint256 destinationFork = setUpFork(destinationChainId, destinationChainBlockNumber);
+    vm.selectFork(originFork);
+    MockConnext connextOrigin = new MockConnext(
+      chainConfigs[originChainId].domainId,
+      chainConfigs[destinationChainId].domainId,
+      originFork,
+      destinationFork,
+      destinationAsset
+    );
+    chainConfigs[originChainId].connext = address(connextOrigin);
+    vm.label(address(connextOrigin), "Mock Connext Origin");
+
+    // destination chain
+    vm.selectFork(destinationFork);
+    MockConnext connextDestination = new MockConnext(
+      chainConfigs[originChainId].domainId,
+      chainConfigs[destinationChainId].domainId,
+      originFork,
+      destinationFork,
+      destinationAsset
+    );
+    chainConfigs[destinationChainId].connext = address(connextDestination);
+    connextDestination.setDestinationConnext(address(connextOrigin));
+    vm.label(address(connextDestination), "Mock Connext Destination");
+
+    vm.selectFork(originFork);
+    connextOrigin.setDestinationConnext(address(connextDestination));
   }
 
-  function setUpBNB(uint256 blockNumber) public {
-    bnbForkId = vm.createSelectFork(getRpc(56), blockNumber);
-    vm.label(CONNEXT_BNB, "Connext BNB");
-  }
-
-  function setUpPolygon(uint256 blockNumber) public {
-    polygonForkId = vm.createSelectFork(getRpc(137), blockNumber);
-    vm.label(CONNEXT_POLYGON, "Connext Polygon");
-  }
-
-  function getRpc(uint256 chainId) internal view returns (string memory) {
-    string memory keyName;
-    string memory defaultRpc;
-
-    if (chainId == 1) {
-      keyName = "MAINNET_RPC_URL";
-      defaultRpc = "https://eth.llamarpc.com";
-    } else if (chainId == 10) {
-      keyName = "OPTIMISM_RPC_URL";
-      defaultRpc = "https://mainnet.optimism.io";
-    } else if (chainId == 42161) {
-      keyName = "ARBITRUM_RPC_URL";
-      defaultRpc = "https://arb1.arbitrum.io/rpc";
-    } else if (chainId == 56) {
-      keyName = "BNB_RPC_URL";
-      defaultRpc = "https://bsc-dataseed.binance.org";
-    } else if (chainId == 137) {
-      keyName = "POLYGON_RPC_URL";
-      defaultRpc = "https://polygon.llamarpc.com";
-    }
-
-    try vm.envString(keyName) {
-      return vm.envString(keyName);
+  function getRpc(uint32 chainId) internal view returns (string memory) {
+    try vm.envString(chainConfigs[chainId].rpcKeyName) {
+      return vm.envString(chainConfigs[chainId].rpcKeyName);
     } catch {
-      return defaultRpc;
+      return chainConfigs[chainId].defaultRpc;
     }
   }
 }
