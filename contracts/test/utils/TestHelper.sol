@@ -84,19 +84,19 @@ contract TestHelper is Test {
 
     if (chainId == 1) {
       keyName = "MAINNET_RPC_URL";
-      defaultRpc = "https://eth.llamarpc.com";
+      defaultRpc = "https://eth-mainnet.g.alchemy.com/v2/rN1fkDW9_vMmLhRj5dyVXV26k6lXZoGr";
     } else if (chainId == 10) {
       keyName = "OPTIMISM_RPC_URL";
-      defaultRpc = "https://mainnet.optimism.io";
+      defaultRpc = "https://opt-mainnet.g.alchemy.com/v2/Kpix_PNmfxTUGWJ3xTpvGieSm3VN_5za";
     } else if (chainId == 42161) {
       keyName = "ARBITRUM_RPC_URL";
-      defaultRpc = "https://arb1.arbitrum.io/rpc";
+      defaultRpc = "https://arb-mainnet.g.alchemy.com/v2/E2B_nYYEybuSsvjrBwKKXGPzAt8NxjE0";
     } else if (chainId == 56) {
       keyName = "BNB_RPC_URL";
       defaultRpc = "https://bsc-dataseed.binance.org";
     } else if (chainId == 137) {
       keyName = "POLYGON_RPC_URL";
-      defaultRpc = "https://polygon.llamarpc.com";
+      defaultRpc = "https://polygon-mainnet.g.alchemy.com/v2/0xcCQA06LTzwAiRM5B9qHGs6X958x0oF";
     }
 
     try vm.envString(keyName) {

@@ -58,6 +58,8 @@ contract PancakeV3Swapper is ISwapper {
 
       if (_toAsset == address(0)) {
         uniswapV3Router.unwrapWETH9(amountOut, msg.sender);
+      } else {
+        TransferHelper.safeTransfer(_toAsset, msg.sender, amountOut);
       }
     } else {
       amountOut = _amountIn;
