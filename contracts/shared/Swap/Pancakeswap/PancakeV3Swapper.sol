@@ -42,10 +42,13 @@ contract PancakeV3Swapper is ISwapper {
     if (_fromAsset != _toAsset) {
       TransferHelper.safeApprove(_fromAsset, address(uniswapV3Router), _amountIn);
 
+      bool toNative = _toAsset == address(0);
+      IWETH9 weth9 = IWETH9(uniswapV3Router.WETH9());
+
       // Set up uniswap swap params.
       IV3SwapRouter.ExactInputSingleParams memory params = IV3SwapRouter.ExactInputSingleParams({
         tokenIn: _fromAsset,
-        tokenOut: _toAsset,
+        tokenOut: toNative ? address(weth9) : _toAsset,
         fee: poolFee,
         recipient: address(this),
         amountIn: _amountIn,
@@ -56,8 +59,9 @@ contract PancakeV3Swapper is ISwapper {
       // The call to `exactInputSingle` executes the swap.
       amountOut = uniswapV3Router.exactInputSingle(params);
 
-      if (_toAsset == address(0)) {
-        uniswapV3Router.unwrapWETH9(amountOut, msg.sender);
+      if (toNative) {
+        weth9.withdraw(amountOut);
+        TransferHelper.safeTransferETH(msg.sender, amountOut);
       } else {
         TransferHelper.safeTransfer(_toAsset, msg.sender, amountOut);
       }

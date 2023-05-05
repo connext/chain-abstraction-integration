@@ -42,16 +42,18 @@ contract UniV2Swapper is ISwapper {
     uint256 amountOutMin = abi.decode(_swapData, (uint256));
 
     if (_fromAsset != _toAsset) {
+      bool toNative = _toAsset == address(0);
+      address weth = uniswapV2Router.WETH();
+
       address[] memory path = new address[](2);
       path[0] = _fromAsset;
-      path[1] = _toAsset;
+      path[1] = toNative ? weth : _toAsset;
       TransferHelper.safeApprove(_fromAsset, address(uniswapV2Router), _amountIn);
 
       uint[] memory amounts;
-      if (_toAsset != address(0)) {
+      if (!toNative) {
         amounts = uniswapV2Router.swapExactTokensForTokens(_amountIn, amountOutMin, path, msg.sender, block.timestamp);
       } else {
-        path[1] = uniswapV2Router.WETH();
         amounts = uniswapV2Router.swapExactTokensForETH(_amountIn, amountOutMin, path, msg.sender, block.timestamp);
       }
       amountOut = amounts[amounts.length - 1];
