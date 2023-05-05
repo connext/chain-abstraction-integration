@@ -22,42 +22,76 @@ contract UniV2Swapper is ISwapper {
   }
 
   /**
-   * @notice Swap the given amount of tokens using 1inch.
+   * @notice Swap the given amount of tokens using UniV2.
    * @dev Decode the passed in data and re-encode it with the correct amountIn. This is because the amountIn is not known
    * until the funds are transferred to this contract.
    * @param _amountIn Amount of tokens to swap.
    * @param _fromAsset Address of the token to swap from.
    * @param _toAsset Address of the token to swap to.
-   * @param _swapData Data to pass to the 1inch aggregator router.
+   * @param _swapData Data to pass to the UniV2 router.
    */
   function swap(
     uint256 _amountIn,
     address _fromAsset,
     address _toAsset,
     bytes calldata _swapData
-  ) public payable override returns (uint256 amountOut) {
+  ) external override returns (uint256 amountOut) {
     // transfer the funds to be swapped from the sender into this contract
     TransferHelper.safeTransferFrom(_fromAsset, msg.sender, address(this), _amountIn);
 
     uint256 amountOutMin = abi.decode(_swapData, (uint256));
 
-    // Set up swap params
-    // Approve the swapper if needed
-    if (IERC20(_fromAsset).allowance(address(this), address(uniswapV2Router)) < _amountIn) {
-      TransferHelper.safeApprove(_fromAsset, address(uniswapV2Router), type(uint256).max);
-    }
-
     if (_fromAsset != _toAsset) {
+      bool toNative = _toAsset == address(0);
+      address weth = uniswapV2Router.WETH();
+
       address[] memory path = new address[](2);
       path[0] = _fromAsset;
-      path[1] = _toAsset;
+      path[1] = toNative ? weth : _toAsset;
       TransferHelper.safeApprove(_fromAsset, address(uniswapV2Router), _amountIn);
-      uniswapV2Router.swapExactTokensForTokens(_amountIn, amountOutMin, path, address(this), block.timestamp);
+
+      uint[] memory amounts;
+      if (!toNative) {
+        amounts = uniswapV2Router.swapExactTokensForTokens(_amountIn, amountOutMin, path, msg.sender, block.timestamp);
+      } else {
+        amounts = uniswapV2Router.swapExactTokensForETH(_amountIn, amountOutMin, path, msg.sender, block.timestamp);
+      }
+      amountOut = amounts[amounts.length - 1];
     }
+  }
 
-    amountOut = IERC20(_toAsset).balanceOf(address(this));
+  /**
+   * @notice Swap the given amount of ETH using UniV2.
+   * @dev Decode the passed in data and re-encode it with the correct amountIn. This is because the amountIn is not known
+   * until the funds are transferred to this contract.
+   * @param _amountIn Amount of tokens to swap.
+   * @param _toAsset Address of the token to swap to.
+   * @param _swapData Data to pass to the UniV2 router.
+   */
+  function swapETH(
+    uint256 _amountIn,
+    address _toAsset,
+    bytes calldata _swapData
+  ) public payable override returns (uint256 amountOut) {
+    // check if msg.value is same as amountIn
+    require(msg.value >= _amountIn, "UniV2Swapper: msg.value != _amountIn");
 
-    // transfer the swapped funds back to the sender
-    TransferHelper.safeTransfer(_toAsset, msg.sender, amountOut);
+    uint256 amountOutMin = abi.decode(_swapData, (uint256));
+
+    if (_toAsset != address(0)) {
+      address[] memory path = new address[](2);
+      path[0] = uniswapV2Router.WETH();
+      path[1] = _toAsset;
+      uint[] memory amounts = uniswapV2Router.swapExactETHForTokens{value: _amountIn}(
+        amountOutMin,
+        path,
+        msg.sender,
+        block.timestamp
+      );
+      amountOut = amounts[amounts.length - 1];
+    } else {
+      amountOut = _amountIn;
+      TransferHelper.safeTransferETH(msg.sender, amountOut);
+    }
   }
 }

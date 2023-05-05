@@ -43,7 +43,9 @@ contract SwapAndXCall is SwapAdapter {
     uint256 _slippage,
     bytes calldata _callData
   ) external payable {
-    uint256 amountOut = _setupAndSwap(_fromAsset, _toAsset, _amountIn, _swapper, _swapData);
+    uint256 amountOut = _fromAsset == address(0)
+      ? _setupAndSwapETH(_toAsset, _amountIn, _swapper, _swapData)
+      : _setupAndSwap(_fromAsset, _toAsset, _amountIn, _swapper, _swapData);
 
     connext.xcall{value: _fromAsset == address(0) ? msg.value - _amountIn : msg.value}(
       _destination,
@@ -85,7 +87,9 @@ contract SwapAndXCall is SwapAdapter {
     bytes calldata _callData,
     uint256 _relayerFee
   ) external payable {
-    uint256 amountOut = _setupAndSwap(_fromAsset, _toAsset, _amountIn, _swapper, _swapData);
+    uint256 amountOut = _fromAsset == address(0)
+      ? _setupAndSwapETH(_toAsset, _amountIn, _swapper, _swapData)
+      : _setupAndSwap(_fromAsset, _toAsset, _amountIn, _swapper, _swapData);
 
     connext.xcall(_destination, _to, _toAsset, _delegate, amountOut - _relayerFee, _slippage, _callData, _relayerFee);
   }
@@ -109,26 +113,54 @@ contract SwapAndXCall is SwapAdapter {
     address _swapper,
     bytes calldata _swapData
   ) internal returns (uint256 amountOut) {
-    if (_fromAsset != address(0)) {
-      TransferHelper.safeTransferFrom(_fromAsset, msg.sender, address(this), _amountIn);
-    } else {
-      require(msg.value >= _amountIn, "SwapAndXCall: msg.value != _amountIn");
-    }
+    TransferHelper.safeTransferFrom(_fromAsset, msg.sender, address(this), _amountIn);
 
     if (_fromAsset != _toAsset) {
       require(_swapper != address(0), "SwapAndXCall: zero swapper!");
 
+      // If fromAsset is not native and allowance is less than amountIn
       if (IERC20(_fromAsset).allowance(address(this), _swapper) < _amountIn) {
-        IERC20(_fromAsset).approve(_swapper, type(uint256).max);
+        TransferHelper.safeApprove(_fromAsset, _swapper, type(uint256).max);
       }
 
-      amountOut = this.directSwapperCall{value: _fromAsset == address(0) ? _amountIn : 0}(_swapper, _swapData);
+      amountOut = this.directSwapperCall(_swapper, _swapData);
     } else {
       amountOut = _amountIn;
     }
 
-    if (IERC20(_toAsset).allowance(address(this), address(connext)) < _amountIn) {
-      IERC20(_toAsset).approve(address(connext), type(uint256).max);
+    if (_toAsset != address(0)) {
+      if (IERC20(_toAsset).allowance(address(this), address(connext)) < amountOut) {
+        TransferHelper.safeApprove(_toAsset, address(connext), type(uint256).max);
+      }
+    }
+  }
+
+  /**
+   * @notice Sets up the swap and returns the amount out
+   * @dev Handles approvals to the connext contract and the swapper contract
+   * @param _toAsset Address of the asset to swap to
+   * @param _amountIn Amount of the asset to swap from
+   * @param _swapper Address of the swapper contract
+   * @param _swapData Data to call the swapper contract with
+   * @return amountOut Amount of the asset after swap
+   */
+  function _setupAndSwapETH(
+    address _toAsset,
+    uint256 _amountIn,
+    address _swapper,
+    bytes calldata _swapData
+  ) internal returns (uint256 amountOut) {
+    require(msg.value >= _amountIn, "SwapAndXCall: msg.value != _amountIn");
+
+    if (_toAsset != address(0)) {
+      require(_swapper != address(0), "SwapAndXCall: zero swapper!");
+      amountOut = this.directSwapperCall{value: _amountIn}(_swapper, _swapData);
+
+      if (IERC20(_toAsset).allowance(address(this), address(connext)) < amountOut) {
+        TransferHelper.safeApprove(_toAsset, address(connext), type(uint256).max);
+      }
+    } else {
+      amountOut = _amountIn;
     }
   }
 }

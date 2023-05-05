@@ -66,7 +66,7 @@ contract SwapAdapter is Ownable2Step {
     address _fromAsset,
     address _toAsset,
     bytes calldata _swapData // comes directly from API with swap data encoded
-  ) public payable returns (uint256 amountOut) {
+  ) external payable returns (uint256 amountOut) {
     require(allowedSwappers[_swapper], "!allowedSwapper");
 
     // If from == to, no need to swap
@@ -74,10 +74,14 @@ contract SwapAdapter is Ownable2Step {
       return _amountIn;
     }
 
-    if (IERC20(_fromAsset).allowance(address(this), _swapper) < _amountIn) {
-      TransferHelper.safeApprove(_fromAsset, _swapper, type(uint256).max);
+    if (_fromAsset == address(0)) {
+      amountOut = ISwapper(_swapper).swapETH(_amountIn, _toAsset, _swapData);
+    } else {
+      if (IERC20(_fromAsset).allowance(address(this), _swapper) < _amountIn) {
+        TransferHelper.safeApprove(_fromAsset, _swapper, type(uint256).max);
+      }
+      amountOut = ISwapper(_swapper).swap(_amountIn, _fromAsset, _toAsset, _swapData);
     }
-    amountOut = ISwapper(_swapper).swap(_amountIn, _fromAsset, _toAsset, _swapData);
   }
 
   /**
@@ -86,7 +90,7 @@ contract SwapAdapter is Ownable2Step {
    * @param _swapper Address of the swapper to use.
    * @param swapData Data to pass to the swapper. This data is encoded for a particular swap router.
    */
-  function directSwapperCall(address _swapper, bytes calldata swapData) public payable returns (uint256 amountOut) {
+  function directSwapperCall(address _swapper, bytes calldata swapData) external payable returns (uint256 amountOut) {
     bytes memory ret = _swapper.functionCallWithValue(swapData, msg.value, "!directSwapperCallFailed");
     amountOut = abi.decode(ret, (uint256));
   }
