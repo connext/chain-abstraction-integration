@@ -14,7 +14,7 @@ export const DEFAULT_ARGS: Record<number, any> = {
     WETH: "0x4200000000000000000000000000000000000006", // Weth on Optimism
     USDC: "0x7F5c764cBc14f9669B88837ca1490cCa17c31607", // USDC on Optimism
     DOMAIN: "1869640809", // Optimism domain ID
-    ONEINCH_ROUTER: "",
+    ONEINCH_ROUTER: "0x1111111254EEB25477B68fb85Ed929f73A960582",
     UNIV3_ROUTER: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
   },
   // Arbitrum
@@ -23,7 +23,7 @@ export const DEFAULT_ARGS: Record<number, any> = {
     WETH: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", // Weth on Arbitrum
     USDC: "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8", // USDC on Arbitrum (donation asset)
     DOMAIN: "1634886255", // Arbitrum domain ID
-    ONEINCH_ROUTER: "",
+    ONEINCH_ROUTER: "0x1111111254EEB25477B68fb85Ed929f73A960582",
     UNIV3_ROUTER: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
   },
   // Polygon
@@ -43,6 +43,14 @@ export const DEFAULT_ARGS: Record<number, any> = {
     ONEINCH_ROUTER: "0x1111111254EEB25477B68fb85Ed929f73A960582",
     UNIV3_ROUTER: "0x13f4EA83D0bd40E75C8222255bc855a974568Dd4", // PancakeSwap Smart Router
   },
+  // Gnosis
+  100: {
+    CONNEXT: "0x5bB83e95f63217CDa6aE3D181BA580Ef377D2109", // Connext
+    USDC: "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83", // USDC
+    DOMAIN: "6778479", // Gnosis domain ID
+    ONEINCH_ROUTER: "0x1111111254EEB25477B68fb85Ed929f73A960582",
+    UNIV2_ROUTER: "0x1C232F01118CB8B424793ae03F870aa7D0ac7f77", // HoneysSwap UniV2 Router
+  },
 };
 
 export const MIDAS_CONFIG: Record<number, any> = {
@@ -51,6 +59,9 @@ export const MIDAS_CONFIG: Record<number, any> = {
   },
   56: {
     COMPTROLLER: "0x31d76A64Bc8BbEffb601fac5884372DEF910F044",
+  },
+  42161: {
+    COMPTROLLER: "0x185Fa7d0e7d8A4FE7E09eB9df68B549c660e1116",
   },
 };
 

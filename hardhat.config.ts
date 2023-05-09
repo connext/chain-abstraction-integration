@@ -36,6 +36,7 @@ function getNetworkUrl(networkType: string) {
     return alchemyApiKey ? `https://opt-mainnet.g.alchemy.com/v2/${alchemyApiKey}` : "https://mainnet.optimism.io";
   else if (networkType === "fantom") return `https://rpc.ftm.tools/`;
   else if (networkType === "bnb") return `https://bsc-dataseed.binance.org`;
+  else if (networkType === "xdai") return `https://rpc.ankr.com/gnosis`;
   else return alchemyApiKey ? `https://eth-mainnet.alchemyapi.io/v2/${alchemyApiKey}` : "https://cloudflare-eth.com";
 }
 
@@ -70,6 +71,8 @@ const config: HardhatUserConfig = {
     arbitrum: createConfig("arbitrum"),
     optimism: createConfig("optimism"),
     bnb: createConfig("bnb"),
+    fantom: createConfig("fantom"),
+    xdai: createConfig("xdai"),
   },
   etherscan: {
     apiKey: {
