@@ -89,7 +89,7 @@ contract UniV3Swapper is ISwapper {
     bytes calldata _swapData
   ) external payable override returns (uint256 amountOut) {
     // check if msg.value is same as amountIn
-    require(msg.value >= _amountIn, "UniV3Swapper: msg.value != _amountIn");
+    require(msg.value == _amountIn, "UniV3Swapper: msg.value != _amountIn");
 
     if (_toAsset != address(0)) {
       (uint256 amountOutMin, bytes memory path) = abi.decode(_swapData, (uint256, bytes));
@@ -99,6 +99,7 @@ contract UniV3Swapper is ISwapper {
       _checkPath(address(weth9), _toAsset, path);
 
       weth9.deposit{value: _amountIn}();
+      TransferHelper.safeApprove(address(weth9), address(uniswapV3Router), _amountIn);
 
       // Set up uniswap swap params.
       ISwapRouter.ExactInputParams memory params = ISwapRouter.ExactInputParams({

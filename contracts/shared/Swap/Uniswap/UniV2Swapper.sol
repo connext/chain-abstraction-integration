@@ -80,7 +80,7 @@ contract UniV2Swapper is ISwapper {
     bytes calldata _swapData
   ) public payable override returns (uint256 amountOut) {
     // check if msg.value is same as amountIn
-    require(msg.value >= _amountIn, "UniV2Swapper: msg.value != _amountIn");
+    require(msg.value == _amountIn, "UniV2Swapper: msg.value != _amountIn");
 
     if (_toAsset != address(0)) {
       (uint256 amountOutMin, address[] memory path) = abi.decode(_swapData, (uint256, address[]));
