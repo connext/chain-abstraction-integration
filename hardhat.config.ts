@@ -42,14 +42,22 @@ function getNetworkUrl(networkType: string) {
 
 const config: HardhatUserConfig = {
   solidity: {
-    version: "0.8.19",
-    settings: {
-      viaIR: true,
-      optimizer: {
-        enabled: true,
-        runs: 200,
+    compilers: [
+      {
+        version: "0.8.19",
+        settings: {
+          viaIR: true,
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
       },
-    },
+      {
+        version: "0.7.6", // for @uniswap/v3-periphery/contracts/libraries/Path.sol
+        settings: {},
+      },
+    ],
   },
   defaultNetwork: "hardhat",
   namedAccounts: {

@@ -3,8 +3,8 @@ pragma solidity ^0.8.17;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
-import {Path} from "@uniswap/v3-periphery/contracts/libraries/Path.sol";
 
+import {Path} from "../libraries/Path.sol";
 import {IPancakeSmartRouter, IV3SwapRouter} from "../interfaces/IPancakeSmartRouter.sol";
 import {ISwapper} from "../interfaces/ISwapper.sol";
 import {IWETH9} from "../interfaces/IWETH9.sol";
