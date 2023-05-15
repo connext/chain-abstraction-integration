@@ -4,7 +4,7 @@ pragma solidity ^0.8.17;
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 
-import {Path} from "../libraries/Path.sol";
+import {BytesLib} from "../libraries/BytesLib.sol";
 import {ISmartRouter, ISwapRouter} from "../interfaces/ISmartRouter.sol";
 import {ISwapper} from "../interfaces/ISwapper.sol";
 import {IWETH9} from "../interfaces/IWETH9.sol";
@@ -14,7 +14,7 @@ import {IWETH9} from "../interfaces/IWETH9.sol";
  * @notice Swapper contract for UniV3 swaps.
  */
 contract UniV3Swapper is ISwapper {
-  using Path for bytes;
+  using BytesLib for bytes;
 
   ISmartRouter public immutable uniswapV3Router;
 
@@ -96,7 +96,7 @@ contract UniV3Swapper is ISwapper {
 
       IWETH9 weth9 = IWETH9(uniswapV3Router.WETH9());
 
-      _checkPath(address(weth9), toAsset, path);
+      _checkPath(address(weth9), _toAsset, path);
 
       weth9.deposit{value: _amountIn}();
 
@@ -117,7 +117,7 @@ contract UniV3Swapper is ISwapper {
     }
   }
 
-  function _checkPath(address from, address to, bytes memory path) internal {
+  function _checkPath(address from, address to, bytes memory path) internal pure {
     require(from == path.toAddress(0), "from token invalid");
     require(to == path.toAddress(path.length - 20), "to token invalid");
   }
