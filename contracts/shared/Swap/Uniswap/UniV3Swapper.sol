@@ -117,10 +117,10 @@ contract UniV3Swapper is ISwapper {
     }
   }
 
-  receive() external payable {}
-}
+  function _checkPath(address from, address to, bytes memory path) internal {
+    require(from == path.toAddress(0), "from token invalid");
+    require(to == path.toAddress(path.length - 20), "to token invalid");
+  }
 
-function _checkPath(address from, address to, bytes memory path) internal {
-  require(from == path.toAddress(0), "from token invalid");
-  require(to == path.toAddress(path.length - 20), "to token invalid");
+  receive() external payable {}
 }
