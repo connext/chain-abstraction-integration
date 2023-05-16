@@ -39,15 +39,21 @@ contract UniV2Swapper is ISwapper {
     // transfer the funds to be swapped from the sender into this contract
     TransferHelper.safeTransferFrom(_fromAsset, msg.sender, address(this), _amountIn);
 
-    uint256 amountOutMin = abi.decode(_swapData, (uint256));
-
     if (_fromAsset != _toAsset) {
-      bool toNative = _toAsset == address(0);
-      address weth = uniswapV2Router.WETH();
+      (uint256 amountOutMin, address[] memory path) = abi.decode(_swapData, (uint256, address[]));
 
-      address[] memory path = new address[](2);
-      path[0] = _fromAsset;
-      path[1] = toNative ? weth : _toAsset;
+      bool toNative = _toAsset == address(0);
+      address toAsset = toNative ? uniswapV2Router.WETH() : _toAsset;
+
+      uint256 length = path.length;
+      if (length > 1) {
+        require(path[0] == _fromAsset && path[length - 1] == toAsset, "UniV2Swapper: invalid path");
+      } else {
+        path = new address[](2);
+        path[0] = _fromAsset;
+        path[1] = toAsset;
+      }
+
       TransferHelper.safeApprove(_fromAsset, address(uniswapV2Router), _amountIn);
 
       uint[] memory amounts;
@@ -74,14 +80,22 @@ contract UniV2Swapper is ISwapper {
     bytes calldata _swapData
   ) public payable override returns (uint256 amountOut) {
     // check if msg.value is same as amountIn
-    require(msg.value >= _amountIn, "UniV2Swapper: msg.value != _amountIn");
-
-    uint256 amountOutMin = abi.decode(_swapData, (uint256));
+    require(msg.value == _amountIn, "UniV2Swapper: msg.value != _amountIn");
 
     if (_toAsset != address(0)) {
-      address[] memory path = new address[](2);
-      path[0] = uniswapV2Router.WETH();
-      path[1] = _toAsset;
+      (uint256 amountOutMin, address[] memory path) = abi.decode(_swapData, (uint256, address[]));
+
+      address weth = uniswapV2Router.WETH();
+
+      uint256 length = path.length;
+      if (length > 1) {
+        require(path[length - 1] == _toAsset, "UniV2Swapper: invalid path");
+      } else {
+        path = new address[](2);
+        path[0] = weth;
+        path[1] = _toAsset;
+      }
+
       uint[] memory amounts = uniswapV2Router.swapExactETHForTokens{value: _amountIn}(
         amountOutMin,
         path,
