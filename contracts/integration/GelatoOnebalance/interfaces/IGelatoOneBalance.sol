@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import {Fee} from "./Fee.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-interface IGelato1Balance {
+interface IGelatoOneBalance {
     /// EVENTS
     event LogDeposit(
         bytes32 indexed root,

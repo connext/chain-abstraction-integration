@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {Gelato1BalanceAdapter} from "./Gelato1balanceAdapter.sol";
+import {GelatoOneBalanceAdapter} from "./GelatoOnebalanceAdapter.sol";
 import {SwapForwarderXReceiver} from "../../destination/xreceivers/Swap/SwapForwarderXReceiver.sol";
 
-contract Gelato1BalanceTarget is Gelato1BalanceAdapter, SwapForwarderXReceiver {
-    constructor (address _connext, address _gelato1balance) SwapForwarderXReceiver(_connext) Gelato1BalanceAdapter(_gelato1balance) {}
+contract GelatoOneBalanceTarget is GelatoOneBalanceAdapter, SwapForwarderXReceiver {
+    constructor (address _connext, address _gelato1balance) SwapForwarderXReceiver(_connext) GelatoOneBalanceAdapter(_gelato1balance) {}
 
     function _forwardFunctionCall(
     bytes memory _preparedData,
