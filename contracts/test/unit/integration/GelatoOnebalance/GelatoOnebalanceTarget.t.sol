@@ -45,8 +45,8 @@ contract GelatoOneBalanceTargetTest is TestHelper {
 
   function test__GelatoOneBalanceTargetTest__forwardCall_works (uint256 _amountOut) public {
     vm.prank(address(target));
-    uint256 amountOut = _amountOut;
-    bytes memory forwardCallData = abi.encode(sponsor, token, amount);
+    uint256 amountOut = 9;
+    bytes memory forwardCallData = abi.encode(sponsor, token);
     bytes memory _preparedData = abi.encode(forwardCallData, amountOut, address(0), address(0));
     vm.mockCall(token, abi.encodeWithSelector(IERC20.approve.selector), abi.encode(true));
     vm.mockCall(

@@ -17,12 +17,12 @@ contract GelatoOneBalanceTarget is GelatoOneBalanceAdapter, SwapForwarderXReceiv
       _preparedData,
       (bytes, uint256, address, address)
     );
-    (address _sponsor, address _token, uint256 _amount) = abi.decode(
+    (address _sponsor, address _asset) = abi.decode(
         _forwardCallData, 
-        (address, address, uint256)
+        (address, address)
     );
 
-    depositTokens(_sponsor, _token, _amount);
+    depositTokens(_sponsor, _asset, _amountOut);
     return true;
   } 
 }
