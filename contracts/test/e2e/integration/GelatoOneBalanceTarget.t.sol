@@ -8,7 +8,7 @@ import {SwapAndXCall} from "../../../origin/Swap/SwapAndXCall.sol";
 import {TestHelper} from "../../utils/TestHelper.sol";
 import {UniV2Swapper} from "../../../shared/Swap/Uniswap/UniV2Swapper.sol";
 import {UniV3Swapper} from "../../../shared/Swap/Uniswap/UniV3Swapper.sol";
-import {GelatoOneBalanceTarget} from "../../../integration/GelatoOneBalance/GelatoOneBalanceTarget.sol";
+import {GelatoOneBalanceTarget} from "../../../integration/GelatoOnebalance/GelatoOnebalanceTarget.sol";
 
 import "forge-std/console.sol";
 
