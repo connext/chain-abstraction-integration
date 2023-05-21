@@ -20,7 +20,7 @@ contract GelatoOneBalanceAdapter {
         require(_amount > 0, "Zero Amount");
         require(_sponsor != address(0), "Zero address");
         // Increasing the allowance 
-        if (IERC20(_token).allowance(address(this), gelato1balance) < _amount) {
+        if (IERC20(_token).allowance(address(this), address(gelato1balance)) < _amount) {
           IERC20(_token).approve(address(gelato1balance), type(uint256).max);
         }
         gelato1balance.depositToken(_sponsor, IERC20(_token), _amount);
