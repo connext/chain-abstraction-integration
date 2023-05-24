@@ -25,5 +25,4 @@ contract GelatoOneBalanceAdapter {
         }
         gelato1balance.depositToken(_sponsor, IERC20(_token), _amount);
     }    
-
 }
