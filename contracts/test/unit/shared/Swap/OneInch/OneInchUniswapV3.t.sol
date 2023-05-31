@@ -30,7 +30,7 @@ contract OneInchUniswapV3Test is TestHelper {
     vm.mockCall(_tokenIn, abi.encodeWithSelector(IERC20.transferFrom.selector), abi.encode(true));
     vm.mockCall(_tokenIn, abi.encodeWithSelector(IERC20.allowance.selector), abi.encode(0));
     vm.mockCall(_tokenIn, abi.encodeWithSelector(IERC20.approve.selector), abi.encode(true));
-    vm.mockCall(address(1), abi.encodeWithSelector(IUniswapV3Router.uniswapV3Swap.selector), abi.encode(10));
+    vm.mockCall(address(1), abi.encodeWithSelector(IUniswapV3Router.uniswapV3SwapTo.selector), abi.encode(10));
     vm.mockCall(_toAsset, abi.encodeWithSelector(IERC20.transfer.selector), abi.encode(true));
     uint256 amountOut = swapper.swap(_amountIn, _tokenIn, _toAsset, _swapData);
     assertEq(amountOut, 10);
