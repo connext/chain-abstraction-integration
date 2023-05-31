@@ -106,4 +106,6 @@ contract OneInchUniswapV3 is ISwapper {
       TransferHelper.safeTransferETH(msg.sender, amountOut);
     }
   }
+
+  receive() external payable {}
 }

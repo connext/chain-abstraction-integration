@@ -108,4 +108,6 @@ contract UniV2Swapper is ISwapper {
       TransferHelper.safeTransferETH(msg.sender, amountOut);
     }
   }
+
+  receive() external payable {}
 }
