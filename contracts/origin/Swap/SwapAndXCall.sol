@@ -43,11 +43,14 @@ contract SwapAndXCall is SwapAdapter {
     uint256 _slippage,
     bytes calldata _callData
   ) external payable {
-    uint256 amountOut = _fromAsset == address(0)
+    require(_toAsset != address(0), "connext not support");
+
+    bool isNative = _fromAsset == address(0);
+    uint256 amountOut = isNative
       ? _setupAndSwapETH(_toAsset, _amountIn, _swapper, _swapData)
       : _setupAndSwap(_fromAsset, _toAsset, _amountIn, _swapper, _swapData);
 
-    connext.xcall{value: _fromAsset == address(0) ? msg.value - _amountIn : msg.value}(
+    connext.xcall{value: isNative ? msg.value - _amountIn : msg.value}(
       _destination,
       _to,
       _toAsset,
@@ -87,7 +90,12 @@ contract SwapAndXCall is SwapAdapter {
     bytes calldata _callData,
     uint256 _relayerFee
   ) external payable {
-    uint256 amountOut = _fromAsset == address(0)
+    require(_toAsset != address(0), "connext not support");
+
+    bool isNative = _fromAsset == address(0);
+    require(msg.value == isNative ? _amountIn : 0, "!value");
+
+    uint256 amountOut = isNative
       ? _setupAndSwapETH(_toAsset, _amountIn, _swapper, _swapData)
       : _setupAndSwap(_fromAsset, _toAsset, _amountIn, _swapper, _swapData);
 
