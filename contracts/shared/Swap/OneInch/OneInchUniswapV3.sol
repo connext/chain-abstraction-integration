@@ -89,7 +89,7 @@ contract OneInchUniswapV3 is ISwapper {
     bytes calldata _swapData // from 1inch API
   ) external payable override returns (uint256 amountOut) {
     // check if msg.value is same as amountIn
-    require(msg.value >= _amountIn, "OneInchUniswapV3: msg.value != _amountIn");
+    require(msg.value == _amountIn, "OneInchUniswapV3: msg.value != _amountIn");
 
     if (_toAsset != address(0)) {
       // decode the swap data
