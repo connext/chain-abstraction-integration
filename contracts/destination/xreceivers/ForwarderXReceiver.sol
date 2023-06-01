@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import {IConnext} from "@connext/interfaces/core/IConnext.sol";
 import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
@@ -13,6 +14,8 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * This is meant to be used when there are funds passed into the contract that need to be forwarded to another contract.
  */
 abstract contract ForwarderXReceiver is IXReceiver {
+  using SafeERC20 for IERC20;
+
   // The Connext contract on this domain
   IConnext public immutable connext;
 
@@ -92,7 +95,7 @@ abstract contract ForwarderXReceiver is IXReceiver {
       emit ForwardedFunctionCallFailed(_transferId, _lowLevelData);
     }
     if (!successfulForward) {
-      IERC20(_asset).transfer(_fallbackAddress, _amount);
+      SafeERC20.safeTransfer(IERC20(_asset), _fallbackAddress, _amount);
     }
     // Return the success status of the forwardFunctionCall
     return abi.encode(successfulForward);
