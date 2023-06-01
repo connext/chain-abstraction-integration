@@ -93,7 +93,7 @@ contract SwapAndXCall is SwapAdapter {
     require(_toAsset != address(0), "connext not support");
 
     bool isNative = _fromAsset == address(0);
-    require(msg.value == isNative ? _amountIn : 0, "!value");
+    require(msg.value == (isNative ? _amountIn : 0), "!value");
 
     uint256 amountOut = isNative
       ? _setupAndSwapETH(_toAsset, _amountIn, _swapper, _swapData)
