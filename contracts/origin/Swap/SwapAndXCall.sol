@@ -20,8 +20,8 @@ contract SwapAndXCall is SwapAdapter {
    * @notice Calls a swapper contract and then calls xcall on connext
    * @dev Data for the swap is generated offchain to call to the appropriate swapper contract
    * Function is payable since it uses the relayer fee in native asset
-   * @param _fromAsset Address of the asset to swap from
-   * @param _toAsset Address of the asset to swap to
+   * @param _fromAsset Address of the asset to swap from. fromAsset can be both of ETH and ERC20
+   * @param _toAsset Address of the asset to swap to. toAsset can't be ETH. because connext doesn't support xcall with ETH
    * @param _amountIn Amount of the asset to swap from
    * @param _swapper Address of the swapper contract
    * @param _swapData Data to call the swapper contract with
@@ -65,8 +65,8 @@ contract SwapAndXCall is SwapAdapter {
    * @notice Calls a swapper contract and then calls xcall on connext
    * @dev Data for the swap is generated offchain to call to the appropriate swapper contract
    * Pays relayer fee from the input asset
-   * @param _fromAsset Address of the asset to swap from
-   * @param _toAsset Address of the asset to swap to
+   * @param _fromAsset Address of the asset to swap from. fromAsset can be both of ETH and ERC20
+   * @param _toAsset Address of the asset to swap to. toAsset can't be ETH. because connext doesn't support xcall with ETH
    * @param _amountIn Amount of the asset to swap from
    * @param _swapper Address of the swapper contract
    * @param _swapData Data to call the swapper contract with
