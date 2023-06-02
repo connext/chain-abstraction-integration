@@ -120,7 +120,7 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
       }
     }
 
-    if (indexToRemove >= len) {
+    if (indexToRemove == len) {
       revert ForwarderXReceiver__removeOrigin_invalidOrigin(_originDomain);
     }
 
