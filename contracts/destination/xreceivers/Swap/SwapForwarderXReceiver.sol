@@ -27,6 +27,7 @@ abstract contract SwapForwarderXReceiver is ForwarderXReceiver, SwapAdapter {
    * @param _data The data to be swapped.
    * @param _amount The amount to be swapped.
    * @param _asset The incoming asset to be swapped.
+   * @return prepared data
    */
   function _prepare(
     bytes32 _transferId,
