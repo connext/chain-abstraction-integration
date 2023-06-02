@@ -68,7 +68,7 @@ contract SwapAdapterTest is TestHelper {
     address fromAsset = address(0x12345);
     address toAsset = address(0x54321);
     bytes memory swapData = bytes("0x");
-    vm.expectRevert(bytes("!allowedSwapper"));
+    vm.expectRevert(SwapAdapter.SwapAdapter__exactSwap_notAllowedSwapper.selector);
     swapAdapter.exactSwap(swapper, amountIn, fromAsset, toAsset, swapData);
   }
 
