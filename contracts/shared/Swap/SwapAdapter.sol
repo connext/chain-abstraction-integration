@@ -18,7 +18,6 @@ import {ISwapper} from "./interfaces/ISwapper.sol";
  */
 contract SwapAdapter is Ownable2Step {
   using Address for address;
-  using Address for address payable;
 
   mapping(address => bool) public allowedSwappers;
 
