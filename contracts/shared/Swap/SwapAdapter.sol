@@ -25,7 +25,6 @@ contract SwapAdapter is Ownable2Step {
   address public immutable uniswapSwapRouter = address(0xE592427A0AEce92De3Edee1F18E0157C05861564);
 
   constructor() {
-    allowedSwappers[address(this)] = true;
     allowedSwappers[uniswapSwapRouter] = true;
   }
 
