@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {Ownable2Step} from "@openzeppelin/contracts/access/Ownable2Step.sol";
 import {IConnext} from "@connext/interfaces/core/IConnext.sol";
 import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -15,10 +15,10 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * caveat that xReceive will fail until the AMB's validation window has elapsed. This is meant to be used when there
  * are funds passed into the contract that need to be forwarded to another contract.
  *
- * This contract inherits OpenZeppelin's Ownable module which allows ownership to be changed with `transferOwnership`.
- * For more details, see the implementation: https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol
+ * This contract inherits OpenZeppelin's Ownable2Step module which allows ownership to be changed with `transferOwnership`.
+ * For more details, see the implementation: https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable2Step.sol
  */
-abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
+abstract contract AuthForwarderXReceiver is IXReceiver, Ownable2Step {
   using SafeERC20 for IERC20;
 
   /// The Connext contract on this domain
