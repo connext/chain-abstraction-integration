@@ -42,8 +42,6 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
   error ForwarderXReceiver__prepareAndForward_notThis(address sender);
   error ForwarderXReceiver__constructor_mismatchingOriginArrayLengths(address sender);
   error ForwarderXReceiver__removeOrigin_invalidOrigin(uint32 originDomain);
-  error ForwarderXReceiver__addOrigin_alreadySet(uint32 originDomain);
-  error ForwarderXReceiver__addOrigin_zeroSender();
 
   /// MODIFIERS
   /** @notice A modifier for authenticated calls.
@@ -68,19 +66,15 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
    * @param _originSenders - Array of senders on origin domains that are expected to call xcall
    */
   constructor(address _connext, uint32[] memory _originDomains, address[] memory _originSenders) {
-    uint256 len = _originDomains.length;
-    if (len != _originSenders.length) {
+    if (_originDomains.length != _originSenders.length) {
       revert ForwarderXReceiver__constructor_mismatchingOriginArrayLengths(msg.sender);
     }
 
     connext = IConnext(_connext);
 
-    for (uint256 i; i < len; ) {
-      _addOrigin(_originDomains[i], _originSenders[i]);
-
-      unchecked {
-        ++i;
-      }
+    for (uint32 i = 0; i < _originDomains.length; i++) {
+      originDomains.push(_originDomains[i]);
+      originRegistry[_originDomains[i]] = _originSenders[i];
     }
   }
 
@@ -89,14 +83,7 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
    * @param _originDomain - Origin domain to be registered in the OriginRegistry
    * @param _originSender - Sender on origin domain that is expected to call this contract
    */
-  function addOrigin(uint32 _originDomain, address _originSender) external onlyOwner {
-    _addOrigin(_originDomain, _originSender);
-  }
-
-  function _addOrigin(uint32 _originDomain, address _originSender) internal {
-    if (_originSender == address(0)) revert ForwarderXReceiver__addOrigin_zeroSender();
-    if (originRegistry[_originDomain] != address(0)) revert ForwarderXReceiver__addOrigin_alreadySet(_originDomain);
-
+  function addOrigin(uint32 _originDomain, address _originSender) public onlyOwner {
     originDomains.push(_originDomain);
     originRegistry[_originDomain] = _originSender;
     emit OriginAdded(_originDomain, _originSender);
@@ -106,26 +93,22 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
    * @dev Remove an origin domain from the originRegistry.
    * @param _originDomain - Origin domain to be removed from the OriginRegistry
    */
-  function removeOrigin(uint32 _originDomain) external onlyOwner {
-    uint256 len = originDomains.length;
+  function removeOrigin(uint32 _originDomain) public onlyOwner {
     // Assign an out-of-bounds index by default
-    uint256 indexToRemove = len;
-    for (uint256 i; i < len; ) {
+    uint32 indexToRemove = uint32(originDomains.length);
+    for (uint32 i = 0; i < originDomains.length; i++) {
       if (originDomains[i] == _originDomain) {
         indexToRemove = i;
         break;
       }
-      unchecked {
-        ++i;
-      }
     }
 
-    if (indexToRemove == len) {
+    if (indexToRemove >= uint32(originDomains.length)) {
       revert ForwarderXReceiver__removeOrigin_invalidOrigin(_originDomain);
     }
 
     // Constant operation to remove origin since we don't need to preserve order
-    originDomains[indexToRemove] = originDomains[len - 1];
+    originDomains[indexToRemove] = originDomains[originDomains.length - 1];
     originDomains.pop();
 
     delete originRegistry[_originDomain];
