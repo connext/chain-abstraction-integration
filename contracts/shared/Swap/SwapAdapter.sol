@@ -34,7 +34,6 @@ contract SwapAdapter is Ownable2Step {
   error SwapAdapter__exactSwap_notAllowedSwapper();
 
   constructor() {
-    allowedSwappers[address(this)] = true;
     allowedSwappers[uniswapSwapRouter] = true;
   }
 
