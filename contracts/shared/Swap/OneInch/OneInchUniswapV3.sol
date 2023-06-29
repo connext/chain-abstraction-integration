@@ -15,6 +15,13 @@ interface IUniswapV3Router {
     uint256 minReturn,
     uint256[] calldata pools
   ) external payable returns (uint256 returnAmount);
+
+  function uniswapV3SwapTo(
+    address payable recipient,
+    uint256 amount,
+    uint256 minReturn,
+    uint256[] calldata pools
+  ) external payable returns (uint256 returnAmount);
 }
 
 /**
@@ -62,15 +69,10 @@ contract OneInchUniswapV3 is ISwapper {
 
       // The call to `uniswapV3Swap` executes the swap.
       // use actual amountIn that was sent to the xReceiver
-      amountOut = oneInchUniRouter.uniswapV3Swap(_amountIn, _minReturn, _pools);
+      amountOut = oneInchUniRouter.uniswapV3SwapTo(payable(msg.sender), _amountIn, _minReturn, _pools);
     } else {
+      // transfer the funds back to the sender
       amountOut = _amountIn;
-    }
-
-    // transfer the swapped funds back to the sender
-    if (_toAsset == address(0)) {
-      TransferHelper.safeTransferETH(msg.sender, amountOut);
-    } else {
       TransferHelper.safeTransfer(_toAsset, msg.sender, amountOut);
     }
   }
@@ -99,8 +101,12 @@ contract OneInchUniswapV3 is ISwapper {
 
       // The call to `uniswapV3Swap` executes the swap.
       // use actual amountIn that was sent to the xReceiver
-      amountOut = oneInchUniRouter.uniswapV3Swap(_amountIn, _minReturn, _pools);
-      TransferHelper.safeTransfer(_toAsset, msg.sender, amountOut);
+      amountOut = oneInchUniRouter.uniswapV3SwapTo{value: _amountIn}(
+        payable(msg.sender),
+        _amountIn,
+        _minReturn,
+        _pools
+      );
     } else {
       amountOut = _amountIn;
       TransferHelper.safeTransferETH(msg.sender, amountOut);
