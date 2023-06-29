@@ -24,6 +24,15 @@ contract SwapAdapter is Ownable2Step {
 
   address public immutable uniswapSwapRouter = address(0xE592427A0AEce92De3Edee1F18E0157C05861564);
 
+  /// EVENTS
+  event SwapperAdded(address indexed swapper, address caller);
+  event SwapperRemoved(address indexed swapper, address caller);
+
+  /// ERRORS
+  error SwapAdapter__addSwapper_alreadyAdded();
+  error SwapAdapter__removeSwapper_notSwapper();
+  error SwapAdapter__exactSwap_notAllowedSwapper();
+
   constructor() {
     allowedSwappers[address(this)] = true;
     allowedSwappers[uniswapSwapRouter] = true;
@@ -39,7 +48,12 @@ contract SwapAdapter is Ownable2Step {
    * @param _swapper Address of the swapper to add.
    */
   function addSwapper(address _swapper) external onlyOwner {
+    if (allowedSwappers[_swapper]) {
+      revert SwapAdapter__addSwapper_alreadyAdded();
+    }
     allowedSwappers[_swapper] = true;
+
+    emit SwapperAdded(_swapper, msg.sender);
   }
 
   /**
@@ -47,7 +61,12 @@ contract SwapAdapter is Ownable2Step {
    * @param _swapper Address of the swapper to remove.
    */
   function removeSwapper(address _swapper) external onlyOwner {
-    allowedSwappers[_swapper] = false;
+    if (!allowedSwappers[_swapper]) {
+      revert SwapAdapter__removeSwapper_notSwapper();
+    }
+    delete allowedSwappers[_swapper];
+
+    emit SwapperRemoved(_swapper, msg.sender);
   }
 
   /// EXTERNAL
@@ -67,7 +86,9 @@ contract SwapAdapter is Ownable2Step {
     address _toAsset,
     bytes calldata _swapData // comes directly from API with swap data encoded
   ) external payable returns (uint256 amountOut) {
-    require(allowedSwappers[_swapper], "!allowedSwapper");
+    if (!allowedSwappers[_swapper]) {
+      revert SwapAdapter__exactSwap_notAllowedSwapper();
+    }
 
     // If from == to, no need to swap
     if (_fromAsset == _toAsset) {
@@ -75,7 +96,7 @@ contract SwapAdapter is Ownable2Step {
     }
 
     if (_fromAsset == address(0)) {
-      amountOut = ISwapper(_swapper).swapETH(_amountIn, _toAsset, _swapData);
+      amountOut = ISwapper(_swapper).swapETH{value: msg.value}(_amountIn, _toAsset, _swapData);
     } else {
       if (IERC20(_fromAsset).allowance(address(this), _swapper) < _amountIn) {
         TransferHelper.safeApprove(_fromAsset, _swapper, type(uint256).max);
@@ -91,6 +112,8 @@ contract SwapAdapter is Ownable2Step {
    * @param swapData Data to pass to the swapper. This data is encoded for a particular swap router.
    */
   function directSwapperCall(address _swapper, bytes calldata swapData) external payable returns (uint256 amountOut) {
+    require(allowedSwappers[_swapper], "!allowedSwapper");
+
     bytes memory ret = _swapper.functionCallWithValue(swapData, msg.value, "!directSwapperCallFailed");
     amountOut = abi.decode(ret, (uint256));
   }

@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IConnext} from "@connext/interfaces/core/IConnext.sol";
 import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
@@ -18,6 +19,8 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * For more details, see the implementation: https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol
  */
 abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
+  using SafeERC20 for IERC20;
+
   /// The Connext contract on this domain
   IConnext public immutable connext;
 
@@ -29,13 +32,13 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
   mapping(uint32 => address) public originRegistry;
 
   /// EVENTS
-  event ForwardedFunctionCallFailed(bytes32 _transferId);
-  event ForwardedFunctionCallFailed(bytes32 _transferId, string _errorMessage);
-  event ForwardedFunctionCallFailed(bytes32 _transferId, uint _errorCode);
-  event ForwardedFunctionCallFailed(bytes32 _transferId, bytes _lowLevelData);
-  event OriginAdded(uint32 indexed _originDomain, address _originSender);
+  event ForwardedFunctionCallFailed(bytes32 indexed _transferId);
+  event ForwardedFunctionCallFailed(bytes32 indexed _transferId, string _errorMessage);
+  event ForwardedFunctionCallFailed(bytes32 indexed _transferId, uint _errorCode);
+  event ForwardedFunctionCallFailed(bytes32 indexed _transferId, bytes _lowLevelData);
+  event OriginAdded(uint32 indexed _originDomain, address indexed _originSender);
   event OriginRemoved(uint32 indexed _originDomain);
-  event Prepared(bytes32 _transferId, bytes _data, uint256 _amount, address _asset);
+  event Prepared(bytes32 indexed _transferId, bytes _data, uint256 _amount, address _asset);
 
   /// ERRORS
   error ForwarderXReceiver__onlyOrigin(uint32 originDomain, address originSender, address sender);
@@ -161,7 +164,7 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
       emit ForwardedFunctionCallFailed(_transferId, _lowLevelData);
     }
     if (!successfulForward) {
-      IERC20(_asset).transfer(_fallbackAddress, _amount);
+      SafeERC20.safeTransfer(IERC20(_asset), _fallbackAddress, _amount);
     }
     // Return the success status of the forwardFunctionCall
     return abi.encode(successfulForward);
