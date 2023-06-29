@@ -5,7 +5,6 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import {ISwapRouter} from "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
-import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
 import {ISwapper} from "../interfaces/ISwapper.sol";
 
@@ -29,8 +28,6 @@ interface IUniswapV3Router {
  * @notice Swapper contract for 1inch UniswapV3 swaps.
  */
 contract OneInchUniswapV3 is ISwapper {
-  using Address for address;
-
   IUniswapV3Router public immutable oneInchUniRouter;
 
   constructor(address _oneInchUniRouter) {

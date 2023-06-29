@@ -4,7 +4,6 @@ pragma solidity ^0.8.17;
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IUniswapV2Router02} from "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
-import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
 import {ISwapper} from "../interfaces/ISwapper.sol";
 
@@ -13,8 +12,6 @@ import {ISwapper} from "../interfaces/ISwapper.sol";
  * @notice Swapper contract for UniswapV2 swaps.
  */
 contract UniV2Swapper is ISwapper {
-  using Address for address;
-
   IUniswapV2Router02 public immutable uniswapV2Router;
 
   constructor(address _uniV2Router) {
