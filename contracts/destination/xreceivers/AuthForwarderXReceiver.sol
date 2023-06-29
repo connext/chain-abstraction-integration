@@ -32,13 +32,13 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable {
   mapping(uint32 => address) public originRegistry;
 
   /// EVENTS
-  event ForwardedFunctionCallFailed(bytes32 _transferId);
-  event ForwardedFunctionCallFailed(bytes32 _transferId, string _errorMessage);
-  event ForwardedFunctionCallFailed(bytes32 _transferId, uint _errorCode);
-  event ForwardedFunctionCallFailed(bytes32 _transferId, bytes _lowLevelData);
+  event ForwardedFunctionCallFailed(bytes32 indexed _transferId);
+  event ForwardedFunctionCallFailed(bytes32 indexed _transferId, string _errorMessage);
+  event ForwardedFunctionCallFailed(bytes32 indexed _transferId, uint _errorCode);
+  event ForwardedFunctionCallFailed(bytes32 indexed _transferId, bytes _lowLevelData);
   event OriginAdded(uint32 _originDomain, address _originSender);
   event OriginRemoved(uint32 _originDomain);
-  event Prepared(bytes32 _transferId, bytes _data, uint256 _amount, address _asset);
+  event Prepared(bytes32 indexed _transferId, bytes _data, uint256 _amount, address _asset);
 
   /// ERRORS
   error ForwarderXReceiver__onlyOrigin(uint32 originDomain, address originSender, address sender);

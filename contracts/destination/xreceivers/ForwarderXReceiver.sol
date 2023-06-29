@@ -20,11 +20,11 @@ abstract contract ForwarderXReceiver is IXReceiver {
   IConnext public immutable connext;
 
   /// EVENTS
-  event ForwardedFunctionCallFailed(bytes32 _transferId);
-  event ForwardedFunctionCallFailed(bytes32 _transferId, string _errorMessage);
-  event ForwardedFunctionCallFailed(bytes32 _transferId, uint _errorCode);
-  event ForwardedFunctionCallFailed(bytes32 _transferId, bytes _lowLevelData);
-  event Prepared(bytes32 _transferId, bytes _data, uint256 _amount, address _asset);
+  event ForwardedFunctionCallFailed(bytes32 indexed _transferId);
+  event ForwardedFunctionCallFailed(bytes32 indexed _transferId, string _errorMessage);
+  event ForwardedFunctionCallFailed(bytes32 indexed _transferId, uint _errorCode);
+  event ForwardedFunctionCallFailed(bytes32 indexed _transferId, bytes _lowLevelData);
+  event Prepared(bytes32 indexed _transferId, bytes _data, uint256 _amount, address _asset);
 
   /// ERRORS
   error ForwarderXReceiver__onlyConnext(address sender);
