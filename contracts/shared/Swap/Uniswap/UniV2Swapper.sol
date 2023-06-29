@@ -63,6 +63,9 @@ contract UniV2Swapper is ISwapper {
         amounts = uniswapV2Router.swapExactTokensForETH(_amountIn, amountOutMin, path, msg.sender, block.timestamp);
       }
       amountOut = amounts[amounts.length - 1];
+    } else {
+      amountOut = _amountIn;
+      TransferHelper.safeTransfer(_toAsset, msg.sender, amountOut);
     }
   }
 
