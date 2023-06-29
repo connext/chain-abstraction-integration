@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 import {Ownable2Step} from "@openzeppelin/contracts/access/Ownable2Step.sol";
 import {IConnext} from "@connext/interfaces/core/IConnext.sol";
 import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
@@ -18,6 +19,8 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * For more details, see the implementation: https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable2Step.sol
  */
 abstract contract AuthForwarderXReceiver is IXReceiver, Ownable2Step {
+  using SafeERC20 for IERC20;
+
   /// The Connext contract on this domain
   IConnext public immutable connext;
 
@@ -29,19 +32,21 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable2Step {
   mapping(uint32 => address) public originRegistry;
 
   /// EVENTS
-  event ForwardedFunctionCallFailed(bytes32 _transferId);
-  event ForwardedFunctionCallFailed(bytes32 _transferId, string _errorMessage);
-  event ForwardedFunctionCallFailed(bytes32 _transferId, uint _errorCode);
-  event ForwardedFunctionCallFailed(bytes32 _transferId, bytes _lowLevelData);
+  event ForwardedFunctionCallFailed(bytes32 indexed _transferId);
+  event ForwardedFunctionCallFailed(bytes32 indexed _transferId, string _errorMessage);
+  event ForwardedFunctionCallFailed(bytes32 indexed _transferId, uint _errorCode);
+  event ForwardedFunctionCallFailed(bytes32 indexed _transferId, bytes _lowLevelData);
   event OriginAdded(uint32 _originDomain, address _originSender);
   event OriginRemoved(uint32 _originDomain);
-  event Prepared(bytes32 _transferId, bytes _data, uint256 _amount, address _asset);
+  event Prepared(bytes32 indexed _transferId, bytes _data, uint256 _amount, address _asset);
 
   /// ERRORS
   error ForwarderXReceiver__onlyOrigin(uint32 originDomain, address originSender, address sender);
   error ForwarderXReceiver__prepareAndForward_notThis(address sender);
   error ForwarderXReceiver__constructor_mismatchingOriginArrayLengths(address sender);
   error ForwarderXReceiver__removeOrigin_invalidOrigin(uint32 originDomain);
+  error ForwarderXReceiver__addOrigin_alreadySet(uint32 originDomain);
+  error ForwarderXReceiver__addOrigin_zeroSender();
 
   /// MODIFIERS
   /** @notice A modifier for authenticated calls.
@@ -66,15 +71,19 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable2Step {
    * @param _originSenders - Array of senders on origin domains that are expected to call xcall
    */
   constructor(address _connext, uint32[] memory _originDomains, address[] memory _originSenders) {
-    if (_originDomains.length != _originSenders.length) {
+    uint256 len = _originDomains.length;
+    if (len != _originSenders.length) {
       revert ForwarderXReceiver__constructor_mismatchingOriginArrayLengths(msg.sender);
     }
 
     connext = IConnext(_connext);
 
-    for (uint32 i = 0; i < _originDomains.length; i++) {
-      originDomains.push(_originDomains[i]);
-      originRegistry[_originDomains[i]] = _originSenders[i];
+    for (uint256 i; i < len; ) {
+      _addOrigin(_originDomains[i], _originSenders[i]);
+
+      unchecked {
+        ++i;
+      }
     }
   }
 
@@ -83,7 +92,14 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable2Step {
    * @param _originDomain - Origin domain to be registered in the OriginRegistry
    * @param _originSender - Sender on origin domain that is expected to call this contract
    */
-  function addOrigin(uint32 _originDomain, address _originSender) public onlyOwner {
+  function addOrigin(uint32 _originDomain, address _originSender) external onlyOwner {
+    _addOrigin(_originDomain, _originSender);
+  }
+
+  function _addOrigin(uint32 _originDomain, address _originSender) internal {
+    if (_originSender == address(0)) revert ForwarderXReceiver__addOrigin_zeroSender();
+    if (originRegistry[_originDomain] != address(0)) revert ForwarderXReceiver__addOrigin_alreadySet(_originDomain);
+
     originDomains.push(_originDomain);
     originRegistry[_originDomain] = _originSender;
     emit OriginAdded(_originDomain, _originSender);
@@ -93,22 +109,26 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable2Step {
    * @dev Remove an origin domain from the originRegistry.
    * @param _originDomain - Origin domain to be removed from the OriginRegistry
    */
-  function removeOrigin(uint32 _originDomain) public onlyOwner {
+  function removeOrigin(uint32 _originDomain) external onlyOwner {
+    uint256 len = originDomains.length;
     // Assign an out-of-bounds index by default
-    uint32 indexToRemove = uint32(originDomains.length);
-    for (uint32 i = 0; i < originDomains.length; i++) {
+    uint256 indexToRemove = len;
+    for (uint256 i; i < len; ) {
       if (originDomains[i] == _originDomain) {
         indexToRemove = i;
         break;
       }
+      unchecked {
+        ++i;
+      }
     }
 
-    if (indexToRemove >= uint32(originDomains.length)) {
+    if (indexToRemove == len) {
       revert ForwarderXReceiver__removeOrigin_invalidOrigin(_originDomain);
     }
 
     // Constant operation to remove origin since we don't need to preserve order
-    originDomains[indexToRemove] = originDomains[originDomains.length - 1];
+    originDomains[indexToRemove] = originDomains[len - 1];
     originDomains.pop();
 
     delete originRegistry[_originDomain];
@@ -161,7 +181,7 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable2Step {
       emit ForwardedFunctionCallFailed(_transferId, _lowLevelData);
     }
     if (!successfulForward) {
-      IERC20(_asset).transfer(_fallbackAddress, _amount);
+      SafeERC20.safeTransfer(IERC20(_asset), _fallbackAddress, _amount);
     }
     // Return the success status of the forwardFunctionCall
     return abi.encode(successfulForward);

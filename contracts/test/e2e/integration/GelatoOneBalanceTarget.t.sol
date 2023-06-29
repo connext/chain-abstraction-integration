@@ -49,6 +49,7 @@ contract GelatoOneBalanceTest is TestHelper {
   function utils_setUpOptimismForOrigin() public {
     setUpOptimism(87307161);
     swapAndXCall = new SwapAndXCall(CONNEXT_OPTIMISM);
+    swapAndXCall.addSwapper(OP_ONEINCH_SWAPPER);
     vm.prank(OP_OP_WHALE);
     TransferHelper.safeTransfer(OP_OP, address(this), 1000 ether);
 
@@ -62,6 +63,7 @@ contract GelatoOneBalanceTest is TestHelper {
   function utils_setUpBnbForOrigin() public {
     setUpBNB(27284448);
     swapAndXCall = new SwapAndXCall(CONNEXT_BNB);
+    swapAndXCall.addSwapper(BNB_ONEINCH_SWAPPER);
     vm.prank(BNB_BNB_WHALE);
     TransferHelper.safeTransferETH(address(this), 10 ether);
 
@@ -311,7 +313,6 @@ contract GelatoOneBalanceTest is TestHelper {
     gelatoOneBalanceTarget.xReceive(bytes32(""), 100000000, POLYGON_USDC, address(0), 123, callDataForV3);
     assertEq(IERC20(cTokenForWETH).balanceOf(address(gelatoOneBalanceTarget)), 0);
     assertEq(IERC20(POLYGON_USDC).balanceOf(address(gelatoOneBalanceTarget)), 0);
-
 
     // Trying with univ2swapper
     vm.prank(POLYGON_USDC_WHALE);

@@ -49,6 +49,7 @@ contract MidasProtocolTest is TestHelper {
   function utils_setUpOptimismForOrigin() public {
     setUpOptimism(87307161);
     swapAndXCall = new SwapAndXCall(CONNEXT_OPTIMISM);
+    swapAndXCall.addSwapper(OP_ONEINCH_SWAPPER);
     vm.prank(OP_OP_WHALE);
     TransferHelper.safeTransfer(OP_OP, address(this), 1000 ether);
 
@@ -62,6 +63,7 @@ contract MidasProtocolTest is TestHelper {
   function utils_setUpBnbForOrigin() public {
     setUpBNB(27284448);
     swapAndXCall = new SwapAndXCall(CONNEXT_BNB);
+    swapAndXCall.addSwapper(BNB_ONEINCH_SWAPPER);
     vm.prank(BNB_BNB_WHALE);
     TransferHelper.safeTransferETH(address(this), 10 ether);
 
