@@ -30,6 +30,7 @@ contract AnyToAnySwapAndForwardTest is TestHelper {
   function utils_setUpOrigin() public {
     setUpOptimism(87307161);
     swapAndXCall = new SwapAndXCall(CONNEXT_OPTIMISM);
+    swapAndXCall.addSwapper(ONEINCH_SWAPPER);
     vm.prank(OP_OP_WHALE);
     TransferHelper.safeTransfer(OP_OP, address(this), 1000 ether);
 

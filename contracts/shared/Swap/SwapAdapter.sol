@@ -91,6 +91,8 @@ contract SwapAdapter is Ownable2Step {
    * @param swapData Data to pass to the swapper. This data is encoded for a particular swap router.
    */
   function directSwapperCall(address _swapper, bytes calldata swapData) external payable returns (uint256 amountOut) {
+    require(allowedSwappers[_swapper], "!allowedSwapper");
+
     bytes memory ret = _swapper.functionCallWithValue(swapData, msg.value, "!directSwapperCallFailed");
     amountOut = abi.decode(ret, (uint256));
   }

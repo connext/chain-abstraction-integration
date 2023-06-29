@@ -46,6 +46,7 @@ contract MeanFinanceTargetTest is TestHelper {
   function utils_setUpOptimismForOrigin() public {
     setUpOptimism(87307161);
     swapAndXCall = new SwapAndXCall(CONNEXT_OPTIMISM);
+    swapAndXCall.addSwapper(OP_ONEINCH_SWAPPER);
     vm.prank(OP_OP_WHALE);
     TransferHelper.safeTransfer(OP_OP, address(this), 1000 ether);
 
