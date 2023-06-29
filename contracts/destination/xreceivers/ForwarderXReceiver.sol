@@ -58,6 +58,7 @@ abstract contract ForwarderXReceiver is IXReceiver {
    * @param _amount - The amount of funds received in this transfer.
    * @param _asset - The asset of the funds received in this transfer.
    * @param _callData - The data to be prepared and forwarded. Fallback address needs to be encoded in the data to be used in case the forward fails.
+   * @return the success status of the forwardFunctionCall
    */
   function xReceive(
     bytes32 _transferId,
@@ -113,6 +114,7 @@ abstract contract ForwarderXReceiver is IXReceiver {
    * @param _data - The data to be prepared
    * @param _amount - The amount of funds received in this transfer
    * @param _asset - The asset of the funds received in this transfer
+   * @return The result of the forward Function call
    */
   function prepareAndForward(
     bytes32 _transferId,
@@ -143,6 +145,7 @@ abstract contract ForwarderXReceiver is IXReceiver {
    * @param _data - The data to be prepared
    * @param _amount - The amount of funds received in this transfer
    * @param _asset - The asset of the funds received in this transfer
+   * @return encoded data
    */
   function _prepare(
     bytes32 _transferId,
@@ -163,6 +166,7 @@ abstract contract ForwarderXReceiver is IXReceiver {
    * @param _transferId - The transfer ID of the transfer that triggered this call
    * @param _amount - The amount of funds received in this transfer
    * @param _asset - The asset of the funds received in this transfer
+   * @return the result of the call
    */
   function _forwardFunctionCall(
     bytes memory _preparedData,

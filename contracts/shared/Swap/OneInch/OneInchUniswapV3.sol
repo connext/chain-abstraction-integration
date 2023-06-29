@@ -42,6 +42,7 @@ contract OneInchUniswapV3 is ISwapper {
    * @param _fromAsset Address of the token to swap from.
    * @param _toAsset Address of the token to swap to.
    * @param _swapData Data to pass to the 1inch aggregator router.
+   * @return amountOut Amount of the token received
    */
   function swap(
     uint256 _amountIn,
@@ -81,6 +82,7 @@ contract OneInchUniswapV3 is ISwapper {
    * @param _amountIn Amount of tokens to swap.
    * @param _toAsset Address of the token to swap to.
    * @param _swapData Data to pass to the 1inch aggregator router.
+   * @return amountOut Amount of the token received
    */
   function swapETH(
     uint256 _amountIn,

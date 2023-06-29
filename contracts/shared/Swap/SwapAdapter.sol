@@ -76,6 +76,7 @@ contract SwapAdapter is Ownable2Step {
    * @param _toAsset Address of the token to swap to.
    * @param _swapData Data to pass to the swapper. This data is encoded for a particular swap router, usually given
    * by an API. The swapper will decode the data and re-encode it with the new amountIn.
+   * @return amountOut Amount that is expected to get received in the swap
    */
   function exactSwap(
     address _swapper,
@@ -108,6 +109,7 @@ contract SwapAdapter is Ownable2Step {
    * easy swaps on the source side where the amount does not need to be changed.
    * @param _swapper Address of the swapper to use.
    * @param swapData Data to pass to the swapper. This data is encoded for a particular swap router.
+   * @return amountOut Amount that is expected to get received in the swap
    */
   function directSwapperCall(address _swapper, bytes calldata swapData) external payable returns (uint256 amountOut) {
     require(allowedSwappers[_swapper], "!allowedSwapper");
