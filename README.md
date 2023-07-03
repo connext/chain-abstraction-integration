@@ -1,6 +1,6 @@
-# Connext-Integration
+# Chain Abstraction Integration
 
-Contracts for Connext integration
+Contracts for Chain Abstraction integration
 
 # Setting up environment
 
