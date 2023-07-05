@@ -4,6 +4,23 @@ pragma solidity ^0.8.19;
 import {ERC20PermitUpgradeable} from "openzeppelin-contracts-upgradeable/contracts/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
 import {ProposedOwnableUpgradeable} from "../shared/ownership/ProposedOwnableUpgradeable.sol";
 
+/**
+ * @title XERC20
+ * @author Connext Labs
+ * @notice This is a simple implementation of an xToken to use within Connext. An xToken is a minimal extension to the
+ * ERC-20 standard that enables bridging tokens across domains without creating multiple infungible representations of
+ * the same underlying asset.
+ *
+ * To learn more, please see:
+ * - EIP:
+ * https://github.com/connext/EIPs/blob/master/EIPS/eip-draft_bridged_tokens.md
+ * - Guide to whitelist an xtoken on Connext:
+ * https://connext.notion.site/Public-xTokens-Setup-Guide-be4e136a6db14191b8d61bd60563ebd0?pvs=4
+ *
+ * @dev This contract is designed to be upgradeable so as the EIP is finalized, the implementation
+ * can be updated to reflect the standard. The current implementation is the minimal interface
+ * required to create an xtoken supported by Connext.
+ */
 contract XERC20 is ERC20PermitUpgradeable, ProposedOwnableUpgradeable {
   // ======== Events =========
   /**
