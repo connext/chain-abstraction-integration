@@ -5,7 +5,7 @@ import {ERC20PermitUpgradeable} from "openzeppelin-contracts-upgradeable/contrac
 import {ProposedOwnableUpgradeable} from "../shared/ownership/ProposedOwnableUpgradeable.sol";
 
 /**
- * @title XERC20
+ * @title XERC20Upgradeable
  * @author Connext Labs
  * @notice This is a simple implementation of an xToken to use within Connext. An xToken is a minimal extension to the
  * ERC-20 standard that enables bridging tokens across domains without creating multiple infungible representations of
@@ -21,7 +21,7 @@ import {ProposedOwnableUpgradeable} from "../shared/ownership/ProposedOwnableUpg
  * can be updated to reflect the standard. The current implementation is the minimal interface
  * required to create an xtoken supported by Connext.
  */
-contract XERC20 is ERC20PermitUpgradeable, ProposedOwnableUpgradeable {
+contract XERC20Upgradeable is ERC20PermitUpgradeable, ProposedOwnableUpgradeable {
   // ======== Events =========
   /**
    * Emitted when bridge is whitelisted
@@ -48,10 +48,10 @@ contract XERC20 is ERC20PermitUpgradeable, ProposedOwnableUpgradeable {
 
   // ======== Initializer =========
 
-  function initialize(address _owner) public initializer {
+  function initialize(address _owner, string memory _name, string memory _symbol) public initializer {
     __XERC20_init();
-    __ERC20_init("xToken", "XERC20");
-    __ERC20Permit_init("xToken");
+    __ERC20_init(_name, _symbol);
+    __ERC20Permit_init(_name);
     __ProposedOwnable_init();
 
     // Set specified owner
