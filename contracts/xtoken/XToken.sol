@@ -4,7 +4,7 @@ pragma solidity ^0.8.19;
 import {ERC20PermitUpgradeable} from "openzeppelin-contracts-upgradeable/contracts/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
 import {ProposedOwnableUpgradeable} from "../shared/ownership/ProposedOwnableUpgradeable.sol";
 
-contract ConnextXERC20 is ERC20PermitUpgradeable, ProposedOwnableUpgradeable {
+contract XERC20 is ERC20PermitUpgradeable, ProposedOwnableUpgradeable {
   // ======== Events =========
   /**
    * Emitted when bridge is whitelisted
@@ -35,9 +35,9 @@ contract ConnextXERC20 is ERC20PermitUpgradeable, ProposedOwnableUpgradeable {
   // ======== Initializer =========
 
   function initialize(address _owner) public initializer {
-    __ConnextXERC20_init();
-    __ERC20_init("xConnext", "xNEXT");
-    __ERC20Permit_init("xConnext");
+    __XERC20_init();
+    __ERC20_init("xToken", "XERC20");
+    __ERC20Permit_init("xToken");
     __ProposedOwnable_init();
 
     // Set specified owner
@@ -45,31 +45,31 @@ contract ConnextXERC20 is ERC20PermitUpgradeable, ProposedOwnableUpgradeable {
   }
 
   /**
-   * @dev Initializes ConnextXERC20 instance
+   * @dev Initializes XERC20 instance
    */
-  function __ConnextXERC20_init() internal onlyInitializing {
-    __ConnextXERC20_init_unchained();
+  function __XERC20_init() internal onlyInitializing {
+    __XERC20_init_unchained();
   }
 
-  function __ConnextXERC20_init_unchained() internal onlyInitializing {}
+  function __XERC20_init_unchained() internal onlyInitializing {}
 
   // ======== Errors =========
-  error ConnextXERC20__onlyBridge_notBridge();
-  error ConnextXERC20__onlyBridgeBeforeStart_notBridge();
-  error ConnextXERC20__addBridge_alreadyAdded();
-  error ConnextXERC20__removeBridge_alreadyRemoved();
+  error XERC20__onlyBridge_notBridge();
+  error XERC20__onlyBridgeBeforeStart_notBridge();
+  error XERC20__addBridge_alreadyAdded();
+  error XERC20__removeBridge_alreadyRemoved();
 
   // ============ Modifiers ==============
   modifier onlyBridge() {
     if (!_whitelistedBridges[msg.sender]) {
-      revert ConnextXERC20__onlyBridge_notBridge();
+      revert XERC20__onlyBridge_notBridge();
     }
     _;
   }
 
   modifier onlyBridgeBeforeStart() {
     if (block.timestamp <= TRANSFER_START && !_whitelistedBridges[msg.sender]) {
-      revert ConnextXERC20__onlyBridgeBeforeStart_notBridge();
+      revert XERC20__onlyBridgeBeforeStart_notBridge();
     }
     _;
   }
@@ -81,7 +81,7 @@ contract ConnextXERC20 is ERC20PermitUpgradeable, ProposedOwnableUpgradeable {
    */
   function addBridge(address _bridge) external onlyOwner {
     if (_whitelistedBridges[_bridge]) {
-      revert ConnextXERC20__addBridge_alreadyAdded();
+      revert XERC20__addBridge_alreadyAdded();
     }
     emit BridgeAdded(_bridge);
     _whitelistedBridges[_bridge] = true;
@@ -93,7 +93,7 @@ contract ConnextXERC20 is ERC20PermitUpgradeable, ProposedOwnableUpgradeable {
    */
   function removeBridge(address _bridge) external onlyOwner {
     if (!_whitelistedBridges[_bridge]) {
-      revert ConnextXERC20__removeBridge_alreadyRemoved();
+      revert XERC20__removeBridge_alreadyRemoved();
     }
     emit BridgeRemoved(_bridge);
     _whitelistedBridges[_bridge] = false;
