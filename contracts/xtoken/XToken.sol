@@ -19,7 +19,6 @@ contract XERC20 is ERC20PermitUpgradeable, ProposedOwnableUpgradeable {
   event BridgeRemoved(address indexed bridge);
 
   // ======== Constants =========
-  uint256 public immutable TRANSFER_START;
 
   // ======== Storage =========
   /**
@@ -28,9 +27,7 @@ contract XERC20 is ERC20PermitUpgradeable, ProposedOwnableUpgradeable {
   mapping(address => bool) internal _whitelistedBridges;
 
   // ======== Constructor =========
-  constructor(uint256 _start) {
-    TRANSFER_START = _start;
-  }
+  constructor() {}
 
   // ======== Initializer =========
 
@@ -63,13 +60,6 @@ contract XERC20 is ERC20PermitUpgradeable, ProposedOwnableUpgradeable {
   modifier onlyBridge() {
     if (!_whitelistedBridges[msg.sender]) {
       revert XERC20__onlyBridge_notBridge();
-    }
-    _;
-  }
-
-  modifier onlyBridgeBeforeStart() {
-    if (block.timestamp <= TRANSFER_START && !_whitelistedBridges[msg.sender]) {
-      revert XERC20__onlyBridgeBeforeStart_notBridge();
     }
     _;
   }
@@ -117,18 +107,6 @@ contract XERC20 is ERC20PermitUpgradeable, ProposedOwnableUpgradeable {
    */
   function burn(address _from, uint256 _amount) public onlyBridge {
     _burn(_from, _amount);
-  }
-
-  function transfer(address recipient, uint256 amount) public virtual override onlyBridgeBeforeStart returns (bool) {
-    return super.transfer(recipient, amount);
-  }
-
-  function transferFrom(
-    address from,
-    address to,
-    uint256 amount
-  ) public virtual override onlyBridgeBeforeStart returns (bool) {
-    return super.transferFrom(from, to, amount);
   }
 
   // ============ Upgrade Gap ============
