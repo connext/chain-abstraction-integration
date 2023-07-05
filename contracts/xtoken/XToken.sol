@@ -52,7 +52,6 @@ contract XERC20 is ERC20PermitUpgradeable, ProposedOwnableUpgradeable {
 
   // ======== Errors =========
   error XERC20__onlyBridge_notBridge();
-  error XERC20__onlyBridgeBeforeStart_notBridge();
   error XERC20__addBridge_alreadyAdded();
   error XERC20__removeBridge_alreadyRemoved();
 
