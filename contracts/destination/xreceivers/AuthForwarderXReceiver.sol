@@ -36,8 +36,8 @@ abstract contract AuthForwarderXReceiver is IXReceiver, Ownable2Step {
   event ForwardedFunctionCallFailed(bytes32 indexed _transferId, string _errorMessage);
   event ForwardedFunctionCallFailed(bytes32 indexed _transferId, uint _errorCode);
   event ForwardedFunctionCallFailed(bytes32 indexed _transferId, bytes _lowLevelData);
-  event OriginAdded(uint32 _originDomain, address _originSender);
-  event OriginRemoved(uint32 _originDomain);
+  event OriginAdded(uint32 indexed _originDomain, address indexed _originSender);
+  event OriginRemoved(uint32 indexed _originDomain);
   event Prepared(bytes32 indexed _transferId, bytes _data, uint256 _amount, address _asset);
 
   /// ERRORS
