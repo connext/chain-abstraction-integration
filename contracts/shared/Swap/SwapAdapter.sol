@@ -97,6 +97,8 @@ contract SwapAdapter is Ownable2Step {
     if (_fromAsset == address(0)) {
       amountOut = ISwapper(_swapper).swapETH{value: msg.value}(_amountIn, _toAsset, _swapData);
     } else {
+      require(msg.value == 0, "not ETH swap");
+
       if (IERC20(_fromAsset).allowance(address(this), _swapper) < _amountIn) {
         TransferHelper.safeApprove(_fromAsset, _swapper, type(uint256).max);
       }
