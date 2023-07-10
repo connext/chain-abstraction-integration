@@ -5,12 +5,18 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import {ISwapRouter} from "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
-import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
 import {ISwapper} from "../interfaces/ISwapper.sol";
 
 interface IUniswapV3Router {
   function uniswapV3Swap(
+    uint256 amount,
+    uint256 minReturn,
+    uint256[] calldata pools
+  ) external payable returns (uint256 returnAmount);
+
+  function uniswapV3SwapTo(
+    address payable recipient,
     uint256 amount,
     uint256 minReturn,
     uint256[] calldata pools
@@ -22,8 +28,6 @@ interface IUniswapV3Router {
  * @notice Swapper contract for 1inch UniswapV3 swaps.
  */
 contract OneInchUniswapV3 is ISwapper {
-  using Address for address;
-
   IUniswapV3Router public immutable oneInchUniRouter;
 
   constructor(address _oneInchUniRouter) {
@@ -38,6 +42,7 @@ contract OneInchUniswapV3 is ISwapper {
    * @param _fromAsset Address of the token to swap from.
    * @param _toAsset Address of the token to swap to.
    * @param _swapData Data to pass to the 1inch aggregator router.
+   * @return amountOut Amount of the token received
    */
   function swap(
     uint256 _amountIn,
@@ -62,15 +67,10 @@ contract OneInchUniswapV3 is ISwapper {
 
       // The call to `uniswapV3Swap` executes the swap.
       // use actual amountIn that was sent to the xReceiver
-      amountOut = oneInchUniRouter.uniswapV3Swap(_amountIn, _minReturn, _pools);
+      amountOut = oneInchUniRouter.uniswapV3SwapTo(payable(msg.sender), _amountIn, _minReturn, _pools);
     } else {
+      // transfer the funds back to the sender
       amountOut = _amountIn;
-    }
-
-    // transfer the swapped funds back to the sender
-    if (_toAsset == address(0)) {
-      TransferHelper.safeTransferETH(msg.sender, amountOut);
-    } else {
       TransferHelper.safeTransfer(_toAsset, msg.sender, amountOut);
     }
   }
@@ -82,6 +82,7 @@ contract OneInchUniswapV3 is ISwapper {
    * @param _amountIn Amount of tokens to swap.
    * @param _toAsset Address of the token to swap to.
    * @param _swapData Data to pass to the 1inch aggregator router.
+   * @return amountOut Amount of the token received
    */
   function swapETH(
     uint256 _amountIn,
@@ -89,7 +90,7 @@ contract OneInchUniswapV3 is ISwapper {
     bytes calldata _swapData // from 1inch API
   ) external payable override returns (uint256 amountOut) {
     // check if msg.value is same as amountIn
-    require(msg.value >= _amountIn, "OneInchUniswapV3: msg.value != _amountIn");
+    require(msg.value == _amountIn, "OneInchUniswapV3: msg.value != _amountIn");
 
     if (_toAsset != address(0)) {
       // decode the swap data
@@ -99,8 +100,12 @@ contract OneInchUniswapV3 is ISwapper {
 
       // The call to `uniswapV3Swap` executes the swap.
       // use actual amountIn that was sent to the xReceiver
-      amountOut = oneInchUniRouter.uniswapV3Swap(_amountIn, _minReturn, _pools);
-      TransferHelper.safeTransfer(_toAsset, msg.sender, amountOut);
+      amountOut = oneInchUniRouter.uniswapV3SwapTo{value: _amountIn}(
+        payable(msg.sender),
+        _amountIn,
+        _minReturn,
+        _pools
+      );
     } else {
       amountOut = _amountIn;
       TransferHelper.safeTransferETH(msg.sender, amountOut);

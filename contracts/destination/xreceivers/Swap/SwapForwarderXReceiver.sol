@@ -3,7 +3,6 @@ pragma solidity ^0.8.13;
 
 import {IUniswapV2Router02} from "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
-import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
 import {ForwarderXReceiver} from "../ForwarderXReceiver.sol";
 import {SwapAdapter} from "../../../shared/Swap/SwapAdapter.sol";
@@ -14,8 +13,6 @@ import {SwapAdapter} from "../../../shared/Swap/SwapAdapter.sol";
  * @notice Abstract contract to allow for swapping tokens before forwarding a call.
  */
 abstract contract SwapForwarderXReceiver is ForwarderXReceiver, SwapAdapter {
-  using Address for address;
-
   /// @dev The address of the Connext contract on this domain.
   constructor(address _connext) ForwarderXReceiver(_connext) {}
 
@@ -27,6 +24,7 @@ abstract contract SwapForwarderXReceiver is ForwarderXReceiver, SwapAdapter {
    * @param _data The data to be swapped.
    * @param _amount The amount to be swapped.
    * @param _asset The incoming asset to be swapped.
+   * @return prepared data
    */
   function _prepare(
     bytes32 _transferId,

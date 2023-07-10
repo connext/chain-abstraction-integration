@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import {IConnext} from "@connext/interfaces/core/IConnext.sol";
 import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
@@ -13,15 +14,17 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * This is meant to be used when there are funds passed into the contract that need to be forwarded to another contract.
  */
 abstract contract ForwarderXReceiver is IXReceiver {
+  using SafeERC20 for IERC20;
+
   // The Connext contract on this domain
   IConnext public immutable connext;
 
   /// EVENTS
-  event ForwardedFunctionCallFailed(bytes32 _transferId);
-  event ForwardedFunctionCallFailed(bytes32 _transferId, string _errorMessage);
-  event ForwardedFunctionCallFailed(bytes32 _transferId, uint _errorCode);
-  event ForwardedFunctionCallFailed(bytes32 _transferId, bytes _lowLevelData);
-  event Prepared(bytes32 _transferId, bytes _data, uint256 _amount, address _asset);
+  event ForwardedFunctionCallFailed(bytes32 indexed _transferId);
+  event ForwardedFunctionCallFailed(bytes32 indexed _transferId, string _errorMessage);
+  event ForwardedFunctionCallFailed(bytes32 indexed _transferId, uint _errorCode);
+  event ForwardedFunctionCallFailed(bytes32 indexed _transferId, bytes _lowLevelData);
+  event Prepared(bytes32 indexed _transferId, bytes _data, uint256 _amount, address _asset);
 
   /// ERRORS
   error ForwarderXReceiver__onlyConnext(address sender);
@@ -55,6 +58,7 @@ abstract contract ForwarderXReceiver is IXReceiver {
    * @param _amount - The amount of funds received in this transfer.
    * @param _asset - The asset of the funds received in this transfer.
    * @param _callData - The data to be prepared and forwarded. Fallback address needs to be encoded in the data to be used in case the forward fails.
+   * @return the success status of the forwardFunctionCall
    */
   function xReceive(
     bytes32 _transferId,
@@ -92,7 +96,7 @@ abstract contract ForwarderXReceiver is IXReceiver {
       emit ForwardedFunctionCallFailed(_transferId, _lowLevelData);
     }
     if (!successfulForward) {
-      IERC20(_asset).transfer(_fallbackAddress, _amount);
+      SafeERC20.safeTransfer(IERC20(_asset), _fallbackAddress, _amount);
     }
     // Return the success status of the forwardFunctionCall
     return abi.encode(successfulForward);
@@ -110,6 +114,7 @@ abstract contract ForwarderXReceiver is IXReceiver {
    * @param _data - The data to be prepared
    * @param _amount - The amount of funds received in this transfer
    * @param _asset - The asset of the funds received in this transfer
+   * @return The result of the forward Function call
    */
   function prepareAndForward(
     bytes32 _transferId,
@@ -140,6 +145,7 @@ abstract contract ForwarderXReceiver is IXReceiver {
    * @param _data - The data to be prepared
    * @param _amount - The amount of funds received in this transfer
    * @param _asset - The asset of the funds received in this transfer
+   * @return encoded data
    */
   function _prepare(
     bytes32 _transferId,
@@ -160,6 +166,7 @@ abstract contract ForwarderXReceiver is IXReceiver {
    * @param _transferId - The transfer ID of the transfer that triggered this call
    * @param _amount - The amount of funds received in this transfer
    * @param _asset - The asset of the funds received in this transfer
+   * @return the result of the call
    */
   function _forwardFunctionCall(
     bytes memory _preparedData,

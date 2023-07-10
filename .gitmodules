@@ -1,14 +1,10 @@
-[submodule "hello_foundry/lib/forge-std"]
-	path = hello_foundry/lib/forge-std
-	url = https://github.com/foundry-rs/forge-std
 [submodule "lib/forge-std"]
 	path = lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
-	branch = v1.5.1
 [submodule "lib/vulcan"]
 	path = lib/vulcan
 	url = https://github.com/nomoixyz/vulcan
-	branch = alpha-1
+	tag = v0.1.0
 [submodule "lib/connext-interfaces"]
 	path = lib/connext-interfaces
 	url = https://github.com/connext/interfaces

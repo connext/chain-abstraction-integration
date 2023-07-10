@@ -30,6 +30,7 @@ contract UniV3Swapper is ISwapper {
    * @param _fromAsset Address of the token to swap from.
    * @param _toAsset Address of the token to swap to.
    * @param _swapData Data to pass to the UniV3 router.
+   * @return amountOut Amount of the token received
    */
   function swap(
     uint256 _amountIn,
@@ -82,6 +83,7 @@ contract UniV3Swapper is ISwapper {
    * @param _amountIn Amount of tokens to swap.
    * @param _toAsset Address of the token to swap to.
    * @param _swapData Data to pass to the UniV3 router.
+   * @return amountOut Amount of the token received
    */
   function swapETH(
     uint256 _amountIn,

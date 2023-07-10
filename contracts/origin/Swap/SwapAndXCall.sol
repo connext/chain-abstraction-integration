@@ -20,8 +20,8 @@ contract SwapAndXCall is SwapAdapter {
    * @notice Calls a swapper contract and then calls xcall on connext
    * @dev Data for the swap is generated offchain to call to the appropriate swapper contract
    * Function is payable since it uses the relayer fee in native asset
-   * @param _fromAsset Address of the asset to swap from
-   * @param _toAsset Address of the asset to swap to
+   * @param _fromAsset Address of the asset to swap from. fromAsset can be both of ETH and ERC20
+   * @param _toAsset Address of the asset to swap to. toAsset can't be ETH. because connext doesn't support xcall with ETH
    * @param _amountIn Amount of the asset to swap from
    * @param _swapper Address of the swapper contract
    * @param _swapData Data to call the swapper contract with
@@ -43,11 +43,14 @@ contract SwapAndXCall is SwapAdapter {
     uint256 _slippage,
     bytes calldata _callData
   ) external payable {
-    uint256 amountOut = _fromAsset == address(0)
+    require(_toAsset != address(0), "connext not support");
+
+    bool isNative = _fromAsset == address(0);
+    uint256 amountOut = isNative
       ? _setupAndSwapETH(_toAsset, _amountIn, _swapper, _swapData)
       : _setupAndSwap(_fromAsset, _toAsset, _amountIn, _swapper, _swapData);
 
-    connext.xcall{value: _fromAsset == address(0) ? msg.value - _amountIn : msg.value}(
+    connext.xcall{value: isNative ? msg.value - _amountIn : msg.value}(
       _destination,
       _to,
       _toAsset,
@@ -62,8 +65,8 @@ contract SwapAndXCall is SwapAdapter {
    * @notice Calls a swapper contract and then calls xcall on connext
    * @dev Data for the swap is generated offchain to call to the appropriate swapper contract
    * Pays relayer fee from the input asset
-   * @param _fromAsset Address of the asset to swap from
-   * @param _toAsset Address of the asset to swap to
+   * @param _fromAsset Address of the asset to swap from. fromAsset can be both of ETH and ERC20
+   * @param _toAsset Address of the asset to swap to. toAsset can't be ETH. because connext doesn't support xcall with ETH
    * @param _amountIn Amount of the asset to swap from
    * @param _swapper Address of the swapper contract
    * @param _swapData Data to call the swapper contract with
@@ -87,7 +90,12 @@ contract SwapAndXCall is SwapAdapter {
     bytes calldata _callData,
     uint256 _relayerFee
   ) external payable {
-    uint256 amountOut = _fromAsset == address(0)
+    require(_toAsset != address(0), "connext not support");
+
+    bool isNative = _fromAsset == address(0);
+    require(msg.value == (isNative ? _amountIn : 0), "!value");
+
+    uint256 amountOut = isNative
       ? _setupAndSwapETH(_toAsset, _amountIn, _swapper, _swapData)
       : _setupAndSwap(_fromAsset, _toAsset, _amountIn, _swapper, _swapData);
 

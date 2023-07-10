@@ -4,7 +4,6 @@ pragma solidity ^0.8.17;
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IUniswapV2Router02} from "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
-import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
 import {ISwapper} from "../interfaces/ISwapper.sol";
 
@@ -13,8 +12,6 @@ import {ISwapper} from "../interfaces/ISwapper.sol";
  * @notice Swapper contract for UniswapV2 swaps.
  */
 contract UniV2Swapper is ISwapper {
-  using Address for address;
-
   IUniswapV2Router02 public immutable uniswapV2Router;
 
   constructor(address _uniV2Router) {
@@ -29,6 +26,7 @@ contract UniV2Swapper is ISwapper {
    * @param _fromAsset Address of the token to swap from.
    * @param _toAsset Address of the token to swap to.
    * @param _swapData Data to pass to the UniV2 router.
+   * @return amountOut Amount of the token received
    */
   function swap(
     uint256 _amountIn,
@@ -63,6 +61,9 @@ contract UniV2Swapper is ISwapper {
         amounts = uniswapV2Router.swapExactTokensForETH(_amountIn, amountOutMin, path, msg.sender, block.timestamp);
       }
       amountOut = amounts[amounts.length - 1];
+    } else {
+      amountOut = _amountIn;
+      TransferHelper.safeTransfer(_toAsset, msg.sender, amountOut);
     }
   }
 
@@ -73,6 +74,7 @@ contract UniV2Swapper is ISwapper {
    * @param _amountIn Amount of tokens to swap.
    * @param _toAsset Address of the token to swap to.
    * @param _swapData Data to pass to the UniV2 router.
+   * @return amountOut Amount of the token received
    */
   function swapETH(
     uint256 _amountIn,
