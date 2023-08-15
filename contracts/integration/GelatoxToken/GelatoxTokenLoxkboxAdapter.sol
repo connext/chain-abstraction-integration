@@ -17,7 +17,6 @@ contract GelatoLockboxAdapter is IXReceiver {
     erc20 = IERC20(_erc20);
     xerc20 = IXERC20(_xerc20);
   }
-  
 
   /// @notice Deposit ERC20s into the Lockbox
   /// @param _amount Amount of ERC20s to use
