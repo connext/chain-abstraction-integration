@@ -41,10 +41,42 @@ interface IXERC20Lockbox {
   function deposit(uint256 _amount) external;
 
   /**
+   * @notice Deposit native tokens into the lockbox
+   */
+
+  function depositNative() external payable;
+
+  /**
+   * @notice Deposit ERC20 tokens into the lockbox, and send the XERC20 to a user
+   *
+   * @param _user The user to send the XERC20 to
+   * @param _amount The amount of tokens to deposit
+   */
+
+  function depositTo(address _user, uint256 _amount) external;
+
+  /**
+   * @notice Deposit the native asset into the lockbox, and send the XERC20 to a user
+   *
+   * @param _user The user to send the XERC20 to
+   */
+
+  function depositNativeTo(address _user) external payable;
+
+  /**
    * @notice Withdraw ERC20 tokens from the lockbox
    *
    * @param _amount The amount of tokens to withdraw
    */
 
   function withdraw(uint256 _amount) external;
+
+  /**
+   * @notice Withdraw ERC20 tokens from the lockbox
+   *
+   * @param _user The user to withdraw to
+   * @param _amount The amount of tokens to withdraw
+   */
+
+  function withdrawTo(address _user, uint256 _amount) external;
 }
