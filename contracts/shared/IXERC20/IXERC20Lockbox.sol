@@ -33,6 +33,24 @@ interface IXERC20Lockbox {
   error IXERC20Lockbox_WithdrawFailed();
 
   /**
+   * @notice The XERC20 token of this contract
+   */
+
+  function XERC20() external view returns (address);
+
+  /**
+   * @notice The ERC20 token of this contract
+   */
+
+  function ERC20() external view returns (address);
+
+  /**
+   * @notice Whether the ERC20 token is the native gas token of this chain
+   */
+
+  function IS_NATIVE() external view returns (bool);
+
+  /**
    * @notice Deposit ERC20 tokens into the lockbox
    *
    * @param _amount The amount of tokens to deposit
