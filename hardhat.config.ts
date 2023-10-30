@@ -37,7 +37,7 @@ function getNetworkUrl(networkType: string) {
   else if (networkType === "fantom") return `https://rpc.ftm.tools/`;
   else if (networkType === "bnb") return `https://bsc-dataseed.binance.org`;
   else if (networkType === "xdai") return `https://rpc.ankr.com/gnosis`;
-  else return alchemyApiKey ? `https://eth-mainnet.alchemyapi.io/v2/${alchemyApiKey}` : "https://cloudflare-eth.com";
+  else return alchemyApiKey ? `https://eth-mainnet.alchemyapi.io/v2/${alchemyApiKey}` : "https://eth.llamarpc.com";
 }
 
 const config: HardhatUserConfig = {

@@ -8,6 +8,15 @@ export const DEFAULT_ARGS: Record<number, any> = {
     ONEINCH_ROUTER: "",
     UNIV3_ROUTER: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
   },
+  // Ethereum
+  1: {
+    CONNEXT: "0x8898B472C54c31894e3B9bb83cEA802a5d0e63C6",
+    WETH: "",
+    USDC: "",
+    DOMAIN: "",
+    ONEINCH_ROUTER: "",
+    UNIV3_ROUTER: "",
+  },
   // Optimism
   10: {
     CONNEXT: "0x8f7492DE823025b4CfaAB1D34c58963F2af5DEDA",
@@ -50,6 +59,14 @@ export const DEFAULT_ARGS: Record<number, any> = {
     DOMAIN: "6778479", // Gnosis domain ID
     ONEINCH_ROUTER: "0x1111111254EEB25477B68fb85Ed929f73A960582",
     UNIV2_ROUTER: "0x1C232F01118CB8B424793ae03F870aa7D0ac7f77", // HoneysSwap UniV2 Router
+  },
+};
+
+export const GRUMPYCAT_CONFIG: Record<number, any> = {
+  1: {
+    LOCKBOX: "0x713F8CE92B4369f2206AFEE90bD13464Bbfb28bE",
+    XERC20: "0x3B350F202473932411772C8Cb76DB7975f42397E",
+    ERC20: "0xd8E2D95C8614F28169757cD6445a71c291dEc5bF",
   },
 };
 
