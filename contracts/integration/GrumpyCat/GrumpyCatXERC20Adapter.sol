@@ -17,18 +17,18 @@ contract GrumpycatLockboxAdapter is IXReceiver {
 
   error XReceiver__onlyConnext(address sender);
 
-  constructor(address _connext, address _lockbox, address _erc20, address _xerc20) {
-    connext = IConnext(_connext);
-    lockbox = IXERC20Lockbox(_lockbox);
-    erc20 = IERC20(_erc20);
-    xerc20 = IXERC20(_xerc20);
-  }
-
   modifier onlyConnext() {
     if (msg.sender != address(connext)) {
       revert XReceiver__onlyConnext(msg.sender);
     }
     _;
+  }
+
+  constructor(address _connext, address _lockbox, address _erc20, address _xerc20) {
+    connext = IConnext(_connext);
+    lockbox = IXERC20Lockbox(_lockbox);
+    erc20 = IERC20(_erc20);
+    xerc20 = IXERC20(_xerc20);
   }
 
   function xcall(
@@ -59,7 +59,7 @@ contract GrumpycatLockboxAdapter is IXReceiver {
     address _originSender,
     uint32 _origin,
     bytes memory _callData
-  ) external returns (bytes memory) {
+  ) external onlyConnext returns (bytes memory) {
     // Check for the right xerc20
     require(_asset == address(xerc20), "Wrong asset received");
 
