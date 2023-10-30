@@ -60,45 +60,6 @@ contract LockboxAdapter is IXReceiver {
       IConnext(connext).xcall{value: _relayerFee}(_destination, _to, xerc20, _delegate, _amount, _slippage, _callData);
   }
 
-  /// @dev Combines Lockbox deposit and xcall using transacting asset as relayer fee.
-  /// @param _destination The destination domain ID.
-  /// @param _to The recipient or contract address on destination.
-  /// @param _lockbox The address of the Lockbox, given this contract is only used for xERC20s.
-  /// @param _delegate The address of the Lockbox, given this contract is only used for xERC20s.
-  /// @param _amount The amount of asset to bridge.
-  /// @param _slippage The maximum slippage a user is willing to take, in BPS.
-  /// @param _callData The data that will be sent to the target contract.
-  /// @param _relayerFee The relayer fee in transacting asset.
-  function xcall(
-    uint32 _destination,
-    address _to,
-    address _lockbox,
-    address _delegate,
-    uint256 _amount,
-    uint256 _slippage,
-    bytes calldata _callData,
-    uint256 _relayerFee
-  ) external payable returns (bytes32) {
-    require(_amount > 0, "Amount must be greater than 0");
-
-    address xerc20 = IXERC20Lockbox(_lockbox).XERC20();
-    bool isNative = IXERC20Lockbox(_lockbox).IS_NATIVE();
-
-    // Relayer fee is paid in xERC20, so it will also be exchanged in the Lockbox
-    uint256 totalAmount = _amount + _relayerFee;
-
-    if (isNative) {
-      IXERC20Lockbox(_lockbox).depositNative{value: totalAmount}();
-    } else {
-      IERC20(xerc20).transferFrom(msg.sender, address(this), totalAmount);
-      IERC20(xerc20).approve(_lockbox, totalAmount);
-      IXERC20Lockbox(_lockbox).deposit(totalAmount);
-    }
-
-    IERC20(xerc20).approve(connext, totalAmount);
-    return IConnext(connext).xcall(_destination, _to, xerc20, _delegate, _amount, _slippage, _callData, _relayerFee);
-  }
-
   /// @dev Receives xERC20s from Connext and calls the Lockbox.
   /// @param _transferId The ID of the transfer.
   /// @param _amount The amount of funds that will be received.
