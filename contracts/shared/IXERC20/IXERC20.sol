@@ -61,6 +61,11 @@ interface IXERC20 {
   function setLimits(address _bridge, uint256 _mintingLimit, uint256 _burningLimit) external;
 
   /**
+   * @notice The address of the lockbox contract
+   */
+  function lockbox() external view returns (address);
+
+  /**
    * @notice Returns the max limit of a minter
    *
    * @param _minter The minter we are viewing the limits of
