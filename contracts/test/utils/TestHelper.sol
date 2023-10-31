@@ -2,8 +2,9 @@
 pragma solidity ^0.8.15;
 
 import "forge-std/Test.sol";
+import "forge-std/StdCheats.sol";
 
-contract TestHelper is Test {
+contract TestHelper is StdCheats, Test {
   /// Testnet Domain IDs
   uint32 public GOERLI_DOMAIN_ID = 1735353714;
   uint32 public OPTIMISM_GOERLI_DOMAIN_ID = 1735356532;
@@ -17,6 +18,7 @@ contract TestHelper is Test {
   uint32 public POLYGON_MUMBAI_CHAIN_ID = 80001;
 
   /// Mainnet Domain IDs
+  uint32 public ETHEREUM_DOMAIN_ID = 6648936;
   uint32 public ARBITRUM_DOMAIN_ID = 1634886255;
   uint32 public OPTIMISM_DOMAIN_ID = 1869640809;
   uint32 public BNB_DOMAIN_ID = 6450786;
@@ -27,12 +29,14 @@ contract TestHelper is Test {
   uint32 public OPTIMISM_CHAIN_ID = 10;
 
   // Live Addresses
+  address public CONNEXT_ETHEREUM = 0x8898B472C54c31894e3B9bb83cEA802a5d0e63C6;
   address public CONNEXT_ARBITRUM = 0xEE9deC2712cCE65174B561151701Bf54b99C24C8;
   address public CONNEXT_OPTIMISM = 0x8f7492DE823025b4CfaAB1D34c58963F2af5DEDA;
   address public CONNEXT_BNB = 0xCd401c10afa37d641d2F594852DA94C700e4F2CE;
   address public CONNEXT_POLYGON = 0x11984dc4465481512eb5b777E44061C158CF2259;
 
   // Forks
+  uint256 public ethereumForkId;
   uint256 public arbitrumForkId;
   uint256 public optimismForkId;
   uint256 public bnbForkId;
@@ -42,7 +46,6 @@ contract TestHelper is Test {
   address public USER_CHAIN_A = address(bytes20(keccak256("USER_CHAIN_A")));
   address public USER_CHAIN_B = address(bytes20(keccak256("USER_CHAIN_B")));
   address public MOCK_CONNEXT = address(bytes20(keccak256("MOCK_CONNEXT")));
-  address public MOCK_MEAN_FINANCE = address(bytes20(keccak256("MOCK_MEAN_FINANCE")));
   address public TokenA_ERC20 = address(bytes20(keccak256("TokenA_ERC20")));
   address public TokenB_ERC20 = address(bytes20(keccak256("TokenB_ERC20")));
 
@@ -51,11 +54,15 @@ contract TestHelper is Test {
 
   function setUp() public virtual {
     vm.label(MOCK_CONNEXT, "Mock Connext");
-    vm.label(MOCK_MEAN_FINANCE, "Mock Mean Finance");
     vm.label(TokenA_ERC20, "TokenA_ERC20");
     vm.label(TokenB_ERC20, "TokenB_ERC20");
     vm.label(USER_CHAIN_A, "User Chain A");
     vm.label(USER_CHAIN_B, "User Chain B");
+  }
+
+  function setUpEthereum(uint256 blockNumber) public {
+    ethereumForkId = vm.createSelectFork(getRpc(1), blockNumber);
+    vm.label(CONNEXT_ETHEREUM, "Connext Ethereum");
   }
 
   function setUpArbitrum(uint256 blockNumber) public {
