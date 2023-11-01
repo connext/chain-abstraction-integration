@@ -27,7 +27,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   if (!deployer) {
     throw new Error(`Cannot find signer to deploy with`);
   }
-  console.log("\n============================= Deploying MidasProtocolTarget ===============================");
+  console.log("\n============================= Deploying GrumpyCatLockboxAdapter ===============================");
   console.log("deployer: ", deployer.address);
   console.log("constructorArgs:", args);
 
@@ -35,7 +35,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const adapter = await hre.deployments.deploy("GrumpyCatLockboxAdapter", {
     from: deployer.address,
     args: args,
-    skipIfAlreadyDeployed: true,
     log: true,
     // deterministicDeployment: true,
   });
