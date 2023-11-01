@@ -28,7 +28,9 @@ function createConfig(network: string) {
 }
 
 function getNetworkUrl(networkType: string) {
-  if (networkType === "polygon")
+  if (networkType === "mainnet")
+    return alchemyApiKey ? `https://eth-mainnet.alchemyapi.io/v2/${alchemyApiKey}` : "https://eth.llamarpc.com";
+  else if (networkType === "polygon")
     return alchemyApiKey ? `https://polygon-mainnet.g.alchemy.com/v2/${alchemyApiKey}` : "https://polygon.llamarpc.com";
   else if (networkType === "arbitrum")
     return alchemyApiKey ? `https://arb-mainnet.g.alchemy.com/v2/${alchemyApiKey}` : "https://arb1.arbitrum.io/rpc";

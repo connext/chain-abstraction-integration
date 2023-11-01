@@ -41,6 +41,7 @@ contract GrumpyCatLockboxAdapter is IXReceiver {
     bytes calldata _callData
   ) external payable returns (bytes32) {
     erc20.transferFrom(msg.sender, address(this), _amount);
+    erc20.approve(address(lockbox), _amount);
     lockbox.deposit(_amount);
     xerc20.approve(address(connext), _amount);
 
