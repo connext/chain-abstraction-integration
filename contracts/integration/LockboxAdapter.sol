@@ -26,7 +26,7 @@ contract LockboxAdapter is IXReceiver {
   /// @dev Combines Lockbox deposit and xcall using native asset as relayer fee.
   /// @param _destination The destination domain ID.
   /// @param _to The recipient or contract address on destination.
-  /// @param _asset The address of the asset to be sent.
+  /// @param _asset The address of the asset to be sent (ERC20 or native).
   /// @param _delegate The address on destination allowed to update slippage.
   /// @param _amount The amount of asset to bridge.
   /// @param _slippage The maximum slippage a user is willing to take, in BPS.
