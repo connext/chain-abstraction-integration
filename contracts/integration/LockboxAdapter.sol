@@ -87,6 +87,10 @@ contract LockboxAdapter is IXReceiver {
 
     if (isNative) {
       // TODO
+      IERC20(_asset).approve(lockbox, _amount);
+      IXERC20Lockbox(lockbox).withdraw(_amount);
+      (bool _success, ) = payable(recipient).call{value: _amount}("");
+      if (!_success) revert IXERC20Lockbox.IXERC20Lockbox_WithdrawFailed();
     } else {
       IERC20(_asset).approve(lockbox, _amount);
       IXERC20Lockbox(lockbox).withdraw(_amount);

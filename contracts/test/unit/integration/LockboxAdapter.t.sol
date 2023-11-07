@@ -131,4 +131,35 @@ contract LockboxAdapterTest is TestHelper {
     assertEq(IERC20(erc20).balanceOf(lockbox), lockboxInitialAmount - _amount);
     assertEq(IERC20(xerc20).balanceOf(address(adapter)), adapterInitialAmount - _amount);
   }
+
+  function test_LockboxAdapter__xReceive_worksWithNative() public {
+    utils_setUpEthereum();
+    vm.selectFork(ethereumForkId);
+    deal(xerc20, address(adapter), _amount);
+    // vm.deal(lockbox, _amount);
+    vm.deal(address(adapter), _amount);
+
+    uint256 userInitialAmount = address(USER_CHAIN_A).balance;
+
+    uint256 lockboxInitialBalance = address(lockbox).balance;
+
+    uint256 adapterInitialBalance = address(adapter).balance;
+
+    vm.mockCall(registry, abi.encodeWithSelector(IXERC20Registry.getXERC20.selector, erc20), abi.encode(xerc20));
+    vm.mockCall(registry, abi.encodeWithSelector(IXERC20Registry.getLockbox.selector, erc20), abi.encode(lockbox));
+    vm.mockCall(lockbox, abi.encodeWithSelector(IXERC20Lockbox.IS_NATIVE.selector), abi.encode(true));
+
+    vm.startPrank(CONNEXT_ETHEREUM);
+
+    // assertEq(address(lockbox).balance, _amount);
+
+    adapter.xReceive(bytes32(0), _amount, xerc20, USER_CHAIN_A, 1869640809, abi.encode(USER_CHAIN_A));
+
+    vm.stopPrank();
+
+    // Assert that the user's balance has increased by the amount sent.
+    assertEq(address(USER_CHAIN_A).balance, userInitialAmount + _amount);
+    // assertEq(address(adapter).balance, 0);
+    // assertEq(address(lockbox).balance, lockboxInitialBalance - _amount);
+  }
 }
