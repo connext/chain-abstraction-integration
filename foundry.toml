@@ -6,3 +6,7 @@ test = 'test'
 cache_path  = 'cache_forge'
 solc = "0.8.20"
 via_ir = true
+
+remappings = [
+  '@defi-wonderland/xerc20/=lib/xerc20/'
+]

@@ -11,6 +11,8 @@ import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
 interface IXERC20Registry {
   function getXERC20(address erc20) external view returns (address xerc20);
 
+  function getERC20(address xerc20) external view returns (address erc20);
+
   function getLockbox(address erc20) external view returns (address xerc20);
 }
 
@@ -80,13 +82,14 @@ contract LockboxAdapter is IXReceiver {
     uint32 /* _origin */,
     bytes memory _callData
   ) external returns (bytes memory) {
+    // TODO: fallback deliver to recipient
+
     address recipient = abi.decode(_callData, (address));
     address lockbox = IXERC20Registry(registry).getLockbox(_asset);
-    address erc20 = IXERC20Lockbox(lockbox).ERC20();
+    address erc20 = IXERC20Registry(registry).getERC20(_asset);
     bool isNative = IXERC20Lockbox(lockbox).IS_NATIVE();
 
     if (isNative) {
-      // TODO
       IERC20(_asset).approve(lockbox, _amount);
       IXERC20Lockbox(lockbox).withdraw(_amount);
       (bool _success, ) = payable(recipient).call{value: _amount}("");
