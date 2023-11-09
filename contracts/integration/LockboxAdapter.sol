@@ -20,6 +20,11 @@ contract LockboxAdapter is IXReceiver {
   address immutable connext;
   address immutable registry;
 
+  modifier onlyConnext() {
+    require(msg.sender == connext, "Can only be called by Connext");
+    _;
+  }
+
   constructor(address _connext, address _registry) {
     connext = _connext;
     registry = _registry;
@@ -81,9 +86,7 @@ contract LockboxAdapter is IXReceiver {
     address /* _originSender */,
     uint32 /* _origin */,
     bytes memory _callData
-  ) external returns (bytes memory) {
-    // TODO: fallback deliver to recipient
-
+  ) external onlyConnext returns (bytes memory) {
     address recipient = abi.decode(_callData, (address));
     address lockbox = IXERC20Registry(registry).getLockbox(_asset);
     address erc20 = IXERC20Registry(registry).getERC20(_asset);

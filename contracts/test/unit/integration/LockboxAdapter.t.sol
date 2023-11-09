@@ -196,4 +196,12 @@ contract LockboxAdapterTest is TestHelper {
     assertEq(address(adapter).balance, 0);
     assertEq(address(lockbox).balance, lockboxInitialBalance - _amount);
   }
+
+  function test_LockboxAdapter__xReceive_revertsIfNotConnext() public {
+    utils_setUpEthereum();
+    vm.selectFork(ethereumForkId);
+
+    vm.expectRevert(abi.encodePacked("Can only be called by Connext"));
+    adapter.xReceive(bytes32(0), _amount, xerc20, USER_CHAIN_A, 1869640809, abi.encode(USER_CHAIN_A));
+  }
 }
