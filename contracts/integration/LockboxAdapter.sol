@@ -104,4 +104,6 @@ contract LockboxAdapter is IXReceiver {
     // This receiver does not need to return any data so it returns an empty bytes array.
     return "";
   }
+
+  receive() external payable {}
 }
