@@ -7,7 +7,9 @@ import {LockboxAdapter} from "../../../../contracts/integration/LockboxAdapter.s
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IXERC20Lockbox} from "../../../shared/IXERC20/IXERC20Lockbox.sol";
 import {IConnext} from "@connext/interfaces/core/IConnext.sol";
+import {XERC20Lockbox} from "@defi-wonderland/xerc20/solidity/contracts/XERC20Lockbox.sol";
 import {XERC20} from "@defi-wonderland/xerc20/solidity/contracts/XERC20.sol";
+import {IXERC20} from "@defi-wonderland/xerc20/solidity/interfaces/IXERC20.sol";
 
 interface IXERC20Registry {
   // ========== Events ===========
@@ -40,7 +42,7 @@ interface IXERC20Registry {
 
 contract LockboxAdapterTest is TestHelper {
   LockboxAdapter public adapter;
-  address public registry = address(0xFa6c35C88e03338b13cffC9a5A143a2951B7f2fF);
+  address public registry = address(0xBbA4b5130Fb918A6E2Dbc94b430397D3d2EA1e2F);
   address public registrar = address(0xade09131C6f43fe22C2CbABb759636C43cFc181e);
 
   // NEXT token uses Lockbox on Ethereum
@@ -62,20 +64,29 @@ contract LockboxAdapterTest is TestHelper {
   uint256 _relayerFee = 1e17;
 
   function utils_setUpEthereum() public {
-    setUpEthereum(18516267); // Registry added NEXT
+    setUpEthereum(18530675); // Registry added NEXT
     adapter = new LockboxAdapter(CONNEXT_ETHEREUM, registry);
 
     vm.label(address(erc20), "NEXT (ERC20)");
     vm.label(address(xerc20), "NEXT (xERC20)");
     vm.label(address(lockbox), "Lockbox");
     vm.label(address(adapter), "Adapter");
+    vm.label(address(registry), "Registry");
     vm.label(address(this), "AdapterTest");
   }
 
   function utils_registerNative() public {
-    xerc20ForNative = address(new XERC20("testTKN", "TTKN", address(0)));
+    address factory = address(0x100);
+    xerc20ForNative = address(new XERC20("testTKN", "TTKN", factory));
+    nativeLockbox = address(new XERC20Lockbox(address(xerc20ForNative), address(0), true));
+
+    vm.prank(factory);
+    IXERC20(xerc20ForNative).setLockbox(nativeLockbox);
     vm.prank(registrar);
     IXERC20Registry(registry).registerXERC20(address(xerc20ForNative), address(0));
+
+    vm.label(xerc20ForNative, "Native xERC20");
+    vm.label(nativeLockbox, "Native Lockbox");
   }
 
   function test_LockboxAdapter__xcall_revertsIfZeroAmount() public {
@@ -172,22 +183,17 @@ contract LockboxAdapterTest is TestHelper {
     vm.selectFork(ethereumForkId);
     utils_registerNative();
     deal(xerc20ForNative, address(adapter), _amount);
-    vm.deal(lockbox, _amount);
+    vm.deal(nativeLockbox, _amount);
 
     uint256 userInitialAmount = address(USER_CHAIN_A).balance;
-    uint256 lockboxInitialBalance = address(lockbox).balance;
-    uint256 adapterInitialBalance = address(adapter).balance;
+    uint256 lockboxInitialBalance = address(nativeLockbox).balance;
 
     vm.startPrank(CONNEXT_ETHEREUM);
-
     adapter.xReceive(bytes32(0), _amount, xerc20ForNative, USER_CHAIN_A, ARBITRUM_DOMAIN_ID, abi.encode(USER_CHAIN_A));
-
     vm.stopPrank();
 
-    // Assert that the user's balance has increased by the amount sent
-    // assertEq(address(USER_CHAIN_A).balance, userInitialAmount + _amount);
-    // assertEq(address(adapter).balance, 0);
-    // assertEq(address(adapter).balance, _amount);
-    // assertEq(address(lockbox).balance, lockboxInitialBalance - _amount);
+    assertEq(address(USER_CHAIN_A).balance, userInitialAmount + _amount);
+    assertEq(address(adapter).balance, 0);
+    assertEq(address(lockbox).balance, lockboxInitialBalance - _amount);
   }
 }
