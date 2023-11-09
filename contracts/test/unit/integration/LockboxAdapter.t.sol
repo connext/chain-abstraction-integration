@@ -46,17 +46,18 @@ contract LockboxAdapterTest is TestHelper {
   address public registry = address(0xBbA4b5130Fb918A6E2Dbc94b430397D3d2EA1e2F);
   address public registrar = address(0xade09131C6f43fe22C2CbABb759636C43cFc181e);
 
-  // NEXT token uses Lockbox on Ethereum
+  // NEXT token details (registered)
   address public erc20 = address(0xFE67A4450907459c3e1FFf623aA927dD4e28c67a);
   address public xerc20 = address(0x58b9cB810A68a7f3e1E4f8Cb45D1B9B3c79705E8);
   address public lockbox = address(0x22f424Bca11FE154c403c277b5F8dAb54a4bA29b);
 
-  // Contracts for native
+  // ALCX token details (non-registered)
+  address public alcxERC20 = address(0xdBdb4d16EdA451D0503b854CF79D55697F90c8DF);
+  address public alcxXERC20 = address(0xbD18F9be5675A9658335e6B7E79D9D9B394aC043);
+
+  // Native token details (non-registered)
   address public xerc20ForNative;
   address public nativeLockbox;
-
-  // Contracts for non-registered
-  address public nonRegieteredLockbox;
 
   // Default params for xcall
   uint32 _destination = ARBITRUM_DOMAIN_ID;
@@ -68,7 +69,7 @@ contract LockboxAdapterTest is TestHelper {
   uint256 _relayerFee = 1e17;
 
   function utils_setUpEthereum() public {
-    setUpEthereum(18530675); // Registry added NEXT
+    setUpEthereum(18530675); // Registry added only NEXT
     adapter = new LockboxAdapter(CONNEXT_ETHEREUM, registry);
 
     vm.label(address(erc20), "NEXT (ERC20)");
@@ -213,23 +214,18 @@ contract LockboxAdapterTest is TestHelper {
   function test_LockboxAdapter__xReceive__FallbackWorks() public {
     utils_setUpEthereum();
     vm.selectFork(ethereumForkId);
-    // Tokens not registered in registry
-    // new XERC20
-    address tempFactory = address(0x11);
-    address xerc20NonRegistered = address(new XERC20("xtestTKN", "xTTKN", tempFactory));
-    address erc20NonRegistered = address(new ERC20("testTKN", "TKN"));
 
-    nonRegieteredLockbox = address(new XERC20Lockbox(address(xerc20NonRegistered), address(erc20NonRegistered), false));
-    deal(xerc20NonRegistered, address(adapter), _amount);
+    // Use ALCX, which is not registered
+    deal(alcxXERC20, address(adapter), _amount);
 
-    uint256 userInitialAmount = IERC20(xerc20NonRegistered).balanceOf(USER_CHAIN_A);
-    uint256 adapterInitialAmount = IERC20(xerc20NonRegistered).balanceOf(address(adapter));
+    uint256 userInitialAmount = IERC20(alcxXERC20).balanceOf(USER_CHAIN_A);
+    uint256 adapterInitialAmount = IERC20(alcxXERC20).balanceOf(address(adapter));
 
     vm.startPrank(CONNEXT_ETHEREUM);
-    adapter.xReceive(bytes32(0), _amount, xerc20NonRegistered, USER_CHAIN_A, 1869640809, abi.encode(USER_CHAIN_A));
+    adapter.xReceive(bytes32(0), _amount, alcxXERC20, USER_CHAIN_A, 1869640809, abi.encode(USER_CHAIN_A));
     vm.stopPrank();
 
-    assertEq(IERC20(xerc20NonRegistered).balanceOf(USER_CHAIN_A), userInitialAmount + _amount);
-    assertEq(IERC20(xerc20NonRegistered).balanceOf(address(adapter)), adapterInitialAmount - _amount);
+    assertEq(IERC20(alcxXERC20).balanceOf(USER_CHAIN_A), userInitialAmount + _amount);
+    assertEq(IERC20(alcxXERC20).balanceOf(address(adapter)), adapterInitialAmount - _amount);
   }
 }
