@@ -5,6 +5,7 @@ import {TestHelper} from "../../utils/TestHelper.sol";
 import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 import {LockboxAdapter} from "../../../../contracts/integration/LockboxAdapter.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {IXERC20Lockbox} from "../../../shared/IXERC20/IXERC20Lockbox.sol";
 import {IConnext} from "@connext/interfaces/core/IConnext.sol";
 import {XERC20Lockbox} from "@defi-wonderland/xerc20/solidity/contracts/XERC20Lockbox.sol";
@@ -53,6 +54,9 @@ contract LockboxAdapterTest is TestHelper {
   // Contracts for native
   address public xerc20ForNative;
   address public nativeLockbox;
+
+  // Contracts for non-registered
+  address public nonRegieteredLockbox;
 
   // Default params for xcall
   uint32 _destination = ARBITRUM_DOMAIN_ID;
@@ -203,5 +207,28 @@ contract LockboxAdapterTest is TestHelper {
 
     vm.expectRevert(abi.encodePacked("Can only be called by Connext"));
     adapter.xReceive(bytes32(0), _amount, xerc20, USER_CHAIN_A, 1869640809, abi.encode(USER_CHAIN_A));
+  }
+
+  function test_LockboxAdapter__xReceive__FallbackWorks() public {
+    utils_setUpEthereum();
+    vm.selectFork(ethereumForkId);
+    // Tokens not registered in registry
+    // new XERC20
+    address tempFactory = address(0x11);
+    address xerc20NonRegistered = address(new XERC20("xtestTKN", "xTTKN", tempFactory));
+    address erc20NonRegistered = address(new ERC20("testTKN", "TKN"));
+
+    nonRegieteredLockbox = address(new XERC20Lockbox(address(xerc20NonRegistered), address(erc20NonRegistered), false));
+    deal(xerc20NonRegistered, address(adapter), _amount);
+
+    uint256 userInitialAmount = IERC20(xerc20NonRegistered).balanceOf(USER_CHAIN_A);
+    uint256 adapterInitialAmount = IERC20(xerc20NonRegistered).balanceOf(address(adapter));
+
+    vm.startPrank(CONNEXT_ETHEREUM);
+    adapter.xReceive(bytes32(0), _amount, xerc20NonRegistered, USER_CHAIN_A, 1869640809, abi.encode(USER_CHAIN_A));
+    vm.stopPrank();
+
+    assertEq(IERC20(xerc20NonRegistered).balanceOf(USER_CHAIN_A), userInitialAmount + _amount);
+    assertEq(IERC20(xerc20NonRegistered).balanceOf(address(adapter)), adapterInitialAmount - _amount);
   }
 }
