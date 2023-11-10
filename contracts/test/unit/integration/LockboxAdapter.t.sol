@@ -96,8 +96,8 @@ contract LockboxAdapterTest is TestHelper {
   function test_LockboxAdapter__xcall_revertsIfZeroAmount() public {
     utils_setUpEthereum();
     vm.selectFork(ethereumForkId);
-
-    vm.expectRevert(abi.encodePacked("Amount must be greater than 0"));
+    bytes4 AmountLessThanZeroSelector = bytes4(keccak256("AmountLessThanZero()"));
+    vm.expectRevert(abi.encodePacked(AmountLessThanZeroSelector));
     vm.startPrank(USER_CHAIN_A);
     adapter.xcall(_destination, _to, erc20, _delegate, 0, _slippage, _callData);
     vm.stopPrank();
@@ -112,7 +112,8 @@ contract LockboxAdapterTest is TestHelper {
     vm.mockCall(registry, abi.encodeWithSelector(IXERC20Registry.getLockbox.selector, erc20), abi.encode(lockbox));
     vm.mockCall(lockbox, abi.encodeWithSelector(IXERC20Lockbox.IS_NATIVE.selector), abi.encode(true));
 
-    vm.expectRevert(abi.encodePacked("Value sent must be at least equal to the amount specified"));
+    bytes4 ValueLessThanAmountSelector = bytes4(keccak256("ValueLessThanAmount(uint256,uint256)"));
+    vm.expectRevert(abi.encodePacked(ValueLessThanAmountSelector, abi.encode(_amount - 1, _amount)));
     vm.startPrank(USER_CHAIN_A);
     adapter.xcall{value: _amount - 1}(_destination, _to, erc20, _delegate, _amount, _slippage, _callData);
     vm.stopPrank();
@@ -204,8 +205,8 @@ contract LockboxAdapterTest is TestHelper {
   function test_LockboxAdapter__xReceive_revertsIfNotConnext() public {
     utils_setUpEthereum();
     vm.selectFork(ethereumForkId);
-
-    vm.expectRevert(abi.encodePacked("Can only be called by Connext"));
+    bytes4 NotConnextSelector = bytes4(keccak256("NotConnext(address)"));
+    vm.expectRevert(abi.encodePacked(NotConnextSelector, abi.encode(address(this))));
     adapter.xReceive(bytes32(0), _amount, xerc20, USER_CHAIN_A, 1869640809, abi.encode(USER_CHAIN_A));
   }
 

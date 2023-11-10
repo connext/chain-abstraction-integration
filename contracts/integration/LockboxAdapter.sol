@@ -26,9 +26,14 @@ contract LockboxAdapter is IXReceiver {
   // ERRORS
   error Forwarder__is__not__Adapter(address sender);
   error IXERC20Adapter_WithdrawFailed();
+  error NotConnext(address sender);
+  error AmountLessThanZero();
+  error ValueLessThanAmount(uint256 value, uint256 amount);
 
   modifier onlyConnext() {
-    require(msg.sender == connext, "Can only be called by Connext");
+    if (msg.sender != connext) {
+      revert NotConnext(msg.sender);
+    }
     _;
   }
 
@@ -54,7 +59,9 @@ contract LockboxAdapter is IXReceiver {
     uint256 _slippage,
     bytes calldata _callData
   ) external payable returns (bytes32) {
-    require(_amount > 0, "Amount must be greater than 0");
+    if (_amount <= 0) {
+      revert AmountLessThanZero();
+    }
 
     address xerc20 = IXERC20Registry(registry).getXERC20(_asset);
     address lockbox = IXERC20Registry(registry).getLockbox(_asset);
@@ -62,7 +69,9 @@ contract LockboxAdapter is IXReceiver {
 
     uint256 _relayerFee;
     if (isNative) {
-      require(msg.value >= _amount, "Value sent must be at least equal to the amount specified");
+      if (msg.value < _amount) {
+        revert ValueLessThanAmount(msg.value, _amount);
+      }
 
       // Assume the rest of msg.value is the relayer fee
       _relayerFee = msg.value - _amount;
@@ -112,15 +121,13 @@ contract LockboxAdapter is IXReceiver {
     address lockbox = IXERC20Registry(registry).getLockbox(_asset);
     address erc20 = IXERC20Registry(registry).getERC20(_asset);
     bool isNative = IXERC20Lockbox(lockbox).IS_NATIVE();
+    IERC20(_asset).approve(lockbox, _amount);
+    IXERC20Lockbox(lockbox).withdraw(_amount);
 
     if (isNative) {
-      IERC20(_asset).approve(lockbox, _amount);
-      IXERC20Lockbox(lockbox).withdraw(_amount);
       (bool _success, ) = payable(_recipient).call{value: _amount}("");
       if (!_success) revert IXERC20Adapter_WithdrawFailed();
     } else {
-      IERC20(_asset).approve(lockbox, _amount);
-      IXERC20Lockbox(lockbox).withdraw(_amount);
       SafeERC20.safeTransfer(IERC20(erc20), _recipient, _amount);
     }
   }
