@@ -64,7 +64,7 @@ contract LockboxAdapter is IXReceiver {
     }
 
     address xerc20 = IXERC20Registry(registry).getXERC20(_asset);
-    address lockbox = IXERC20Registry(registry).getLockbox(_asset);
+    address lockbox = IXERC20Registry(registry).getLockbox(xerc20);
     bool isNative = IXERC20Lockbox(lockbox).IS_NATIVE();
 
     uint256 _relayerFee;
