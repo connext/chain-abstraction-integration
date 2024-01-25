@@ -18,10 +18,11 @@ lcov.info
 yarn-debug.log*
 yarn-error.log*
 
-# broadcasts
-!/broadcast
-/broadcast/*
-/broadcast/*/31337/
+# Keep the latest deployment only
+broadcast/*
+!broadcast/**/
+broadcast/**/*.json
+!broadcast/**/run-latest.json
 
 node_modules
 .env
