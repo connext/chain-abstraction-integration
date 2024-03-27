@@ -15,14 +15,6 @@ interface IXERC20Registry {
 }
 
 interface L1StandardBridge {
-  function bridgeERC20(
-    address _localToken,
-    address _remoteToken,
-    uint256 _amount,
-    uint32 _minGasLimit,
-    bytes calldata _extraData
-  ) external;
-
   function bridgeERC20To(
     address _localToken,
     address _remoteToken,
@@ -47,34 +39,6 @@ contract LockboxAdapterBlast {
   constructor(address _blastStandardBridge, address _registry) {
     blastStandardBridge = _blastStandardBridge;
     registry = _registry;
-  }
-
-  /// @dev Combines Lockbox deposit and Blast bridge's BridgeERC20 call.
-  /// @param _erc20 The address of the adopted ERC20 on the origin chain.
-  /// @param _remoteToken The address of the asset to be received on the destination chain.
-  /// @param _amount The amount of asset to bridge.
-  /// @param _minGasLimit Minimum amount of gas that the bridge can be relayed with.
-  /// @param _extraData Extra data to be sent with the transaction.
-  function bridge(
-    address _erc20,
-    address _remoteToken,
-    uint256 _amount,
-    uint32 _minGasLimit,
-    bytes calldata _extraData
-  ) external {
-    if (_amount <= 0) {
-      revert AmountLessThanZero();
-    }
-    address xerc20 = IXERC20Registry(registry).getXERC20(_erc20);
-    if(xerc20 != _remoteToken) {
-        revert InvalidRemoteToken(_remoteToken); 
-    }
-    address lockbox = IXERC20Registry(registry).getLockbox(xerc20);
-    SafeERC20.safeTransferFrom(IERC20(_erc20), msg.sender, address(this), _amount);
-    IERC20(_erc20).approve(lockbox, _amount);
-    IXERC20Lockbox(lockbox).deposit(_amount);
-    IERC20(xerc20).approve(blastStandardBridge, _amount);
-    L1StandardBridge(blastStandardBridge).bridgeERC20(xerc20, _remoteToken, _amount, _minGasLimit, _extraData);
   }
 
   /// @dev Combines Lockbox deposit and Blast bridge's BridgeERC20To call.
