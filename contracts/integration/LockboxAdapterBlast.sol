@@ -3,8 +3,8 @@ pragma solidity ^0.8.13;
 
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { IXERC20 } from "../../xERC20/interfaces/IXERC20.sol";
-import { IXERC20Lockbox } from "../../xERC20/interfaces/IXERC20Lockbox.sol";
+import { IXERC20 } from "../shared/IXERC20/IXERC20.sol";
+import { IXERC20Lockbox } from "../shared/IXERC20/IXERC20Lockbox.sol";
 
 interface IXERC20Registry {
     function getXERC20(address erc20) external view returns (address xerc20);
